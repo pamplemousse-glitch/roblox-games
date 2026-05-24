@@ -1,0 +1,272 @@
+-- Handles the Hot Dog Ring skill-check: renders the ring UI, captures input,
+-- fires SkillCheckResult back to the server.
+
+local Players           = game:GetService("Players")
+local UserInputService  = game:GetService("UserInputService")
+local TweenService      = game:GetService("TweenService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local Common    = ReplicatedStorage:WaitForChild("Common")
+local Constants = require(Common:WaitForChild("Constants"))
+local Types     = require(Common:WaitForChild("Types"))
+
+local ContestController = {}
+
+local remotes: { [string]: RemoteEvent } = {}
+local localPlayer = Players.LocalPlayer
+local playerGui   = localPlayer:WaitForChild("PlayerGui")
+
+-- ── Ring UI ───────────────────────────────────────────────────────────────────
+-- Built entirely from code so Rojo sync doesn't need art assets for MVP.
+
+local ringGui: ScreenGui
+local ringFrame: Frame
+local arcImage: ImageLabel  -- placeholder arc (solid arc drawn via Frame rotation)
+local needleFrame: Frame
+local feedbackLabel: TextLabel
+
+local RING_SIZE = UDim2.fromOffset(220, 220)
+local CENTER    = UDim2.new(0.5, 0, 0.5, 0)
+
+local function buildRingGui()
+	ringGui = Instance.new("ScreenGui")
+	ringGui.Name            = "RingGui"
+	ringGui.ResetOnSpawn    = false
+	ringGui.IgnoreGuiInset  = true
+	ringGui.Enabled         = false
+	ringGui.Parent          = playerGui
+
+	-- Outer circle background
+	local bg = Instance.new("Frame")
+	bg.Name              = "RingBg"
+	bg.Size              = RING_SIZE
+	bg.Position          = UDim2.new(0.5, -110, 0.5, -110)
+	bg.BackgroundColor3  = Color3.fromRGB(30, 30, 30)
+	bg.BorderSizePixel   = 0
+	bg.Parent            = ringGui
+	Instance.new("UICorner", bg).CornerRadius = UDim.new(1, 0)
+	ringFrame = bg
+
+	-- Green success arc (rotated frame = visual approximation for MVP)
+	local arc = Instance.new("Frame")
+	arc.Name              = "Arc"
+	arc.Size              = UDim2.new(0.8, 0, 0.8, 0)
+	arc.Position          = UDim2.new(0.1, 0, 0.1, 0)
+	arc.BackgroundColor3  = Color3.fromRGB(80, 220, 80)
+	arc.BorderSizePixel   = 0
+	arc.Rotation          = 0
+	arc.Parent            = bg
+	arc.BackgroundTransparency = 0.4
+	Instance.new("UICorner", arc).CornerRadius = UDim.new(1, 0)
+	arcImage = arc :: any
+
+	-- Gold great-zone ring (inner)
+	local great = Instance.new("Frame")
+	great.Name              = "GreatArc"
+	great.Size              = UDim2.new(0.6, 0, 0.6, 0)
+	great.Position          = UDim2.new(0.2, 0, 0.2, 0)
+	great.BackgroundColor3  = Color3.fromRGB(255, 200, 0)
+	great.BorderSizePixel   = 0
+	great.Rotation          = 0
+	great.Parent            = bg
+	great.BackgroundTransparency = 0.6
+	Instance.new("UICorner", great).CornerRadius = UDim.new(1, 0)
+
+	-- Needle (thin frame rotated from center)
+	local needle = Instance.new("Frame")
+	needle.Name              = "Needle"
+	needle.Size              = UDim2.fromOffset(4, 90)
+	needle.Position          = UDim2.new(0.5, -2, 0.5, -90)
+	needle.BackgroundColor3  = Color3.fromRGB(255, 60, 60)
+	needle.BorderSizePixel   = 0
+	needle.Rotation          = 0
+	needle.Parent            = bg
+	needleFrame = needle
+
+	-- Feedback label
+	local lbl = Instance.new("TextLabel")
+	lbl.Name                = "Feedback"
+	lbl.Size                = UDim2.fromOffset(220, 40)
+	lbl.Position            = UDim2.new(0.5, -110, 0.5, 120)
+	lbl.BackgroundTransparency = 1
+	lbl.TextColor3          = Color3.new(1, 1, 1)
+	lbl.TextScaled          = true
+	lbl.Font                = Enum.Font.GothamBold
+	lbl.Text                = ""
+	lbl.Parent              = ringGui
+	feedbackLabel = lbl
+
+	-- "HIT HERE" onboarding label
+	local hitLabel = Instance.new("TextLabel")
+	hitLabel.Name  = "HitHere"
+	hitLabel.Size  = UDim2.fromOffset(160, 30)
+	hitLabel.Position = UDim2.new(0.5, -80, 0.5, -145)
+	hitLabel.BackgroundTransparency = 1
+	hitLabel.TextColor3 = Color3.fromRGB(255, 220, 0)
+	hitLabel.TextScaled = true
+	hitLabel.Font       = Enum.Font.GothamBold
+	hitLabel.Text       = "HIT HERE ↓"
+	hitLabel.Visible    = false
+	hitLabel.Parent     = ringGui
+end
+
+-- ── Active ring state ─────────────────────────────────────────────────────────
+
+local activeRing: Types.SkillCheckParams? = nil
+local needleAngle = 0   -- degrees, updated every frame
+local ringConn: RBXScriptConnection?
+local inputConn: RBXScriptConnection?
+local hitThisRing = false
+
+local function clearRing()
+	activeRing = nil
+	hitThisRing = false
+	ringGui.Enabled = false
+	feedbackLabel.Text = ""
+	if ringConn then ringConn:Disconnect(); ringConn = nil end
+	if inputConn then inputConn:Disconnect(); inputConn = nil end
+end
+
+local function showFeedback(text: string, color: Color3)
+	feedbackLabel.Text       = text
+	feedbackLabel.TextColor3 = color
+	task.delay(0.6, function()
+		if feedbackLabel then feedbackLabel.Text = "" end
+	end)
+end
+
+local function isInArc(angle: number, arcStart: number, arcWidth: number): (boolean, boolean)
+	-- Normalize angle into [0, 360)
+	local a = angle % 360
+	local s = arcStart % 360
+	local e = (s + arcWidth) % 360
+
+	local inArc: boolean
+	if s <= e then
+		inArc = a >= s and a <= e
+	else
+		inArc = a >= s or a <= e
+	end
+
+	if not inArc then return false, false end
+
+	-- Great zone: center ±RING_GREAT_WIDTH/2
+	local center = (s + arcWidth / 2) % 360
+	local half   = Constants.RING_GREAT_WIDTH / 2
+	local diff   = math.abs((a - center + 540) % 360 - 180)
+	return true, diff <= half
+end
+
+local function startRing(params: Types.SkillCheckParams)
+	activeRing   = params
+	hitThisRing  = false
+	needleAngle  = 0
+	ringGui.Enabled = true
+
+	-- Show onboarding hint for first N bites
+	local hitHere = ringGui:FindFirstChild("HitHere") :: TextLabel?
+	if hitHere then
+		-- Only visible if server sends biteIndex ≤ threshold
+		hitHere.Visible = (params.biteIndex <= Constants.ONBOARDING_HIT_LABEL_BITES)
+	end
+
+	-- Position arc visually
+	arcImage.Rotation = params.arcStart
+
+	-- Needle rotation loop
+	local startTime = tick()
+	ringConn = game:GetService("RunService").RenderStepped:Connect(function()
+		if not activeRing then return end
+		local elapsed = tick() - startTime
+		needleAngle   = (elapsed * params.needleSpeed) % 360
+		needleFrame.Rotation = needleAngle
+	end)
+
+	-- Input: tap/click fires the result
+	inputConn = UserInputService.InputBegan:Connect(function(input, processed)
+		if processed then return end
+		if input.UserInputType ~= Enum.UserInputType.MouseButton1
+			and input.UserInputType ~= Enum.UserInputType.Touch then
+			return
+		end
+		if hitThisRing or not activeRing then return end
+		hitThisRing = true
+
+		local hit, isGreat = isInArc(needleAngle, params.arcStart, params.arcWidth)
+		local alignment = 0.0
+		if hit then
+			-- alignment: 1.0 at center, 0.5 at edge
+			local center = (params.arcStart + params.arcWidth / 2) % 360
+			local diff   = math.abs((needleAngle - center + 540) % 360 - 180)
+			alignment    = 1 - (diff / (params.arcWidth / 2)) * 0.5
+			alignment    = math.clamp(alignment, 0, 1)
+		end
+
+		local result: Types.SkillCheckResult = {
+			arenaId   = params.arenaId,
+			biteIndex = params.biteIndex,
+			hit       = hit,
+			alignment = alignment,
+			isGreat   = isGreat,
+		}
+		remotes.SkillCheckResult:FireServer(result)
+
+		if isGreat then
+			showFeedback("GREAT!", Color3.fromRGB(255, 200, 0))
+		elseif hit then
+			showFeedback("GOOD", Color3.fromRGB(100, 255, 100))
+		else
+			showFeedback("MISS", Color3.fromRGB(255, 80, 80))
+		end
+
+		-- Ring clears after brief visual pause
+		task.delay(0.2, clearRing)
+	end)
+
+	-- Auto-expire
+	task.delay(params.duration + 0.1, function()
+		if activeRing == params then
+			clearRing()
+		end
+	end)
+end
+
+-- ── ContestPhase listener (enable/disable ring input) ────────────────────────
+
+local activeArenaId: number? = nil
+
+local function onPhaseChanged(arenaId: number, state: string)
+	activeArenaId = if state ~= "Idle" then arenaId else nil
+
+	if state == "Queuing" then
+		-- Server guards against double-joins; safe to fire every broadcast
+		remotes.JoinQueue:FireServer(arenaId)
+	end
+
+	if state ~= "Active" then
+		clearRing()
+	end
+end
+
+-- ── Init ─────────────────────────────────────────────────────────────────────
+
+function ContestController.init(remotesFolder: Folder)
+	remotes.SkillCheckStart    = remotesFolder:WaitForChild("SkillCheckStart")   :: RemoteEvent
+	remotes.SkillCheckResult   = remotesFolder:WaitForChild("SkillCheckResult")  :: RemoteEvent
+	remotes.ContestPhaseChanged = remotesFolder:WaitForChild("ContestPhaseChanged") :: RemoteEvent
+	remotes.JoinQueue           = remotesFolder:WaitForChild("JoinQueue")          :: RemoteEvent
+
+	buildRingGui()
+
+	remotes.SkillCheckStart.OnClientEvent:Connect(function(params: any)
+		if activeArenaId == params.arenaId then
+			startRing(params)
+		end
+	end)
+
+	remotes.ContestPhaseChanged.OnClientEvent:Connect(function(arenaId: any, state: any)
+		onPhaseChanged(arenaId, state)
+	end)
+end
+
+return ContestController

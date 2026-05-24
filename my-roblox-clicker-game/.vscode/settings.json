@@ -1,0 +1,15 @@
+{
+  "luau-lsp.sourcemap.autogenerate": true,
+  "luau-lsp.sourcemap.enabled": true,
+  "[lua]": {
+    "editor.defaultFormatter": "JohnnyMorganz.stylua",
+    "editor.formatOnSave": true,
+    "editor.tabSize": 4
+  },
+  "selene.lintOn": "save",
+  "search.exclude": {
+    "**/.git": true,
+    "**/node_modules": true,
+    "**/packages": true
+  }
+}

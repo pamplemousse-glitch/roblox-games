@@ -1,0 +1,23 @@
+{
+  "name": "CompetitiveEating",
+  "tree": {
+    "$className": "DataModel",
+    "ServerScriptService": {
+      "$className": "ServerScriptService",
+      "$path": "src/Server"
+    },
+    "ReplicatedStorage": {
+      "$className": "ReplicatedStorage",
+      "Common": {
+        "$path": "src/Common"
+      }
+    },
+    "StarterPlayer": {
+      "$className": "StarterPlayer",
+      "StarterPlayerScripts": {
+        "$className": "StarterPlayerScripts",
+        "$path": "src/Client"
+      }
+    }
+  }
+}

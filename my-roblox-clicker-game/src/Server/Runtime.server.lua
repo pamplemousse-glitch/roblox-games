@@ -1,0 +1,1 @@
+-- Template leftover — disabled. FunGuy uses GameInit.server.luau instead.

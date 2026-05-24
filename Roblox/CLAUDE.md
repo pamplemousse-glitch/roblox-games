@@ -1,0 +1,1 @@
+Answer as tersely as possible, as though each word costs money.
