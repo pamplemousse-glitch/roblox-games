@@ -11,7 +11,7 @@ local RideController = {}
 local SPIN_RIDES = {
 	{ name = "Carousel",       rps = 0.35, gallopAmplitude = 0.75, gallopFreq = 0.6 },
 	{ name = "TeacupRide",     rps = 0.55 },
-	{ name = "SwingCarousel",  rps = 0.30, rampSecs = 20 }, -- ramps from 0
+	{ name = "SwingCarousel",  rps = 0.30, rampSecs = 20, swingOutAmplitude = 4.5 }, -- ramps from 0; chairs swing out
 	{ name = "TiltAWhirl",     rps = 0.75 },
 }
 
@@ -46,10 +46,12 @@ local SCRAMBLER_SUB_RPS  = -0.84  -- sub-hub counter-rotation (3× main, opposit
 -- ── Types ─────────────────────────────────────────────────────────────────────
 
 type HorseGallop   = { parts: { BasePart }, seat: Seat?, phase: number, prevOffset: number }
+type ChairSwing    = { parts: { BasePart }, chains: { BasePart }, seat: Seat?, prevOffset: number }
 type SpinState     = { model: Model, angle: number, rps: number, currentRps: number,
                        rampRate: number, baseCF: CFrame,
                        gallopAmplitude: number?, gallopFreq: number?,
-                       horses: { HorseGallop }?, totalTime: number? }
+                       horses: { HorseGallop }?, totalTime: number?,
+                       swingOutAmplitude: number?, chairs: { ChairSwing }? }
 type PendulumState = { model: Model, amp: number, freq: number, t: number, baseCF: CFrame, axis: string }
 type CoasterState  = {
 	cartModel  : Model,
@@ -600,6 +602,41 @@ function RideController.init(remotesFolder: Folder)
 			end
 		end
 
+		-- Optional swing-out: chairs translate radially outward as ride speeds up.
+		local swingAmp = (cfg :: any).swingOutAmplitude :: number?
+		if swingAmp then
+			local chairs: { ChairSwing } = {}
+			for i = 1, 16 do
+				local group = m:FindFirstChild("ChairGroup_" .. i)
+				if group and group:IsA("Model") then
+					local parts: { BasePart } = {}
+					local chains: { BasePart } = {}
+					local seat: Seat? = nil
+					for _, ch in group:GetChildren() do
+						if ch:IsA("Seat") then
+							seat = ch :: Seat
+						elseif ch:IsA("BasePart") then
+							if ch.Name:match("^Chain") then
+								table.insert(chains, ch :: BasePart)
+							else
+								table.insert(parts, ch :: BasePart)
+							end
+						end
+					end
+					if #parts > 0 then
+						table.insert(chairs, {
+							parts      = parts,
+							chains     = chains,
+							seat       = seat,
+							prevOffset = 0,
+						})
+					end
+				end
+			end
+			spinState.chairs            = chairs
+			spinState.swingOutAmplitude = swingAmp
+		end
+
 		table.insert(spinList, spinState)
 	end
 
@@ -788,6 +825,42 @@ function RideController.init(remotesFolder: Folder)
 			end
 			s.angle += s.currentRps * dt
 			s.model:PivotTo(s.baseCF * CFrame.Angles(0, s.angle, 0))
+
+			-- Chair swing-out: radial outward translation proportional to currentRps.
+			-- Reads each chair's current world XZ to derive radial direction, so the
+			-- offset rotates correctly with the spin.
+			local chairs = s.chairs
+			if chairs then
+				local amp = s.swingOutAmplitude :: number
+				local desiredMag = (s.rps > 0 and s.currentRps / s.rps or 0) * amp
+				local centerX = s.baseCF.Position.X
+				local centerZ = s.baseCF.Position.Z
+				for _, c in chairs do
+					local anchor = c.parts[1]
+					local relX = anchor.Position.X - centerX
+					local relZ = anchor.Position.Z - centerZ
+					local mag = math.sqrt(relX*relX + relZ*relZ)
+					if mag > 0.1 then
+						local radX = relX / mag
+						local radZ = relZ / mag
+						local delta = desiredMag - c.prevOffset
+						local offset = Vector3.new(radX * delta, 0, radZ * delta)
+						for _, p in c.parts do
+							p.CFrame = p.CFrame + offset
+						end
+						local seat = c.seat
+						if seat then
+							seat.CFrame = seat.CFrame + offset
+						end
+						-- Chains move half so they tilt visually (rim anchor stays put-ish)
+						local halfOffset = Vector3.new(radX * delta * 0.5, 0, radZ * delta * 0.5)
+						for _, ch in c.chains do
+							ch.CFrame = ch.CFrame + halfOffset
+						end
+						c.prevOffset = desiredMag
+					end
+				end
+			end
 
 			-- Horse gallop: per-horse Y oscillation overlaid on the spin.
 			-- PivotTo above rotates parts around Y axis only (no Y change), so
