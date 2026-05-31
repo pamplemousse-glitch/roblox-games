@@ -28,7 +28,7 @@ local PENDULUM_RIDES = {
 	-- pivotY: override WorldPivot Y to this value instead of part centroid
 	-- (needed when static support frame inflates centroid away from true swing axis)
 	-- axis: "X" or "Z" — rotation axis perpendicular to ship's length
-	{ name = "PirateShipRide", amplitude = 0.55, frequency = 0.7, pivotY = 26, axis = "Z" },
+	{ name = "PirateShipRide", amplitude = 0.55, frequency = 0.7, pivotY = 28, axis = "Z" },
 }
 
 local COASTER_SPEED = 28
