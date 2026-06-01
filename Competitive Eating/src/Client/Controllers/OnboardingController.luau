@@ -27,11 +27,11 @@ local function buildTutorial()
 	tutorialGui.Enabled        = false
 	tutorialGui.Parent         = playerGui
 
-	-- Full-screen dim
+	-- Light dim so the tutorial popup pops without darkening the whole world
 	local dim = Instance.new("Frame")
 	dim.Size              = UDim2.new(1, 0, 1, 0)
 	dim.BackgroundColor3  = Color3.new(0, 0, 0)
-	dim.BackgroundTransparency = 0.55
+	dim.BackgroundTransparency = 0.75  -- was 0.55 (too dark)
 	dim.BorderSizePixel   = 0
 	dim.Parent            = tutorialGui
 
