@@ -55,6 +55,43 @@ return function(parent: Instance, originCF: CFrame): Model
 	AB.wedge(Vector3.new(0.4, 1.2, 0.5), SUCC_GREEN,
 		AB.offset(originCF, 0, 4.7, 0), model, "LeafCenter")
 
+	-- Two cast handles on the sides of the belly (small terracotta arches)
+	AB.block(Vector3.new(0.3, 0.8, 0.3), TERRA_DARK,
+		AB.offset(originCF, -2.1, 2.2, 0), model, "HandleL")
+	AB.block(Vector3.new(0.3, 0.8, 0.3), TERRA_DARK,
+		AB.offset(originCF,  2.1, 2.2, 0), model, "HandleR")
+
+	-- Decorative zigzag pattern around the belly (4 small zigzag accents above and below the ring)
+	for i = 1, 4 do
+		local angle = (i - 1) * (math.pi / 2) + (math.pi / 4)
+		local x = math.cos(angle) * 2.05
+		local z = math.sin(angle) * 2.05
+		AB.block(Vector3.new(0.3, 0.3, 0.2), FIESTA_YEL,
+			AB.offset(originCF, x, 2.6, z) * CFrame.Angles(0, -angle, math.rad(45)),
+			model, "ZigUpper_" .. i)
+		AB.block(Vector3.new(0.3, 0.3, 0.2), AGAVE_TEAL,
+			AB.offset(originCF, x, 1.2, z) * CFrame.Angles(0, -angle, math.rad(45)),
+			model, "ZigLower_" .. i)
+	end
+
+	-- A small pink succulent bloom on the central leaf (neon for night)
+	local bloom = AB.sphere(0.4, Color3.fromRGB(220, 80, 140),
+		AB.offset(originCF, 0, 5.4, 0), model, "Bloom")
+	AB.neon(bloom)
+	AB.glow(bloom, Color3.fromRGB(220, 80, 140), 1.0)
+
+	-- A small painted base ring around the bottom
+	AB.cylinder(3.6, 0.2, FIESTA_YEL,
+		AB.offset(originCF, 0, 0.5, 0), model, "BaseRing")
+
+	-- Tiny "watch out" pebbles around the rim soil (3 small dark spheres)
+	for i = 1, 3 do
+		local a = (i - 1) * (2 * math.pi / 3)
+		AB.sphere(0.2, TERRA_DARK,
+			AB.offset(originCF, math.cos(a) * 0.9, 4.0, math.sin(a) * 0.9),
+			model, "Pebble_" .. i)
+	end
+
 	AB.pivot(model, base)
 	AB.weldAll(model)
 	return model

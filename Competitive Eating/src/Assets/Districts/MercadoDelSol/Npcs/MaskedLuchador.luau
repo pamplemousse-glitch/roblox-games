@@ -90,6 +90,50 @@ return function(parent: Instance, originCF: CFrame): Model
 			model, "BootStripe_" .. (side == -1 and "L" or "R"))
 	end
 
+	-- Lightning bolt detail on chest (3-segment zigzag)
+	AB.block(Vector3.new(0.4, 0.6, 0.12), FIESTA_YEL,
+		AB.offset(originCF, -0.3, 2.4, 0.68) * CFrame.Angles(0, 0, math.rad(20)),
+		model, "BoltSeg1")
+	AB.block(Vector3.new(0.4, 0.6, 0.12), FIESTA_YEL,
+		AB.offset(originCF, 0.05, 1.8, 0.68) * CFrame.Angles(0, 0, math.rad(-25)),
+		model, "BoltSeg2")
+	AB.block(Vector3.new(0.4, 0.6, 0.12), FIESTA_YEL,
+		AB.offset(originCF, 0.35, 1.2, 0.68) * CFrame.Angles(0, 0, math.rad(20)),
+		model, "BoltSeg3")
+
+	-- Championship belt center gem (neon for night visibility)
+	local gem = AB.sphere(0.35, BOUG_PINK,
+		AB.offset(originCF, 0, 0.2, 0.85), model, "BeltGem")
+	AB.neon(gem)
+	AB.glow(gem, BOUG_PINK, 1.4)
+
+	-- Mask laces at the back (3 horizontal stripes)
+	for i = 1, 3 do
+		AB.block(Vector3.new(0.8, 0.1, 0.12), WHITE,
+			AB.offset(originCF, 0, 3.4 + i * 0.4, -0.85),
+			model, "MaskLace_" .. i)
+	end
+
+	-- Wristband on raised arm (gold)
+	AB.cylinder(1.15, 0.4, FIESTA_YEL,
+		AB.offset(originCF, -2.5, 4.7, 0) * CFrame.Angles(math.rad(-20), 0, math.rad(-25)),
+		model, "WristbandL")
+	-- Wristband on hand at side
+	AB.cylinder(1.15, 0.4, FIESTA_YEL,
+		AB.offset(originCF, 1.95, 0.5, 0),
+		model, "WristbandR")
+
+	-- Cape clasp at neck
+	AB.sphere(0.35, FIESTA_YEL,
+		AB.offset(originCF, 0, 3.0, -0.75), model, "CapeClasp")
+
+	-- Knuckle dots on raised fist (suggests fingers)
+	for k = 1, 4 do
+		AB.sphere(0.18, SKIN_MED,
+			AB.offset(originCF, -2.6 + (k - 2) * 0.18, 5.85, 0.15),
+			model, "Knuckle_" .. k)
+	end
+
 	-- Nametag
 	local head = model:FindFirstChild("Head") :: BasePart
 	if head then AB.billboard(head, "El Rayo Loco", Vector2.new(220, 36), 3.0) end

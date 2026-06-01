@@ -41,6 +41,42 @@ return function(parent: Instance, originCF: CFrame): Model
 			AB.offset(originCF, x - 0.35, 8.3, 0), model, "Notch_" .. i .. "_a")
 		AB.block(Vector3.new(0.3, 0.3, 0.15), NOTCH_BLACK,
 			AB.offset(originCF, x + 0.35, 8.3, 0), model, "Notch_" .. i .. "_b")
+		-- Center decorative cutout (sun motif suggestion)
+		AB.block(Vector3.new(0.2, 0.2, 0.15), NOTCH_BLACK,
+			AB.offset(originCF, x, 8.9, 0), model, "NotchTop_" .. i)
+		-- Scalloped fringe at the bottom (3 tiny accent blocks below each flag)
+		for s = 1, 3 do
+			AB.block(Vector3.new(0.15, 0.15, 0.12), color,
+				AB.offset(originCF, x - 0.4 + (s - 1) * 0.4, 8.1, 0),
+				model, "Fringe_" .. i .. "_" .. s)
+		end
+	end
+
+	-- Decorative pole caps (top of each pole)
+	local capL = AB.sphere(0.6, FIESTA_YEL,
+		AB.offset(originCF, -5, 10.2, 0), model, "CapL")
+	AB.neon(capL)
+	AB.glow(capL, FIESTA_YEL, 1.2)
+	local capR = AB.sphere(0.6, BOUG_PINK,
+		AB.offset(originCF,  5, 10.2, 0), model, "CapR")
+	AB.neon(capR)
+	AB.glow(capR, BOUG_PINK, 1.2)
+
+	-- Small wooden base wedges at each pole foot
+	AB.block(Vector3.new(1.2, 0.4, 1.2), WOOD_DARK,
+		AB.offset(originCF, -5, 0.2, 0), model, "BaseL")
+	AB.block(Vector3.new(1.2, 0.4, 1.2), WOOD_DARK,
+		AB.offset(originCF,  5, 0.2, 0), model, "BaseR")
+
+	-- Second smaller string of mini flags above the rope (decorative layer)
+	AB.cylinder(0.12, 9, ROPE_TAN,
+		AB.offset(originCF, 0, 10.4, 0) * CFrame.Angles(0, 0, math.rad(90)),
+		model, "RopeUpper")
+	for i = 1, 4 do
+		local mx = -3 + (i - 1) * 2
+		local mc = FLAG_COLORS[((i - 1) % #FLAG_COLORS) + 2 > #FLAG_COLORS and 1 or ((i - 1) % #FLAG_COLORS) + 2]
+		AB.block(Vector3.new(0.8, 0.5, 0.08), mc,
+			AB.offset(originCF, mx, 9.9, 0), model, "MiniFlag_" .. i)
 	end
 
 	AB.pivot(model, leftPole)
