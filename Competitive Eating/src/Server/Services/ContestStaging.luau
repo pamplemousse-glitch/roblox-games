@@ -32,11 +32,29 @@ local arenaState: { [number]: any } = {}
 
 -- ── Visual config ────────────────────────────────────────────────────────────
 
-local CHAIR_X        = { -42, -30, -18, -6, 6, 18, 30, 42 }
-local CHAIR_Y        = 5.0  -- top of chair pad
-local CHAIR_Z        = -193.5
-local TABLE_TOP_Y    = 6.0
-local PILE_Z         = -201.0
+-- Chair positions are LOOKED UP from workspace at spawn time, not hardcoded.
+-- The ContestStage_T1 model may have been moved/shifted by builders or
+-- auto-recovery; hardcoded coordinates drift fast.
+local function getChairPositions(): { Vector3 }
+	local stage = workspace:FindFirstChild("ContestStage_T1")
+	if not stage then return {} end
+	local out = {}
+	for i = 1, 8 do
+		local c = stage:FindFirstChild("Chair_" .. i)
+		if c and c:IsA("BasePart") then out[i] = c.Position end
+	end
+	return out
+end
+
+local function getTableTopY(): number
+	local stage = workspace:FindFirstChild("ContestStage_T1")
+	local t = stage and stage:FindFirstChild("ContestTable")
+	if t and t:IsA("BasePart") then return t.Position.Y + t.Size.Y / 2 end
+	return 6.0
+end
+
+local TABLE_TOP_Y    = 6.0  -- updated at spawn time
+local PILE_Z_OFFSET  = -8   -- studs in front of chair Z (toward table)
 local PILE_INITIAL_H = 6.0  -- studs tall when full
 local PILE_RADIUS    = 1.8
 
@@ -66,21 +84,20 @@ local FOOD_COLOR: { [string]: Color3 } = {
 -- ── Helpers ──────────────────────────────────────────────────────────────────
 
 local function seatIndexFor(arena: Types.Arena, contestantIdx: number): number
-	-- arena.id 1 → seats 1..SEATS_PER_ARENA
-	-- arena.id 2 → seats (SEATS+1)..(2*SEATS)
-	-- mod-wrapped if exceeds 8
 	local base = (arena.id - 1) * Constants.SEATS_PER_ARENA
 	local seat = base + contestantIdx
-	if seat > #CHAIR_X then seat = ((seat - 1) % #CHAIR_X) + 1 end
+	if seat > 8 then seat = ((seat - 1) % 8) + 1 end
 	return seat
 end
 
-local function makePile(seatIdx: number, foodName: string, parent: Instance): Part
+local function makePile(chairPos: Vector3, tableTopY: number, foodName: string, parent: Instance, seatIdx: number): Part
 	local color = FOOD_COLOR[foodName] or Color3.fromRGB(220, 180, 100)
 	local pile = Instance.new("Part")
 	pile.Shape          = Enum.PartType.Cylinder
 	pile.Size           = Vector3.new(PILE_INITIAL_H, PILE_RADIUS * 2, PILE_RADIUS * 2)
-	pile.CFrame         = CFrame.new(CHAIR_X[seatIdx], TABLE_TOP_Y + PILE_INITIAL_H / 2, PILE_Z) * CFrame.Angles(0, 0, math.rad(90))
+	-- Pile sits on the table in front of the chair (between chair and table center)
+	local pileZ = chairPos.Z + PILE_Z_OFFSET
+	pile.CFrame         = CFrame.new(chairPos.X, tableTopY + PILE_INITIAL_H / 2, pileZ) * CFrame.Angles(0, 0, math.rad(90))
 	pile.Color          = color
 	pile.Material       = Enum.Material.SmoothPlastic
 	pile.Anchored       = true
@@ -92,13 +109,12 @@ local function makePile(seatIdx: number, foodName: string, parent: Instance): Pa
 	return pile
 end
 
-local function makeNpcRig(seatIdx: number, npcName: string, parent: Instance): Model
+local function makeNpcRig(chairPos: Vector3, npcName: string, parent: Instance, seatIdx: number): Model
 	local model = Instance.new("Model")
 	model.Name = "NpcRig_" .. seatIdx
 
-	local x = CHAIR_X[seatIdx]
-	local sitY = CHAIR_Y + 1.5
-	local baseCF = CFrame.new(x, sitY, CHAIR_Z) * CFrame.Angles(0, math.rad(180), 0) -- face -Z (table)
+	local sitY = chairPos.Y + 1.5
+	local baseCF = CFrame.new(chairPos.X, sitY, chairPos.Z) * CFrame.Angles(0, math.rad(180), 0)
 
 	-- Torso
 	local torso = Instance.new("Part")
@@ -176,33 +192,40 @@ end
 -- ── Public API ───────────────────────────────────────────────────────────────
 
 function ContestStaging.spawnArena(arena: Types.Arena)
-	-- Clean up any leftover from prior contest on same arena
 	ContestStaging.cleanupArena(arena)
 
 	local folder = Instance.new("Folder")
 	folder.Name   = "ArenaStaging_" .. arena.id
 	folder.Parent = workspace
 
+	-- Look up chair positions LIVE so we follow wherever the builder put them
+	local chairPositions = getChairPositions()
+	local tableTopY = getTableTopY()
+
 	local state = {
 		folder              = folder,
 		rigs                = {},
 		piles               = {},
 		consumedPerSeat     = {},
+		chairPositions      = chairPositions,
+		tableTopY           = tableTopY,
 	}
 
 	for i, c in arena.contestants do
 		local seatIdx = seatIndexFor(arena, i)
-		state.piles[seatIdx] = makePile(seatIdx, arena.currentFood, folder)
+		local chairPos = chairPositions[seatIdx]
+		if not chairPos then continue end
+
+		state.piles[seatIdx] = makePile(chairPos, tableTopY, arena.currentFood, folder, seatIdx)
 		state.consumedPerSeat[seatIdx] = 0
 
 		if c.isNpc then
-			state.rigs[seatIdx] = makeNpcRig(seatIdx, c.npcName or "NPC", folder)
+			state.rigs[seatIdx] = makeNpcRig(chairPos, c.npcName or "NPC", folder, seatIdx)
 		else
-			-- Player gets teleported to their chair, no rig needed
 			local player = Players:GetPlayerByUserId(c.userId)
 			if player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
 				local hrp = player.Character.HumanoidRootPart
-				hrp.CFrame = CFrame.new(CHAIR_X[seatIdx], CHAIR_Y + 3, CHAIR_Z) * CFrame.Angles(0, math.rad(180), 0)
+				hrp.CFrame = CFrame.new(chairPos.X, chairPos.Y + 3, chairPos.Z) * CFrame.Angles(0, math.rad(180), 0)
 			end
 		end
 	end
@@ -220,12 +243,14 @@ function ContestStaging.onConsume(arena: Types.Arena, contestantIdx: number)
 	if not pile or not pile.Parent then return end
 
 	state.consumedPerSeat[seatIdx] += 1
-	-- Shrink pile: assume pile starts able to feed 30 items. Scale Y proportionally.
 	local remaining = math.max(0, 1 - (state.consumedPerSeat[seatIdx] / 30))
 	local newH = math.max(0.6, PILE_INITIAL_H * remaining)
+	local chairPos = state.chairPositions[seatIdx]
+	if not chairPos then return end
+	local pileZ = chairPos.Z + PILE_Z_OFFSET
 	TweenService:Create(pile, TweenInfo.new(0.15, Enum.EasingStyle.Quad), {
 		Size  = Vector3.new(newH, PILE_RADIUS * 2, PILE_RADIUS * 2),
-		CFrame = CFrame.new(CHAIR_X[seatIdx], TABLE_TOP_Y + newH / 2, PILE_Z) * CFrame.Angles(0, 0, math.rad(90)),
+		CFrame = CFrame.new(chairPos.X, state.tableTopY + newH / 2, pileZ) * CFrame.Angles(0, 0, math.rad(90)),
 	}):Play()
 
 	-- Bob the contestant's head
@@ -241,10 +266,10 @@ function ContestStaging.cleanupArena(arena: Types.Arena)
 	arenaState[arena.id] = nil
 end
 
--- Tell controllers / staging which seat a contestant is in (for client-side
--- player character bob). Returns the chair X coordinate so client can compute.
 function ContestStaging.getSeatX(arena: Types.Arena, contestantIdx: number): number?
-	return CHAIR_X[seatIndexFor(arena, contestantIdx)]
+	local positions = getChairPositions()
+	local pos = positions[seatIndexFor(arena, contestantIdx)]
+	return pos and pos.X or nil
 end
 
 return ContestStaging
