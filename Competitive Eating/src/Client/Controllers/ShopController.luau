@@ -31,60 +31,62 @@ local coinLabel: TextLabel
 local toggleBtn: TextButton
 local statRows: { [string]: { level: TextLabel, cost: TextLabel, btn: TextButton } } = {}
 
-local PANEL_W = 320
-local PANEL_H = 340
-local ROW_H   = 60
+local PANEL_W = 440
+local PANEL_H = 360
+local ROW_H   = 64
 
 local function makeStatRow(stat: string, index: number, parent: Frame)
 	local y = (index - 1) * ROW_H + 10
 
 	-- Background row
 	local row = Instance.new("Frame")
-	row.Size              = UDim2.new(1, -16, 0, ROW_H - 4)
+	row.Size              = UDim2.new(1, -16, 0, ROW_H - 6)
 	row.Position          = UDim2.fromOffset(8, y)
 	row.BackgroundColor3  = Color3.fromRGB(35, 35, 35)
 	row.BorderSizePixel   = 0
 	row.Parent            = parent
 	Instance.new("UICorner", row).CornerRadius = UDim.new(0, 6)
 
-	-- Stat name
+	-- Stat name (left half)
 	local nameLabel = Instance.new("TextLabel")
-	nameLabel.Size              = UDim2.fromOffset(140, ROW_H - 8)
-	nameLabel.Position          = UDim2.fromOffset(8, 0)
+	nameLabel.Size              = UDim2.fromOffset(180, ROW_H - 18)
+	nameLabel.Position          = UDim2.new(0, 14, 0.5, -(ROW_H - 18) / 2)
 	nameLabel.BackgroundTransparency = 1
 	nameLabel.TextColor3        = Color3.new(1, 1, 1)
 	nameLabel.TextScaled        = true
-	nameLabel.Font              = Enum.Font.Gotham
+	nameLabel.Font              = Enum.Font.GothamBold
 	nameLabel.Text              = Constants.STAT_DISPLAY[stat] or stat
 	nameLabel.TextXAlignment    = Enum.TextXAlignment.Left
 	nameLabel.Parent            = row
 
 	-- Level display
 	local lvlLabel = Instance.new("TextLabel")
-	lvlLabel.Size              = UDim2.fromOffset(50, ROW_H - 8)
-	lvlLabel.Position          = UDim2.fromOffset(148, 0)
+	lvlLabel.Size              = UDim2.fromOffset(60, 22)
+	lvlLabel.Position          = UDim2.fromOffset(202, 8)
 	lvlLabel.BackgroundTransparency = 1
 	lvlLabel.TextColor3        = Color3.fromRGB(180, 220, 255)
 	lvlLabel.TextScaled        = true
 	lvlLabel.Font              = Enum.Font.GothamBold
 	lvlLabel.Text              = "Lv 0"
+	lvlLabel.TextXAlignment    = Enum.TextXAlignment.Left
 	lvlLabel.Parent            = row
 
-	-- Cost label
+	-- Cost label (below level)
 	local costLabel = Instance.new("TextLabel")
-	costLabel.Size              = UDim2.fromOffset(55, ROW_H - 8)
-	costLabel.Position          = UDim2.fromOffset(196, 0)
+	costLabel.Size              = UDim2.fromOffset(60, 18)
+	costLabel.Position          = UDim2.fromOffset(202, 32)
 	costLabel.BackgroundTransparency = 1
 	costLabel.TextColor3        = Color3.fromRGB(255, 220, 80)
 	costLabel.TextScaled        = true
 	costLabel.Font              = Enum.Font.Gotham
 	costLabel.Text              = "50c"
+	costLabel.TextXAlignment    = Enum.TextXAlignment.Left
 	costLabel.Parent            = row
 
-	-- Buy button
+	-- Buy button (right side)
 	local btn = Instance.new("TextButton")
-	btn.Size              = UDim2.fromOffset(50, 28)
-	btn.Position          = UDim2.new(1, -58, 0.5, -14)
+	btn.Size              = UDim2.fromOffset(80, 36)
+	btn.Position          = UDim2.new(1, -94, 0.5, -18)
 	btn.BackgroundColor3  = Color3.fromRGB(60, 160, 60)
 	btn.TextColor3        = Color3.new(1, 1, 1)
 	btn.TextScaled        = true
@@ -107,6 +109,7 @@ local function buildShopGui()
 	shopGui.ResetOnSpawn   = false
 	shopGui.IgnoreGuiInset = true
 	shopGui.Enabled        = false
+	shopGui.DisplayOrder   = 100  -- above all toggle buttons (Cookbook=5, PhotoMode=50)
 	shopGui.Parent         = playerGui
 
 	-- Dark overlay — only visible while the shop panel is open
@@ -131,25 +134,26 @@ local function buildShopGui()
 	shopPanel = panel
 	Instance.new("UICorner", panel).CornerRadius = UDim.new(0, 12)
 
-	-- Title
+	-- Title — capped width so the coin counter has room
 	local title = Instance.new("TextLabel")
-	title.Size              = UDim2.new(1, 0, 0, 40)
-	title.Position          = UDim2.fromOffset(0, 0)
+	title.Size              = UDim2.fromOffset(220, 32)
+	title.Position          = UDim2.fromOffset(12, 8)
 	title.BackgroundTransparency = 1
 	title.TextColor3        = Color3.fromRGB(255, 220, 80)
 	title.TextScaled        = true
 	title.Font              = Enum.Font.GothamBold
 	title.Text              = "UPGRADE SHOP"
+	title.TextXAlignment    = Enum.TextXAlignment.Left
 	title.Parent            = panel
 
-	-- Coin display
+	-- Coin display — top-right of panel
 	local coinLbl = Instance.new("TextLabel")
-	coinLbl.Size              = UDim2.fromOffset(160, 28)
-	coinLbl.Position          = UDim2.new(1, -168, 0, 8)
+	coinLbl.Size              = UDim2.fromOffset(80, 24)
+	coinLbl.Position          = UDim2.new(1, -130, 0, 12)
 	coinLbl.BackgroundTransparency = 1
 	coinLbl.TextColor3        = Color3.fromRGB(255, 220, 80)
 	coinLbl.TextScaled        = true
-	coinLbl.Font              = Enum.Font.GothamBold
+	coinLbl.Font              = Enum.Font.Gotham
 	coinLbl.Text              = "0 coins"
 	coinLbl.TextXAlignment    = Enum.TextXAlignment.Right
 	coinLbl.Parent            = panel
