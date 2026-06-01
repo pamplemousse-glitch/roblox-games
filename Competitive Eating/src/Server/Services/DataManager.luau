@@ -138,6 +138,24 @@ function DataManager.addCoins(player: Player, amount: number)
 	dirty[player.UserId] = true
 end
 
+-- ── Style Bucks (premium currency — purchased w/ Robux, spent on cosmetics) ──
+
+function DataManager.addStyleBucks(player: Player, amount: number)
+	local data = cache[player.UserId]
+	if not data then return end
+	data.styleBucks = math.max(0, (data.styleBucks or 0) + amount)
+	dirty[player.UserId] = true
+end
+
+function DataManager.spendStyleBucks(player: Player, amount: number): boolean
+	local data = cache[player.UserId]
+	if not data then return false end
+	if (data.styleBucks or 0) < amount then return false end
+	data.styleBucks = data.styleBucks - amount
+	dirty[player.UserId] = true
+	return true
+end
+
 function DataManager.spendCoins(player: Player, amount: number): boolean
 	local data = cache[player.UserId]
 	if not data then return false end

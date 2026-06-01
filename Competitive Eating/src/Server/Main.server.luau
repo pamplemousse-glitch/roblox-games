@@ -23,6 +23,22 @@ local remoteNames = {
 	-- Shop / stats
 	"PurchaseUpgrade",      -- client → server
 	"StatsUpdate",          -- server → client
+	-- Mini-games
+	"StartMiniGame",        -- client → server
+	"MiniGameChallenge",    -- server → client
+	"MiniGameThrow",        -- client → server
+	"MiniGameResult",       -- server → client
+	-- Vendors
+	"OpenShop",             -- server → client
+	"OpenPrizeBooth",       -- server → client
+	-- Tickets
+	"AddTickets",           -- server → client
+	-- Cosmetics
+	"BuyCosmetic",          -- client → server
+	"EquipCosmetic",        -- client → server
+	"CosmeticBought",       -- server → client
+	-- Coaster
+	"CoasterFade",          -- server → client  (true = fade-in, false = fade-out)
 }
 
 for _, name in remoteNames do
@@ -35,12 +51,22 @@ end
 
 local Services = script.Parent.Services
 
-local DataManager    = require(Services.DataManager)
-local PlayerService  = require(Services.PlayerService)
-local UpgradeService = require(Services.UpgradeService)
-local ContestService = require(Services.ContestService)
+local DataManager      = require(Services.DataManager)
+local PlayerService    = require(Services.PlayerService)
+local UpgradeService   = require(Services.UpgradeService)
+local ContestService   = require(Services.ContestService)
+local MiniGameService    = require(Services.MiniGameService)
+local NpcVendorService   = require(Services.NpcVendorService)
+local CosmeticsService   = require(Services.CosmeticsService)
+local MonetizationService = require(Services.MonetizationService)
+local RideController     = require(Services.RideController)
 
 DataManager.init()
 PlayerService.init(remotesFolder)
+MonetizationService.init()
 UpgradeService.init(remotesFolder)
 ContestService.init(remotesFolder)
+MiniGameService.init(remotesFolder)
+NpcVendorService.init(remotesFolder)
+CosmeticsService.init(remotesFolder)
+RideController.init(remotesFolder)
