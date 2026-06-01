@@ -249,6 +249,8 @@ function ShopController.init(remotesFolder: Folder)
 	remotes.PurchaseUpgrade     = remotesFolder:WaitForChild("PurchaseUpgrade")     :: RemoteEvent
 	remotes.StatsUpdate         = remotesFolder:WaitForChild("StatsUpdate")         :: RemoteEvent
 	remotes.ContestPhaseChanged = remotesFolder:WaitForChild("ContestPhaseChanged") :: RemoteEvent
+	remotes.OpenShop            = remotesFolder:WaitForChild("OpenShop")            :: RemoteEvent
+	remotes.OpenPrizeBooth      = remotesFolder:WaitForChild("OpenPrizeBooth")      :: RemoteEvent
 
 	buildShopGui()
 	shopPanel.Visible = false
@@ -267,6 +269,14 @@ function ShopController.init(remotesFolder: Folder)
 		else
 			toggleBtn.Visible = true
 		end
+	end)
+
+	-- NPC vendor proximity prompts route through these.
+	remotes.OpenShop.OnClientEvent:Connect(function()
+		ShopController.open()
+	end)
+	remotes.OpenPrizeBooth.OnClientEvent:Connect(function()
+		ShopController.open()
 	end)
 end
 

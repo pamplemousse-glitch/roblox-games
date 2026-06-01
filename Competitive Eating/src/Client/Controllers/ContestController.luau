@@ -330,17 +330,25 @@ local function onPhaseChanged(arenaId: number, state: string)
 	end
 end
 
--- Wire ProximityPrompts on the contest stage to trigger JoinQueue.
+-- Wire contest stage ProximityPrompts → JoinQueue. Chairs may replicate to the
+-- client AFTER controller init, so we also listen for DescendantAdded.
 local function setupContestPrompts()
 	local stage = workspace:WaitForChild("ContestStage_T1", 60)
-	if not stage then return end
-	for _, desc in stage:GetDescendants() do
-		if desc:IsA("ProximityPrompt") then
-			desc.Triggered:Connect(function()
-				remotes.JoinQueue:FireServer(nil) -- server picks first available arena
+	if not stage then
+		warn("[ContestController] ContestStage_T1 not found")
+		return
+	end
+	local function connectPrompt(inst: Instance)
+		if inst:IsA("ProximityPrompt") then
+			inst.Triggered:Connect(function()
+				remotes.JoinQueue:FireServer(nil)
 			end)
 		end
 	end
+	for _, desc in stage:GetDescendants() do
+		connectPrompt(desc)
+	end
+	stage.DescendantAdded:Connect(connectPrompt)
 end
 
 -- ── Init ─────────────────────────────────────────────────────────────────────

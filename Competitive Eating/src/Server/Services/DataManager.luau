@@ -37,6 +37,15 @@ function DataManager.init()
 			end
 		end
 	end)
+
+	-- Shutdown flush: server shutdown gives ~30s to persist; save every dirty player.
+	game:BindToClose(function()
+		for userId, isDirty in dirty do
+			if isDirty then
+				DataManager._save(userId)
+			end
+		end
+	end)
 end
 
 -- ── Load ─────────────────────────────────────────────────────────────────────

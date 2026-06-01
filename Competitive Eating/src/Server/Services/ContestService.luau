@@ -321,7 +321,8 @@ local function runQueuing(arena: Types.Arena)
 		local timeLeft    = math.max(0, math.floor(deadline - tick()))
 		local seatsTaken  = #arena.contestants
 		for _, player in Players:GetPlayers() do
-			remotes.ContestPhaseChanged:FireClient(player, arena.id, "Queuing", arena.tier, arena.currentFood, nil, seatsTaken, timeLeft)
+			-- 8-arg signature: (arenaId, state, tier, food, announcement, _unused, seatCount, queueTimeLeft)
+			remotes.ContestPhaseChanged:FireClient(player, arena.id, "Queuing", arena.tier, arena.currentFood, nil, nil, seatsTaken, timeLeft)
 		end
 	end
 
@@ -483,10 +484,8 @@ end
 -- ── JoinQueue / LeaveQueue ────────────────────────────────────────────────────
 
 local function onJoinQueue(player: Player, requestedArenaId: any)
-	-- Prevent double-joining
 	if playerArena[player.UserId] then return end
 
-	-- Find the queuing arena (prefer requested, else first available)
 	local target: Types.Arena? = nil
 	if type(requestedArenaId) == "number" then
 		local a = getArena(requestedArenaId)
@@ -517,7 +516,8 @@ local function onJoinQueue(player: Player, requestedArenaId: any)
 	table.insert(target.contestants, contestant)
 	playerArena[player.UserId] = target.id
 
-	remotes.ContestPhaseChanged:FireClient(player, target.id, "Queuing", target.tier, target.currentFood)
+	-- 8-arg signature: (arenaId, state, tier, food, announcement, _unused, seatCount, queueTimeLeft)
+	remotes.ContestPhaseChanged:FireClient(player, target.id, "Queuing", target.tier, target.currentFood, nil, nil, #target.contestants, 0)
 end
 
 local function onLeaveQueue(player: Player)

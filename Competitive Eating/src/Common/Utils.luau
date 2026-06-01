@@ -69,6 +69,8 @@ end
 function Utils.defaultPlayerData(): any
 	return {
 		coins          = 0,
+		carnivalTickets = 0,
+		styleBucks     = 0,
 		totalWins      = 0,
 		contestsPlayed = 0,
 		stats = {
@@ -77,13 +79,17 @@ function Utils.defaultPlayerData(): any
 			SwallowRate     = 0,
 			Focus           = 0,
 		},
+		statXp           = {},
 		highestTier      = 1,
 		winStreak        = 0,
 		lastWinDate      = "",
 		firstContestDone = false,
+		ownedCosmetics   = {},
+		equippedCosmetics = {},
 		npcEncounters    = {},
 		cookbook         = {},
 		cookbookCoinBonus = 0,
+		friendVaultBalance = 0,
 		tournamentProgress = {
 			currentStage = 1,
 			objectives   = {},
