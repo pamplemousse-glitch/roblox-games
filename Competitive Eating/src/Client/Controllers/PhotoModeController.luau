@@ -153,7 +153,7 @@ local function buildUI()
 	toggleBtn = Instance.new("TextButton")
 	toggleBtn.Name                  = "ToggleButton"
 	toggleBtn.Size                  = UDim2.fromOffset(56, 56)
-	toggleBtn.Position              = UDim2.new(0, 20, 0, 152)  -- top-left, below VAULT (which is below BOOK)
+	toggleBtn.Position              = UDim2.new(0, 20, 0, 208)  -- below VAULT (which is at y=144, 56h)
 	toggleBtn.BackgroundColor3      = Color3.fromRGB(20, 20, 20)
 	toggleBtn.BackgroundTransparency = 0.25
 	toggleBtn.TextColor3            = Color3.new(1, 1, 1)
