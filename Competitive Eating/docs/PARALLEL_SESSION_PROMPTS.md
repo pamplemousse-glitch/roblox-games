@@ -2,14 +2,27 @@
 
 Each prompt below is one full district. Copy/paste into a fresh Claude Code terminal window. Run all 5 in parallel.
 
+## ⚠️ MANDATORY: each session uses its own git worktree
+
+Parallel sessions sharing `~/Roblox/` directly will contaminate each other's branches — when one runs `git checkout`, the swap affects all of them. **Every session must create a worktree before doing any work.**
+
 ## Launch protocol
 
 ```bash
 # In a NEW terminal window for EACH session:
-cd ~/Roblox && claude --dangerously-skip-permissions
+cd ~/Roblox
+git fetch origin
+git worktree add ../<district-shortname>-wt -b feature/district-<full-name> origin/main
+cd ../<district-shortname>-wt
+claude --dangerously-skip-permissions
 ```
 
-Then paste the corresponding prompt below into the session.
+Where `<district-shortname>` is e.g. `tokyo`, `donut`, `burger`, `bbq`, `mercado`. The session then operates EXCLUSIVELY in that worktree path.
+
+After the session finishes + pushes, the coordinator (you) cleans up:
+```bash
+cd ~/Roblox && git worktree remove ../<district-shortname>-wt
+```
 
 ---
 
