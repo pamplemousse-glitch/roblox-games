@@ -98,6 +98,11 @@ return {
 	{ module = "Assets.Districts.PizzaPlaza.Decor.PepperGrinderStack",        position = Vector3.new(1280, 0, 90) },
 	{ module = "Assets.Districts.PizzaPlaza.Decor.CandleHolderRow",           position = Vector3.new(1300, 0, 90) },
 
+	-- Landmarks (3 monumental anchors at z=130) ----------------------------
+	{ module = "Assets.Districts.PizzaPlaza.Landmarks.BaroqueArchEntry",      position = Vector3.new(800, 0, 130), yaw = 0 },
+	{ module = "Assets.Districts.PizzaPlaza.Landmarks.TreviFountain",         position = Vector3.new(900, 0, 130), yaw = 0 },
+	{ module = "Assets.Districts.PizzaPlaza.Landmarks.GiantPizzaOven",        position = Vector3.new(1000, 0, 130), yaw = 0 },
+
 	-- ============================================================
 	-- TOKYO TOWN (base X = 1100) — Japanese Street genre
 	-- ============================================================
