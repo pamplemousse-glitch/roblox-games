@@ -15,22 +15,10 @@ return {
 	-- PIZZA PLAZA (X = 2000) — Italian-American genre — WORKED EXAMPLE
 	-- ============================================================
 
-	{ module = "Assets.Districts.PizzaPlaza.Foods.PizzaSlice",   position = Vector3.new(2000, 6,    0) },
-	{ module = "Assets.Districts.PizzaPlaza.Foods.Calzone",      position = Vector3.new(2010, 6,    0) },
-	{ module = "Assets.Districts.PizzaPlaza.Foods.MeatballSub",  position = Vector3.new(2020, 6,    0) },
-	{ module = "Assets.Districts.PizzaPlaza.Foods.GarlicBread",  position = Vector3.new(2030, 6,    0) },
-	{ module = "Assets.Districts.PizzaPlaza.Foods.PastaBowl",    position = Vector3.new(2040, 6,    0) },
-
-	{ module = "Assets.Districts.PizzaPlaza.Buildings.PizzaParlor",     position = Vector3.new(2000, 0,  100), yaw = 0 },
-	{ module = "Assets.Districts.PizzaPlaza.Buildings.GelatoStand",     position = Vector3.new(2050, 0,  100), yaw = 0 },
-	{ module = "Assets.Districts.PizzaPlaza.Buildings.OperaArchEntry",  position = Vector3.new(2000, 0, -100), yaw = 0 },
-	{ module = "Assets.Districts.PizzaPlaza.Buildings.WoodFiredOven",   position = Vector3.new(2100, 0,    0), yaw = 0 },
-	{ module = "Assets.Districts.PizzaPlaza.Buildings.PiazzaFountain",  position = Vector3.new(1950, 0,    0), yaw = 0 },
-
-	{ module = "Assets.Districts.PizzaPlaza.Npcs.Vinny",   position = Vector3.new(2000, 6, 30) },
-	{ module = "Assets.Districts.PizzaPlaza.Npcs.Tony",    position = Vector3.new(2020, 6, 30) },
-	{ module = "Assets.Districts.PizzaPlaza.Npcs.Carmela", position = Vector3.new(2040, 6, 30) },
-	{ module = "Assets.Districts.PizzaPlaza.Npcs.Sal",     position = Vector3.new(2060, 6, 30) },
+	-- Only the 2 built modules registered for now; the other 12 are TODO (Pizza
+	-- Plaza was a worked-example district, not a fully built one).
+	{ module = "Assets.Districts.PizzaPlaza.Foods.PizzaSlice",      position = Vector3.new(2000, 6,    0) },
+	{ module = "Assets.Districts.PizzaPlaza.Buildings.PizzaParlor", position = Vector3.new(2000, 0,  100), yaw = 0 },
 
 	-- ============================================================
 	-- TOKYO TOWN (X = 4000) — Japanese Street genre
