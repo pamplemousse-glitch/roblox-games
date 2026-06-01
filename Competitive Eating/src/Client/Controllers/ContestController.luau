@@ -5,6 +5,8 @@ local Players           = game:GetService("Players")
 local UserInputService  = game:GetService("UserInputService")
 local TweenService      = game:GetService("TweenService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local SoundService      = game:GetService("SoundService")
+local HapticService     = game:GetService("HapticService")
 
 local Common    = ReplicatedStorage:WaitForChild("Common")
 local Constants = require(Common:WaitForChild("Constants"))
@@ -25,8 +27,20 @@ local arcImage: ImageLabel  -- placeholder arc (solid arc drawn via Frame rotati
 local needleFrame: Frame
 local feedbackLabel: TextLabel
 
-local RING_SIZE = UDim2.fromOffset(220, 220)
-local CENTER    = UDim2.new(0.5, 0, 0.5, 0)
+-- Ring size scales by device. Touch (mobile/tablet) gets ~1.5× larger
+-- because fingers are imprecise vs cursor and tap zones need real estate.
+local function isTouchDevice(): boolean
+	return UserInputService.TouchEnabled and not UserInputService.MouseEnabled
+end
+
+local RING_PX        = isTouchDevice() and 320 or 220
+local RING_HALF      = RING_PX / 2
+local RING_SIZE      = UDim2.fromOffset(RING_PX, RING_PX)
+local NEEDLE_LEN     = math.floor(RING_PX * 0.4)
+local NEEDLE_THICK   = isTouchDevice() and 6 or 4
+local FEEDBACK_W     = math.floor(RING_PX * 1.0)
+local FEEDBACK_H     = isTouchDevice() and 56 or 40
+local CENTER         = UDim2.new(0.5, 0, 0.5, 0)
 
 local function buildRingGui()
 	ringGui = Instance.new("ScreenGui")
@@ -40,7 +54,7 @@ local function buildRingGui()
 	local bg = Instance.new("Frame")
 	bg.Name              = "RingBg"
 	bg.Size              = RING_SIZE
-	bg.Position          = UDim2.new(0.5, -110, 0.5, -110)
+	bg.Position          = UDim2.new(0.5, -RING_HALF, 0.5, -RING_HALF)
 	bg.BackgroundColor3  = Color3.fromRGB(30, 30, 30)
 	bg.BorderSizePixel   = 0
 	bg.Parent            = ringGui
@@ -75,8 +89,8 @@ local function buildRingGui()
 	-- Needle (thin frame rotated from center)
 	local needle = Instance.new("Frame")
 	needle.Name              = "Needle"
-	needle.Size              = UDim2.fromOffset(4, 90)
-	needle.Position          = UDim2.new(0.5, -2, 0.5, -90)
+	needle.Size              = UDim2.fromOffset(NEEDLE_THICK, NEEDLE_LEN)
+	needle.Position          = UDim2.new(0.5, -math.floor(NEEDLE_THICK/2), 0.5, -NEEDLE_LEN)
 	needle.BackgroundColor3  = Color3.fromRGB(255, 60, 60)
 	needle.BorderSizePixel   = 0
 	needle.Rotation          = 0
@@ -86,8 +100,8 @@ local function buildRingGui()
 	-- Feedback label
 	local lbl = Instance.new("TextLabel")
 	lbl.Name                = "Feedback"
-	lbl.Size                = UDim2.fromOffset(220, 40)
-	lbl.Position            = UDim2.new(0.5, -110, 0.5, 120)
+	lbl.Size                = UDim2.fromOffset(FEEDBACK_W, FEEDBACK_H)
+	lbl.Position            = UDim2.new(0.5, -math.floor(FEEDBACK_W/2), 0.5, RING_HALF + 10)
 	lbl.BackgroundTransparency = 1
 	lbl.TextColor3          = Color3.new(1, 1, 1)
 	lbl.TextScaled          = true
@@ -210,6 +224,16 @@ local function startRing(params: Types.SkillCheckParams)
 			isGreat   = isGreat,
 		}
 		remotes.SkillCheckResult:FireServer(result)
+
+		-- Haptic feedback on mobile (haptic motor pulse)
+		if UserInputService.TouchEnabled and HapticService and HapticService:IsVibrationSupported(Enum.UserInputType.Gamepad1) then
+			pcall(function()
+				HapticService:SetMotor(Enum.UserInputType.Gamepad1, Enum.VibrationMotor.Small, isGreat and 1.0 or (hit and 0.4 or 0))
+				task.delay(0.08, function()
+					HapticService:SetMotor(Enum.UserInputType.Gamepad1, Enum.VibrationMotor.Small, 0)
+				end)
+			end)
+		end
 
 		if isGreat then
 			showFeedback("GREAT!", Color3.fromRGB(255, 200, 0))

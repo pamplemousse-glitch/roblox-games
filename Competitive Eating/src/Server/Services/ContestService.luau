@@ -151,6 +151,45 @@ end
 
 -- ── SkillCheckResult handler ─────────────────────────────────────────────────
 
+-- Per-userId anti-cheat: track recent bite times to detect impossible speeds
+local lastBiteAt: { [number]: number } = {}
+local biteBurstWindow: { [number]: { number } } = {}
+
+local function antiCheatPassed(userId: number, biteIndex: number): boolean
+	local now = tick()
+
+	-- Floor: human reaction time minimum (sub-100ms = bot/script)
+	-- The ring is shown for RING_DURATION (1.5s); a fire within 100ms of start
+	-- is almost certainly automated. We track the time the ring became active
+	-- via pendingRings[userId].expiresAt - (RING_DURATION + grace).
+	-- Simpler practical check here: cap consecutive bite rate.
+
+	-- Rolling-window: max 12 bites in any 6-second span (already very generous —
+	-- normal optimal play is ~1 bite/sec at best).
+	local burst = biteBurstWindow[userId] or {}
+	-- Drop stale entries
+	local i = 1
+	while i <= #burst do
+		if burst[i] < now - 6 then table.remove(burst, i) else i += 1 end
+	end
+	if #burst >= 12 then
+		warn("[AntiCheat] " .. userId .. " exceeded bite-rate cap (12/6s)")
+		return false
+	end
+	table.insert(burst, now)
+	biteBurstWindow[userId] = burst
+
+	-- Floor: minimum 80ms between consecutive bite results
+	local last = lastBiteAt[userId]
+	if last and now - last < 0.08 then
+		warn("[AntiCheat] " .. userId .. " sub-80ms bite interval")
+		return false
+	end
+	lastBiteAt[userId] = now
+
+	return true
+end
+
 local function onSkillCheckResult(player: Player, result: any)
 	if type(result) ~= "table" then return end
 
@@ -159,6 +198,12 @@ local function onSkillCheckResult(player: Player, result: any)
 	if not ring then return end
 	if ring.biteIndex ~= result.biteIndex then return end
 	if tick() > ring.expiresAt then return end
+
+	-- Anti-cheat: validate before crediting the bite
+	if not antiCheatPassed(userId, result.biteIndex) then
+		pendingRings[userId] = nil
+		return
+	end
 
 	pendingRings[userId] = nil -- consume
 
