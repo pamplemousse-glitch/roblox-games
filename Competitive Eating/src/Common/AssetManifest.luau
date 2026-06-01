@@ -78,6 +78,27 @@ return {
 	{ module = "Assets.Districts.MercadoDelSol.Npcs.DonaRosa", position = Vector3.new(12080, 6, 30) },
 
 	-- ============================================================
-	-- Remaining districts to be merged in: TOKYO, DONUT, BBQ HOLLER
+	-- BBQ HOLLER (X = 10000) — American BBQ genre
+	-- ============================================================
+
+	{ module = "Assets.Districts.BbqHoller.Foods.Brisket",      position = Vector3.new(10010, 6,    0) },
+	{ module = "Assets.Districts.BbqHoller.Foods.PulledPork",   position = Vector3.new(10020, 6,    0) },
+	{ module = "Assets.Districts.BbqHoller.Foods.Ribs",         position = Vector3.new(10030, 6,    0) },
+	{ module = "Assets.Districts.BbqHoller.Foods.HotLink",      position = Vector3.new(10040, 6,    0) },
+	{ module = "Assets.Districts.BbqHoller.Foods.MacAndCheese", position = Vector3.new(10050, 6,    0) },
+
+	{ module = "Assets.Districts.BbqHoller.Buildings.SmokehouseShack", position = Vector3.new(10050, 0, 100), yaw = 0 },
+	{ module = "Assets.Districts.BbqHoller.Buildings.PicnicPavilion",  position = Vector3.new(10100, 0, 100), yaw = 0 },
+	{ module = "Assets.Districts.BbqHoller.Buildings.ChuckwagonStand", position = Vector3.new(10150, 0, 100), yaw = 0 },
+	{ module = "Assets.Districts.BbqHoller.Buildings.BarnLandmark",    position = Vector3.new(10200, 0, 100), yaw = 0 },
+	{ module = "Assets.Districts.BbqHoller.Buildings.FirepitCircle",   position = Vector3.new(10250, 0, 100), yaw = 0 },
+
+	{ module = "Assets.Districts.BbqHoller.Npcs.BigEarl",    position = Vector3.new(10020, 6, 30) },
+	{ module = "Assets.Districts.BbqHoller.Npcs.MamaHattie", position = Vector3.new(10040, 6, 30) },
+	{ module = "Assets.Districts.BbqHoller.Npcs.TexDiggs",   position = Vector3.new(10060, 6, 30) },
+	{ module = "Assets.Districts.BbqHoller.Npcs.SkinnyJoe",  position = Vector3.new(10080, 6, 30) },
+
+	-- ============================================================
+	-- Remaining districts to be merged: TOKYO TOWN, DONUT DYNASTY
 	-- ============================================================
 }
