@@ -65,6 +65,16 @@ function DataManager.load(player: Player): any
 		if data.version == nil then
 			data.version = 1
 		end
+		-- v1 currency unification: migrate any existing tickets to coins (2.5x ratio).
+		if data.carnivalTickets and data.carnivalTickets > 0 then
+			data.coins = (data.coins or 0) + math.floor(data.carnivalTickets * 2.5)
+			data.carnivalTickets = 0
+		elseif data.carnivalTickets == nil then
+			data.carnivalTickets = 0
+		end
+		if data.statXp == nil then
+			data.statXp = {}
+		end
 	else
 		data = Utils.defaultPlayerData()
 		if not ok then
@@ -180,6 +190,55 @@ function DataManager.recordContest(player: Player)
 	if not data.firstContestDone then
 		data.firstContestDone = true
 	end
+	dirty[player.UserId] = true
+end
+
+-- ── Carnival Ticket mutators ──────────────────────────────────────────────────
+
+function DataManager.addTickets(player: Player, amount: number)
+	local data = cache[player.UserId]
+	if not data then return end
+	data.carnivalTickets = math.max(0, (data.carnivalTickets or 0) + amount)
+	dirty[player.UserId] = true
+end
+
+function DataManager.spendTickets(player: Player, amount: number): boolean
+	local data = cache[player.UserId]
+	if not data then return false end
+	if (data.carnivalTickets or 0) < amount then return false end
+	data.carnivalTickets = data.carnivalTickets - amount
+	dirty[player.UserId] = true
+	return true
+end
+
+-- ── Stat XP ───────────────────────────────────────────────────────────────────
+-- Every 100 XP triggers an auto-upgrade attempt if the player can afford it.
+-- XP always accumulates even if upgrade fails (e.g. insufficient coins).
+
+local STAT_XP_PER_LEVEL = 100
+
+function DataManager.addStatXp(player: Player, statName: string, xp: number)
+	local data = cache[player.UserId]
+	if not data then return end
+
+	if not data.statXp then data.statXp = {} end
+	data.statXp[statName] = (data.statXp[statName] or 0) + xp
+
+	-- Attempt auto-upgrade for each full threshold crossed
+	while (data.statXp[statName] or 0) >= STAT_XP_PER_LEVEL do
+		local current = data.stats and (data.stats[statName] or 0) or 0
+		if current >= Constants.STAT_MAX_LEVEL then break end
+		local cost = Utils.upgradeCost(current)
+		if data.coins >= cost then
+			data.coins = data.coins - cost
+			data.stats[statName] = current + 1
+			data.statXp[statName] = (data.statXp[statName] or 0) - STAT_XP_PER_LEVEL
+		else
+			-- Can't afford; stop draining XP until they can
+			break
+		end
+	end
+
 	dirty[player.UserId] = true
 end
 
