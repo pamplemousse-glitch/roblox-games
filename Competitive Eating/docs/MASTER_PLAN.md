@@ -116,24 +116,89 @@
 
 ---
 
-## Districts unlock cadence
+## Map / district design — GENRE per map, not single dish (decision 2026-06-01)
+
+Each map is a culinary **genre**, not a single food. Single-dish maps run out
+of meaningful variants in ~10 entries; genre maps sustain 15-25 items with
+clear identity. Map theme provides aesthetic + brand, internal variety
+provides depth + replay.
+
+### Districts (5 contest foods per district, 4 tiers each = 20-25 dishes)
+
+| District | Genre | Sample tier-1 contest foods |
+|---|---|---|
+| Frank's Fairground (Hot Dog Boardwalk) | American Carnival | Hot Dog, Hamburger, Corn Dog, Pretzel Bites, Chicken Wings |
+| Pizza Plaza | Italian-American | Pizza Slice, Calzone, Meatball Sub, Garlic Bread, Pasta Bowl |
+| Donut Dynasty | Sweets / Pastries | Donut, Eclair, Churro, Beignet, Cinnamon Roll |
+| Tokyo Town | Japanese Street | Ramen, Gyoza, Takoyaki, Sushi Roll, Mochi |
+| Burger Boulevard | Burger Variants | Smashburger, Double-Stack, Slider Combo, Fried Chicken Sandwich, Milkshake |
+| Mercado del Sol (Mexico City Lot) | Mexican Street | Taco, Burrito, Quesadilla, Tamale, Elote |
+| BBQ Holler | American BBQ | Brisket, Pulled Pork, Ribs, Hot Link, Mac & Cheese |
+| Curry Lane | South Asian | Butter Chicken, Biryani, Samosa, Tandoori Wings, Naan |
+| Drink District | Liquid Challenges | Milkshake, Boba, Soda Float, Sangria, Bubble Tea |
+| Dessert Town | Frozen / Cake | Ice Cream Sundae, Cheesecake, Tiramisu, Birthday Cake, Soft Serve |
+| Patisserie Quarter | French | Croissant, Macaron, Pain au Chocolat, Crème Brûlée, Éclair Tower |
+| Underground Speakeasy | Bar Snacks | Wings, Sliders, Loaded Skins, Quesadilla, Fried Pickles |
+| Frank's Future (Cyberpunk) | Synthetic Future-Food | Algae Block, Insect Bar, Lab-Grown Wing, Neon Noodle, Vat Burger |
+
+### District unlock cadence
 
 | District | Unlock | Build cost | Ship target |
 |---|---|---|---|
-| Hot Dog Boardwalk | Starting | 0 (exists) | v1.0 |
+| Frank's Fairground | Starting | 0 (exists) | v1.0 |
 | Pizza Plaza | 50 wins | ~16-24 hrs | Week 4 |
-| Diner America | 100 wins | ~16-24 hrs | Week 6 |
-| Donut Dynasty | 200 wins | ~30-40 hrs | Week 8 |
-| Burger Boulevard | 300 wins | ~16-24 hrs | Week 12 |
-| Tokyo Town | 500 wins | ~30-40 hrs | Month 4 |
-| Patisserie Quarter | 750 wins | ~8-12 hrs | Month 5 |
-| BBQ Holler | 750 wins | ~8-12 hrs | Month 5 |
-| Mercado del Sol | 1000 wins | ~8-12 hrs | Month 6 |
-| Curry Lane | 1000 wins | ~8-12 hrs | Month 6 |
-| Drink District | 1500 wins | ~4-6 hrs | Month 7 |
-| Dessert Town | 2000 wins | ~4-6 hrs | Month 7 |
-| Underground Speakeasy | Mystery door reveal | ~4-6 hrs | Month 8 |
-| Frank's Future (Cyberpunk) | 3000 wins | ~16-24 hrs | Month 9 |
+| Burger Boulevard | 150 wins | ~16-24 hrs | Week 6 |
+| Donut Dynasty | 250 wins | ~24-32 hrs | Week 8 |
+| Tokyo Town | 400 wins | ~24-32 hrs | Month 3 |
+| BBQ Holler | 600 wins | ~16-24 hrs | Month 4 |
+| Mercado del Sol | 750 wins | ~16-24 hrs | Month 5 |
+| Curry Lane | 900 wins | ~16-24 hrs | Month 5 |
+| Patisserie Quarter | 1100 wins | ~12-16 hrs | Month 6 |
+| Dessert Town | 1300 wins | ~12-16 hrs | Month 6 |
+| Drink District | 1500 wins | ~8-12 hrs | Month 7 |
+| Underground Speakeasy | Mystery door | ~12-16 hrs | Month 8 |
+| Frank's Future | 3000 wins | ~16-24 hrs | Month 9 |
+
+---
+
+## Per-food specialized mini-mechanics (v2 depth feature)
+
+The base ring skill check (rhythm-based tap-on-beat) is the default. Selected
+"signature" foods get a **specialized mechanic** that replaces or augments the
+ring. This is what makes the game replay — players seek out foods they're
+good at, and entire content updates can introduce one new mechanic.
+
+### Examples per genre
+
+| Food | Genre | Specialized mechanic |
+|---|---|---|
+| Hot Dog | Carnival (Frank's) | Base ring (rhythm tap) — the canonical mechanic |
+| Pretzel Bites | Carnival | Rapid multi-target tap — 3 small dots appear, tap all 3 within 0.4s |
+| Chili Dog | Carnival | Heat tolerance gauge — manage spice meter alongside the ring |
+| Funnel Cake | Carnival | Powdered sugar haze obscures the ring — narrowed visibility, wider hit zone |
+| Wing Bucket | Carnival | Two-stage: select wing (left/right), then ring tap |
+| Footlong Hot Dog | Carnival | Needle speeds up as bite progresses — first 5 bites slow, last 5 frantic |
+| Bloomin' Onion | Carnival | Pull-layers-apart drag minigame replaces the ring entirely |
+| World's Hottest Wings | Carnival | Ring + cooldown gauge — must space bites to let the burn fade |
+| Pizza Slice | Italian | Cheese-pull threshold — tap once to bite, hold to stretch cheese, release at green |
+| Calzone | Italian | Fold-and-bite: trace a curved line around the calzone before tapping |
+| Ramen Bowl | Japanese | Chopstick swipe gesture (touch swipe / WASD direction) instead of tap |
+| Sushi Roll | Japanese | Memory pattern — server shows 3-tap rhythm, player repeats |
+| Takoyaki | Japanese | Heat-flip timing — flip each ball at right moment, 5 in sequence |
+| Donut | Sweets | Glaze-dip rhythm — tap matches dipping cadence |
+| Churro | Sweets | Bite-along-length — drag finger from one end to the other, hit checkpoints |
+| Birthday Cake | Dessert | Slice-and-eat — first cut a perfect slice, then eat |
+| Milkshake | Drinks | Suction strength gauge — hold tap, release at the right pressure |
+| Boba | Drinks | Catch-the-pearls — bouncing pearls in the cup, tap to catch each one |
+| Synthetic Burger | Future | Glitching ring — color flips, hit the correct color zone |
+
+### Implementation plan
+
+- **v1.0 ship**: All foods use base ring. Per-food mechanics scaffolded but use the ring stub.
+- **v1.2 (~2 weeks post-launch)**: Pick 3 specialized mechanics. Wire one per foodtype the player frequently encounters.
+- **v1.3-v2.0 cadence**: New mechanic every other content update. Each becomes a "viral moment" worth a TikTok clip.
+
+This is the path that turns "tap rings" into "Frank's has 14 districts each with 4-6 unique eating styles, you're never bored."
 
 ---
 
