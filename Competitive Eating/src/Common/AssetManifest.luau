@@ -280,4 +280,98 @@ return {
 	{ module = "Assets.Districts.MercadoDelSol.Npcs.Lucia",    position = Vector3.new(3140, 6, 30) },
 	{ module = "Assets.Districts.MercadoDelSol.Npcs.Memo",     position = Vector3.new(3160, 6, 30) },
 	{ module = "Assets.Districts.MercadoDelSol.Npcs.DonaRosa", position = Vector3.new(3180, 6, 30) },
+
+	-- ============================================================
+	-- DONUT DYNASTY V2 (base X = 2100) — Sweets/Pastries, fairy-tale
+	-- Robloxy primitives. ~80 placements across hero buildings,
+	-- backdrops, props, decor, landmarks, and pedestrian NPCs.
+	-- ============================================================
+
+	-- Hero buildings — main street row at Z = 100, spaced 50 studs
+	{ module = "Assets.Districts.DonutDynasty.V2.Buildings.LeGlacePastry",       position = Vector3.new(2080, 0, 100), yaw = 0 },
+	{ module = "Assets.Districts.DonutDynasty.V2.Buildings.SweetheartDonuts",    position = Vector3.new(2130, 0, 100), yaw = 0 },
+	{ module = "Assets.Districts.DonutDynasty.V2.Buildings.BeignetBayou",        position = Vector3.new(2180, 0, 100), yaw = 0 },
+	{ module = "Assets.Districts.DonutDynasty.V2.Buildings.CinnamonSpiralRollCo",position = Vector3.new(2230, 0, 100), yaw = 0 },
+	{ module = "Assets.Districts.DonutDynasty.V2.Buildings.CocoaAndCake",        position = Vector3.new(2280, 0, 100), yaw = 0 },
+
+	-- Backdrop buildings — further back, Z = 160-200
+	{ module = "Assets.Districts.DonutDynasty.V2.Buildings.PinkTownhouses",       position = Vector3.new(2100, 0, 180), yaw = 0 },
+	{ module = "Assets.Districts.DonutDynasty.V2.Buildings.SugarCrustedApartments", position = Vector3.new(2200, 0, 200), yaw = 0 },
+	{ module = "Assets.Districts.DonutDynasty.V2.Buildings.GingerbreadStorefronts", position = Vector3.new(2270, 0, 180), yaw = 0 },
+	{ module = "Assets.Districts.DonutDynasty.V2.Buildings.CandyCaneLampRow",     position = Vector3.new(2180, 0,  75), yaw = 0 },
+
+	-- Landmarks
+	{ module = "Assets.Districts.DonutDynasty.V2.Landmarks.GiantDonutTower",      position = Vector3.new(2180, 0,  20), yaw = 0 },
+	{ module = "Assets.Districts.DonutDynasty.V2.Landmarks.CandyCaneArchway",     position = Vector3.new(2080, 0,  60), yaw = 0 },
+	{ module = "Assets.Districts.DonutDynasty.V2.Landmarks.SugarSpireCastle",     position = Vector3.new(2330, 0, 220), yaw = 0 },
+	-- Keep v1 GlazeFountain (per spec) — reference v1 module at v2 position
+	{ module = "Assets.Districts.DonutDynasty.Buildings.GlazeFountain",            position = Vector3.new(2150, 0,  45), yaw = 0 },
+
+	-- Props: CandyCoatedBench (x4) — flanking sidewalks
+	{ module = "Assets.Districts.DonutDynasty.V2.Props.CandyCoatedBench", position = Vector3.new(2095, 2, 85),  yaw = 0 },
+	{ module = "Assets.Districts.DonutDynasty.V2.Props.CandyCoatedBench", position = Vector3.new(2155, 2, 85),  yaw = 0 },
+	{ module = "Assets.Districts.DonutDynasty.V2.Props.CandyCoatedBench", position = Vector3.new(2215, 2, 85),  yaw = 0 },
+	{ module = "Assets.Districts.DonutDynasty.V2.Props.CandyCoatedBench", position = Vector3.new(2275, 2, 85),  yaw = 0 },
+
+	-- Props: LollipopSignpost (x6) — along sidewalk at regular intervals
+	{ module = "Assets.Districts.DonutDynasty.V2.Props.LollipopSignpost", position = Vector3.new(2090, 0, 75) },
+	{ module = "Assets.Districts.DonutDynasty.V2.Props.LollipopSignpost", position = Vector3.new(2130, 0, 75) },
+	{ module = "Assets.Districts.DonutDynasty.V2.Props.LollipopSignpost", position = Vector3.new(2170, 0, 75) },
+	{ module = "Assets.Districts.DonutDynasty.V2.Props.LollipopSignpost", position = Vector3.new(2210, 0, 75) },
+	{ module = "Assets.Districts.DonutDynasty.V2.Props.LollipopSignpost", position = Vector3.new(2250, 0, 75) },
+	{ module = "Assets.Districts.DonutDynasty.V2.Props.LollipopSignpost", position = Vector3.new(2290, 0, 75) },
+
+	-- Props: SugarCubePlanter (x8) — bracketing the buildings
+	{ module = "Assets.Districts.DonutDynasty.V2.Props.SugarCubePlanter", position = Vector3.new(2068, 0, 90) },
+	{ module = "Assets.Districts.DonutDynasty.V2.Props.SugarCubePlanter", position = Vector3.new(2092, 0, 90) },
+	{ module = "Assets.Districts.DonutDynasty.V2.Props.SugarCubePlanter", position = Vector3.new(2118, 0, 90) },
+	{ module = "Assets.Districts.DonutDynasty.V2.Props.SugarCubePlanter", position = Vector3.new(2168, 0, 90) },
+	{ module = "Assets.Districts.DonutDynasty.V2.Props.SugarCubePlanter", position = Vector3.new(2218, 0, 90) },
+	{ module = "Assets.Districts.DonutDynasty.V2.Props.SugarCubePlanter", position = Vector3.new(2268, 0, 90) },
+	{ module = "Assets.Districts.DonutDynasty.V2.Props.SugarCubePlanter", position = Vector3.new(2300, 0, 90) },
+	{ module = "Assets.Districts.DonutDynasty.V2.Props.SugarCubePlanter", position = Vector3.new(2180, 0,  35) },
+
+	-- Other single-instance props
+	{ module = "Assets.Districts.DonutDynasty.V2.Props.MarshmallowOttoman", position = Vector3.new(2140, 0, 80) },
+	{ module = "Assets.Districts.DonutDynasty.V2.Props.MarshmallowOttoman", position = Vector3.new(2220, 0, 80) },
+	{ module = "Assets.Districts.DonutDynasty.V2.Props.GumdropPebble",      position = Vector3.new(2105, 0, 82) },
+	{ module = "Assets.Districts.DonutDynasty.V2.Props.GumdropPebble",      position = Vector3.new(2245, 0, 82) },
+	{ module = "Assets.Districts.DonutDynasty.V2.Props.GumdropPebble",      position = Vector3.new(2185, 0, 50) },
+	{ module = "Assets.Districts.DonutDynasty.V2.Props.HotChocolateStand",  position = Vector3.new(2110, 0, 60), yaw = 180 },
+	{ module = "Assets.Districts.DonutDynasty.V2.Props.IceCreamPushcart",   position = Vector3.new(2250, 0, 60), yaw = 180 },
+	{ module = "Assets.Districts.DonutDynasty.V2.Props.DonutDisplayRack",   position = Vector3.new(2130, 0, 85), yaw = 0 },
+	{ module = "Assets.Districts.DonutDynasty.V2.Props.DonutDisplayRack",   position = Vector3.new(2270, 0, 85), yaw = 0 },
+	{ module = "Assets.Districts.DonutDynasty.V2.Props.CakeStandTable",     position = Vector3.new(2200, 0, 70), yaw = 0 },
+
+	-- Decor: PinkBalloonBunch (x5)
+	{ module = "Assets.Districts.DonutDynasty.V2.Decor.PinkBalloonBunch", position = Vector3.new(2085, 0, 78) },
+	{ module = "Assets.Districts.DonutDynasty.V2.Decor.PinkBalloonBunch", position = Vector3.new(2135, 0, 78) },
+	{ module = "Assets.Districts.DonutDynasty.V2.Decor.PinkBalloonBunch", position = Vector3.new(2185, 0, 78) },
+	{ module = "Assets.Districts.DonutDynasty.V2.Decor.PinkBalloonBunch", position = Vector3.new(2235, 0, 78) },
+	{ module = "Assets.Districts.DonutDynasty.V2.Decor.PinkBalloonBunch", position = Vector3.new(2285, 0, 78) },
+
+	-- Decor: other single placements
+	{ module = "Assets.Districts.DonutDynasty.V2.Decor.RibbonStreamer",    position = Vector3.new(2180, 0, 110), yaw = 0 },
+	{ module = "Assets.Districts.DonutDynasty.V2.Decor.GumdropFence",      position = Vector3.new(2080, 0, 50), yaw = 0 },
+	{ module = "Assets.Districts.DonutDynasty.V2.Decor.GumdropFence",      position = Vector3.new(2260, 0, 50), yaw = 0 },
+	{ module = "Assets.Districts.DonutDynasty.V2.Decor.CottonCandyBush",   position = Vector3.new(2115, 0, 70) },
+	{ module = "Assets.Districts.DonutDynasty.V2.Decor.CottonCandyBush",   position = Vector3.new(2195, 0, 70) },
+	{ module = "Assets.Districts.DonutDynasty.V2.Decor.CottonCandyBush",   position = Vector3.new(2275, 0, 70) },
+	{ module = "Assets.Districts.DonutDynasty.V2.Decor.RainbowSprinklePath", position = Vector3.new(2120, 0, 45), yaw = 90 },
+	{ module = "Assets.Districts.DonutDynasty.V2.Decor.RainbowSprinklePath", position = Vector3.new(2240, 0, 45), yaw = 90 },
+
+	-- Named NPCs (reuse v1 visuals at v2 positions)
+	{ module = "Assets.Districts.DonutDynasty.Npcs.Marie",    position = Vector3.new(2120, 6, 40) },
+	{ module = "Assets.Districts.DonutDynasty.Npcs.Bernard",  position = Vector3.new(2160, 6, 40) },
+	{ module = "Assets.Districts.DonutDynasty.Npcs.Lulu",     position = Vector3.new(2200, 6, 40) },
+	{ module = "Assets.Districts.DonutDynasty.Npcs.Stephane", position = Vector3.new(2240, 6, 40) },
+
+	-- Pedestrian NPCs (V2-only)
+	{ module = "Assets.Districts.DonutDynasty.V2.Npcs.PastryChef",         position = Vector3.new(2095, 6, 65) },
+	{ module = "Assets.Districts.DonutDynasty.V2.Npcs.FairyGodmother",     position = Vector3.new(2150, 6, 30) },
+	{ module = "Assets.Districts.DonutDynasty.V2.Npcs.DonutDeliveryKid",   position = Vector3.new(2180, 6, 65) },
+	{ module = "Assets.Districts.DonutDynasty.V2.Npcs.KidCottonCandy",     position = Vector3.new(2215, 6, 30) },
+	{ module = "Assets.Districts.DonutDynasty.V2.Npcs.WeddingPhotoCouple", position = Vector3.new(2265, 6, 25), yaw = 180 },
+	{ module = "Assets.Districts.DonutDynasty.V2.Npcs.BalletDancerKid",    position = Vector3.new(2245, 6, 65) },
+	{ module = "Assets.Districts.DonutDynasty.V2.Npcs.BakerWithApron",     position = Vector3.new(2125, 6, 110) },
 }
