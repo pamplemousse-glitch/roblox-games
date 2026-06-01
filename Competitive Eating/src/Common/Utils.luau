@@ -84,6 +84,11 @@ function Utils.defaultPlayerData(): any
 		npcEncounters    = {},
 		cookbook         = {},
 		cookbookCoinBonus = 0,
+		tournamentProgress = {
+			currentStage = 1,
+			objectives   = {},
+			arcComplete  = false,
+		},
 		version          = 1,
 	}
 end

@@ -8,10 +8,11 @@ local Common        = ReplicatedStorage.Common
 local Constants     = require(Common.Constants)
 local Utils         = require(Common.Utils)
 local Types         = require(Common.Types)
-local DataManager      = require(script.Parent.DataManager)
-local NpcService       = require(script.Parent.NpcService)
-local NpcMemoryService = require(script.Parent.NpcMemoryService)
-local CookbookService  = require(script.Parent.CookbookService)
+local DataManager       = require(script.Parent.DataManager)
+local NpcService        = require(script.Parent.NpcService)
+local NpcMemoryService  = require(script.Parent.NpcMemoryService)
+local CookbookService   = require(script.Parent.CookbookService)
+local TournamentService = require(script.Parent.TournamentService)
 
 local ContestService = {}
 
@@ -288,15 +289,14 @@ local function resolveResults(arena: Types.Arena)
 			DataManager.recordLoss(player)
 		end
 
-		-- Record this player's encounter with every NPC in the contest.
-		-- Per-pairing outcome: "win" if player placed ahead of that NPC, else "loss".
-		-- Drives familiar/rival catchphrase escalation on future contests.
 		for _, opponent in results do
 			if opponent.npcName then
 				local outcome = (entry.place < opponent.place) and "win" or "loss"
 				DataManager.recordNpcEncounter(player, opponent.npcName, outcome)
 			end
 		end
+
+		TournamentService.onContestResult(player, entry.place == 1, sorted, entry.place, arena.tier)
 
 		local updatedData = DataManager.get(player)
 		remotes.StatsUpdate:FireClient(player, updatedData.stats, updatedData.coins, updatedData.highestTier)

@@ -84,6 +84,23 @@ function DataManager.load(player: Player): any
 		if data.cookbookCoinBonus == nil then
 			data.cookbookCoinBonus = 0
 		end
+		if data.tournamentProgress == nil then
+			data.tournamentProgress = {
+				currentStage = 1,
+				objectives   = {},
+				arcComplete  = false,
+			}
+		else
+			if data.tournamentProgress.currentStage == nil then
+				data.tournamentProgress.currentStage = 1
+			end
+			if data.tournamentProgress.objectives == nil then
+				data.tournamentProgress.objectives = {}
+			end
+			if data.tournamentProgress.arcComplete == nil then
+				data.tournamentProgress.arcComplete = false
+			end
+		end
 	else
 		data = Utils.defaultPlayerData()
 		if not ok then
@@ -275,7 +292,6 @@ function DataManager.withdrawFromFriendVault(player: Player, amount: number): bo
 end
 
 -- ── NPC encounters (rivalry memory) ──────────────────────────────────────────
--- Each entry: { count, wins, losses, lastContestDate }
 
 function DataManager.getNpcEncounter(player: Player, npcName: string): any
 	local data = cache[player.UserId]

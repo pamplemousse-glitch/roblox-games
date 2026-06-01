@@ -44,6 +44,8 @@ local remoteNames = {
 	"WithdrawFromVault",
 	-- Cookbook
 	"CookbookUpdate",
+	-- Tournament arc
+	"TournamentProgressUpdate",
 }
 
 for _, name in remoteNames do
@@ -67,11 +69,13 @@ local MonetizationService = require(Services.MonetizationService)
 local RideController     = require(Services.RideController)
 local FriendVaultService = require(Services.FriendVaultService)
 local CookbookService    = require(Services.CookbookService)
+local TournamentService  = require(Services.TournamentService)
 
 DataManager.init()
 PlayerService.init(remotesFolder)
 MonetizationService.init()
 UpgradeService.init(remotesFolder)
+TournamentService.init(remotesFolder)
 ContestService.init(remotesFolder)
 MiniGameService.init(remotesFolder)
 NpcVendorService.init(remotesFolder)
