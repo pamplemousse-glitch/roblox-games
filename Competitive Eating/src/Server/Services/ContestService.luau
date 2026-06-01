@@ -253,6 +253,7 @@ local function resolveResults(arena: Types.Arena)
 			npcName = c.npcName,
 			bites   = c.biteCount,
 			place   = place,
+			isDqd   = c.isDqd == true,
 		})
 	end
 	arena.results = results

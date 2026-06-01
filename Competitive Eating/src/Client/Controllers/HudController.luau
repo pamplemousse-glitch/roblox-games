@@ -285,7 +285,11 @@ local function showResults(results: { any }, coinsEarned: number)
 		row.TextColor3         = isMe and Color3.fromRGB(255, 255, 120) or Color3.new(1, 1, 1)
 		row.TextScaled         = true
 		row.Font               = isMe and Enum.Font.GothamBold or Enum.Font.Gotham
-		row.Text               = string.format("#%d  %-14s  %d bites", entry.place, nameStr:sub(1, 14), entry.bites)
+		local biteSuffix = entry.isDqd and (string.format("%d bites — DQ (overstuffed)", entry.bites)) or string.format("%d bites", entry.bites)
+		row.Text               = string.format("#%d  %-14s  %s", entry.place, nameStr:sub(1, 14), biteSuffix)
+		if entry.isDqd then
+			row.TextColor3 = Color3.fromRGB(255, 130, 130)
+		end
 		row.TextXAlignment     = Enum.TextXAlignment.Left
 		row.Parent             = list
 	end
@@ -407,7 +411,7 @@ end
 
 local countdownTask: thread? = nil
 
-local function onPhaseChanged(arenaId: number, state: string, _tier: any, _food: any, announcement: any, _unused: any, seatCount: any, queueTimeLeft: any)
+local function onPhaseChanged(arenaId: number, state: string, _tier: any, food: any, announcement: any, _unused: any, seatCount: any, queueTimeLeft: any)
 	-- Cancel any running local countdown or danger pulse
 	if countdownTask then
 		task.cancel(countdownTask)
@@ -462,7 +466,7 @@ local function onPhaseChanged(arenaId: number, state: string, _tier: any, _food:
 		end)
 
 	elseif state == "Active" then
-		phaseLabel.Text = ""
+		phaseLabel.Text = food and ("🍴 " .. tostring(food):upper()) or ""
 		dqLabel.Visible = false
 		wasDqd          = false
 		if biteLabel then biteLabel.Text = "" end
