@@ -333,25 +333,78 @@ return {
 	{ module = "Assets.Districts.BurgerBoulevard.Npcs.ClassicCarOwner",       position = Vector3.new(3000, 6, 45) },
 
 	-- ============================================================
-	-- BBQ HOLLER (base X = 2600) — American BBQ
+	-- BBQ HOLLER V2 (base X = 3500) — American BBQ / rural smokehouse
 	-- ============================================================
 
-	{ module = "Assets.Districts.BbqHoller.Foods.Brisket",      position = Vector3.new(2610, 6, 0) },
-	{ module = "Assets.Districts.BbqHoller.Foods.PulledPork",   position = Vector3.new(2620, 6, 0) },
-	{ module = "Assets.Districts.BbqHoller.Foods.Ribs",         position = Vector3.new(2630, 6, 0) },
-	{ module = "Assets.Districts.BbqHoller.Foods.HotLink",      position = Vector3.new(2640, 6, 0) },
-	{ module = "Assets.Districts.BbqHoller.Foods.MacAndCheese", position = Vector3.new(2650, 6, 0) },
+	-- Foods (kept from V1)
+	{ module = "Assets.Districts.BbqHoller.Foods.Brisket",      position = Vector3.new(3510, 6, 0) },
+	{ module = "Assets.Districts.BbqHoller.Foods.PulledPork",   position = Vector3.new(3520, 6, 0) },
+	{ module = "Assets.Districts.BbqHoller.Foods.Ribs",         position = Vector3.new(3530, 6, 0) },
+	{ module = "Assets.Districts.BbqHoller.Foods.HotLink",      position = Vector3.new(3540, 6, 0) },
+	{ module = "Assets.Districts.BbqHoller.Foods.MacAndCheese", position = Vector3.new(3550, 6, 0) },
 
-	{ module = "Assets.Districts.BbqHoller.Buildings.SmokehouseShack", position = Vector3.new(2600, 0, 100), yaw = 0 },
-	{ module = "Assets.Districts.BbqHoller.Buildings.PicnicPavilion",  position = Vector3.new(2650, 0, 100), yaw = 0 },
-	{ module = "Assets.Districts.BbqHoller.Buildings.ChuckwagonStand", position = Vector3.new(2700, 0, 100), yaw = 0 },
-	{ module = "Assets.Districts.BbqHoller.Buildings.BarnLandmark",    position = Vector3.new(2750, 0, 100), yaw = 0 },
-	{ module = "Assets.Districts.BbqHoller.Buildings.FirepitCircle",   position = Vector3.new(2580, 0,  60), yaw = 0 },
+	-- Hero buildings (main street, Z=100)
+	{ module = "Assets.Districts.BbqHoller.Buildings.SmokehouseSmokyJoes", position = Vector3.new(3500, 0, 100), yaw = 0 },
+	{ module = "Assets.Districts.BbqHoller.Buildings.RibShack",            position = Vector3.new(3560, 0, 100), yaw = 0 },
+	{ module = "Assets.Districts.BbqHoller.Buildings.PulledPorkPit",       position = Vector3.new(3620, 0, 100), yaw = 0 },
+	{ module = "Assets.Districts.BbqHoller.Buildings.BrisketBarn",         position = Vector3.new(3680, 0, 100), yaw = 0 },
+	{ module = "Assets.Districts.BbqHoller.Buildings.PitBossBBQTruck",     position = Vector3.new(3740, 0,  95), yaw = 15 },
 
-	{ module = "Assets.Districts.BbqHoller.Npcs.BigEarl",    position = Vector3.new(2620, 6, 30) },
-	{ module = "Assets.Districts.BbqHoller.Npcs.MamaHattie", position = Vector3.new(2640, 6, 30) },
-	{ module = "Assets.Districts.BbqHoller.Npcs.TexDiggs",   position = Vector3.new(2660, 6, 30) },
-	{ module = "Assets.Districts.BbqHoller.Npcs.SkinnyJoe",  position = Vector3.new(2680, 6, 30) },
+	-- Backdrop buildings (back row, Z=175)
+	{ module = "Assets.Districts.BbqHoller.Buildings.WeatheredFarmhouse", position = Vector3.new(3490, 0, 175), yaw = 0 },
+	{ module = "Assets.Districts.BbqHoller.Buildings.RustedShed",        position = Vector3.new(3550, 0, 175), yaw = -10 },
+	{ module = "Assets.Districts.BbqHoller.Buildings.HayBarn",           position = Vector3.new(3620, 0, 185), yaw = 0 },
+	{ module = "Assets.Districts.BbqHoller.Buildings.LogCabin",          position = Vector3.new(3700, 0, 170), yaw = 8 },
+	{ module = "Assets.Districts.BbqHoller.Buildings.WaterTower",        position = Vector3.new(3770, 0, 195), yaw = 0 },
+
+	-- Landmarks (anchor points around the district)
+	{ module = "Assets.Districts.BbqHoller.Landmarks.BarnLandmark",       position = Vector3.new(3450, 0, 160), yaw = 25 },
+	{ module = "Assets.Districts.BbqHoller.Landmarks.GiantPigStatue",     position = Vector3.new(3600, 0,  70), yaw = -20 },
+	{ module = "Assets.Districts.BbqHoller.Landmarks.SmokerChimneyTower", position = Vector3.new(3780, 0, 130), yaw = 0 },
+	{ module = "Assets.Districts.BbqHoller.Landmarks.HayBalePyramid",     position = Vector3.new(3470, 0, 120), yaw = 0 },
+
+	-- Props (scattered around buildings)
+	{ module = "Assets.Districts.BbqHoller.Props.SmokerBarrel", position = Vector3.new(3505, 0,  78), yaw = 10 },
+	{ module = "Assets.Districts.BbqHoller.Props.SmokerBarrel", position = Vector3.new(3530, 0,  82), yaw = -20 },
+	{ module = "Assets.Districts.BbqHoller.Props.SmokerBarrel", position = Vector3.new(3565, 0,  78), yaw = 0 },
+	{ module = "Assets.Districts.BbqHoller.Props.SmokerBarrel", position = Vector3.new(3595, 0,  82), yaw = 30 },
+	{ module = "Assets.Districts.BbqHoller.Props.BBQGrill",     position = Vector3.new(3525, 0,  85), yaw = 0 },
+	{ module = "Assets.Districts.BbqHoller.Props.BBQGrill",     position = Vector3.new(3625, 0,  85), yaw = 20 },
+	{ module = "Assets.Districts.BbqHoller.Props.BBQGrill",     position = Vector3.new(3725, 0,  88), yaw = -15 },
+	{ module = "Assets.Districts.BbqHoller.Props.PicnicTable",  position = Vector3.new(3490, 0,  55), yaw = 0 },
+	{ module = "Assets.Districts.BbqHoller.Props.PicnicTable",  position = Vector3.new(3555, 0,  55), yaw = 0 },
+	{ module = "Assets.Districts.BbqHoller.Props.PicnicTable",  position = Vector3.new(3650, 0,  55), yaw = 90 },
+	{ module = "Assets.Districts.BbqHoller.Props.PicnicTable",  position = Vector3.new(3720, 0,  55), yaw = 0 },
+	{ module = "Assets.Districts.BbqHoller.Props.WoodenCrate",  position = Vector3.new(3540, 0,  75), yaw = 25 },
+	{ module = "Assets.Districts.BbqHoller.Props.BeerKeg",      position = Vector3.new(3575, 0,  90), yaw = 0 },
+	{ module = "Assets.Districts.BbqHoller.Props.CharcoalPile", position = Vector3.new(3510, 0,  68), yaw = 0 },
+	{ module = "Assets.Districts.BbqHoller.Props.AxeAndStump",  position = Vector3.new(3460, 0, 110), yaw = 35 },
+	{ module = "Assets.Districts.BbqHoller.Props.RockingChair", position = Vector3.new(3680, 0,  80), yaw = 180 },
+	{ module = "Assets.Districts.BbqHoller.Props.Lantern",      position = Vector3.new(3640, 0,  95), yaw = 0 },
+
+	-- Decor (small flourishes)
+	{ module = "Assets.Districts.BbqHoller.Decor.StringLight",          position = Vector3.new(3555, 0, 108), yaw = 0 },
+	{ module = "Assets.Districts.BbqHoller.Decor.AmericanFlagBunting",  position = Vector3.new(3520, 0, 109), yaw = 0 },
+	{ module = "Assets.Districts.BbqHoller.Decor.SunBleachedPennant",   position = Vector3.new(3640, 0, 109), yaw = 0 },
+	{ module = "Assets.Districts.BbqHoller.Decor.WagonWheel",           position = Vector3.new(3450, 0,  70), yaw = 60 },
+	{ module = "Assets.Districts.BbqHoller.Decor.RanchFence",           position = Vector3.new(3780, 0,  70), yaw = 0 },
+	{ module = "Assets.Districts.BbqHoller.Decor.HayBaleStack",         position = Vector3.new(3760, 0, 110), yaw = 15 },
+	{ module = "Assets.Districts.BbqHoller.Decor.DriedCornHusk",        position = Vector3.new(3690, 0,  68), yaw = 0 },
+
+	-- Named NPCs (kept from V1)
+	{ module = "Assets.Districts.BbqHoller.Npcs.BigEarl",    position = Vector3.new(3520, 6, 30) },
+	{ module = "Assets.Districts.BbqHoller.Npcs.MamaHattie", position = Vector3.new(3540, 6, 30) },
+	{ module = "Assets.Districts.BbqHoller.Npcs.TexDiggs",   position = Vector3.new(3560, 6, 30) },
+	{ module = "Assets.Districts.BbqHoller.Npcs.SkinnyJoe",  position = Vector3.new(3580, 6, 30) },
+
+	-- Pedestrian NPCs (V2 additions, scattered)
+	{ module = "Assets.Districts.BbqHoller.Npcs.PitMasterApron",      position = Vector3.new(3470, 6,  50), yaw = 180 },
+	{ module = "Assets.Districts.BbqHoller.Npcs.CowboyWithHat",       position = Vector3.new(3500, 6,  45), yaw = 0 },
+	{ module = "Assets.Districts.BbqHoller.Npcs.FarmgirlIcedTea",     position = Vector3.new(3600, 6,  45), yaw = 180 },
+	{ module = "Assets.Districts.BbqHoller.Npcs.BBQJudge",            position = Vector3.new(3630, 6,  20), yaw = 90 },
+	{ module = "Assets.Districts.BbqHoller.Npcs.KidEatingRibs",       position = Vector3.new(3450, 6,  50), yaw = 270 },
+	{ module = "Assets.Districts.BbqHoller.Npcs.FarmerWithPitchfork", position = Vector3.new(3705, 6,  50), yaw = 200 },
+	{ module = "Assets.Districts.BbqHoller.Npcs.GuitarPlayerPorch",   position = Vector3.new(3680, 6,  85), yaw = 180 },
 
 	-- ============================================================
 	-- MERCADO DEL SOL (base X = 3100) — Mexican Street genre
