@@ -41,9 +41,7 @@ return function(parent: Instance, originCF: CFrame): Model
 	napBody.Material = Enum.Material.Metal
 	AB.block(Vector3.new(0.2, 1, 1.4), CREAM, AB.offset(originCF, -0.5, 1.1, -0.3), model, "Napkins")
 
-	-- Sugar canister (small chrome jar)
-	AB.cylinder(0.6, 1.2, GLASS, AB.offset(originCF, 1.2, 1.1, 0.2), model, "Sugar"):Destroy()
-	-- (replace with a single glass canister positioned to one side)
+	-- Sugar canister (small glass jar tucked to one side)
 	local sugar = AB.cylinder(0.5, 1, GLASS, AB.offset(originCF, -1.3, 1, -0.5), model, "SugarJar")
 	sugar.Material = Enum.Material.Glass; sugar.Transparency = 0.3
 	AB.cylinder(0.4, 0.3, CHROME, AB.offset(originCF, -1.3, 1.6, -0.5), model, "SugarCap")

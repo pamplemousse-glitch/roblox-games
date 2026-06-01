@@ -66,11 +66,7 @@ return function(parent: Instance, originCF: CFrame): Model
 	txt.Transparency = 1
 	AB.billboard(txt, "SLIDERS", Vector2.new(200, 50), 0)
 
-	-- Vertical fluorescent tubes on either side of window (50s neon detail)
-	local tubeL = AB.cylinder(0.4, 3.5, NEON_RED, AB.offset(originCF, -3.4, 4, 6.85) * CFrame.Angles(0, 0, math.rad(0)), model, "TubeL")
-	-- Actually want it vertical, the cylinder helper makes it Y-aligned already via rotation, but we want vertical not horizontal
-	-- Use a thin block instead
-	tubeL:Destroy()
+	-- Vertical fluorescent neon tubes flanking the order window
 	local tL = AB.block(Vector3.new(0.4, 3.5, 0.4), NEON_RED, AB.offset(originCF, -3.4, 4, 6.85), model, "TubeL")
 	AB.neon(tL); AB.glow(tL, NEON_RED, 1.5)
 	local tR = AB.block(Vector3.new(0.4, 3.5, 0.4), NEON_RED, AB.offset(originCF,  3.4, 4, 6.85), model, "TubeR")
