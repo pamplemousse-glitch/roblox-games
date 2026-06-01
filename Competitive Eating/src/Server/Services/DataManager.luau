@@ -242,6 +242,29 @@ function DataManager.spendTickets(player: Player, amount: number): boolean
 	return true
 end
 
+-- ── Friend Vault ──────────────────────────────────────────────────────────────
+-- Shared coin pool a player and their Roblox friends can deposit into.
+-- Only the vault owner withdraws. Cap enforced by caller (FriendVaultService).
+
+function DataManager.addToFriendVault(player: Player, amount: number): boolean
+	local data = cache[player.UserId]
+	if not data then return false end
+	if amount <= 0 then return false end
+	data.friendVaultBalance = (data.friendVaultBalance or 0) + amount
+	dirty[player.UserId] = true
+	return true
+end
+
+function DataManager.withdrawFromFriendVault(player: Player, amount: number): boolean
+	local data = cache[player.UserId]
+	if not data then return false end
+	if amount <= 0 then return false end
+	if (data.friendVaultBalance or 0) < amount then return false end
+	data.friendVaultBalance = data.friendVaultBalance - amount
+	dirty[player.UserId] = true
+	return true
+end
+
 -- ── Stat XP ───────────────────────────────────────────────────────────────────
 -- Every 100 XP triggers an auto-upgrade attempt if the player can afford it.
 -- XP always accumulates even if upgrade fails (e.g. insufficient coins).
