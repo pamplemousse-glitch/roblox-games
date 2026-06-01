@@ -36,34 +36,48 @@ return {
 	{ module = "Assets.Districts.PizzaPlaza.Npcs.Sal",      position = Vector3.new(2060, 6,   30) },
 
 	-- ============================================================
+	-- BURGER BOULEVARD (X = 8000) — 50s diner / burger variants genre
+	-- ============================================================
+
+	{ module = "Assets.Districts.BurgerBoulevard.Foods.Smashburger",           position = Vector3.new(8010, 6,    0) },
+	{ module = "Assets.Districts.BurgerBoulevard.Foods.DoubleStack",           position = Vector3.new(8020, 6,    0) },
+	{ module = "Assets.Districts.BurgerBoulevard.Foods.SliderCombo",           position = Vector3.new(8030, 6,    0) },
+	{ module = "Assets.Districts.BurgerBoulevard.Foods.FriedChickenSandwich",  position = Vector3.new(8040, 6,    0) },
+	{ module = "Assets.Districts.BurgerBoulevard.Foods.Milkshake",             position = Vector3.new(8050, 6,    0) },
+
+	{ module = "Assets.Districts.BurgerBoulevard.Buildings.DriveThruDiner",       position = Vector3.new(8050, 0,  100), yaw = 0 },
+	{ module = "Assets.Districts.BurgerBoulevard.Buildings.BurgerJoint",          position = Vector3.new(8100, 0,  100), yaw = 0 },
+	{ module = "Assets.Districts.BurgerBoulevard.Buildings.ShakeStand",           position = Vector3.new(8150, 0,  100), yaw = 0 },
+	{ module = "Assets.Districts.BurgerBoulevard.Buildings.BurgerTowerLandmark",  position = Vector3.new(8200, 0,  100), yaw = 0 },
+	{ module = "Assets.Districts.BurgerBoulevard.Buildings.RetroGasStation",      position = Vector3.new(8250, 0,  100), yaw = 0 },
+
+	{ module = "Assets.Districts.BurgerBoulevard.Npcs.SmashRiley",   position = Vector3.new(8020, 6,   30) },
+	{ module = "Assets.Districts.BurgerBoulevard.Npcs.PattyBonez",   position = Vector3.new(8040, 6,   30) },
+	{ module = "Assets.Districts.BurgerBoulevard.Npcs.SliderSteve",  position = Vector3.new(8060, 6,   30) },
+	{ module = "Assets.Districts.BurgerBoulevard.Npcs.Cookie",       position = Vector3.new(8080, 6,   30) },
+
+	-- ============================================================
 	-- MERCADO DEL SOL (X = 12000) — Mexican Street genre
 	-- ============================================================
 
-	-- Foods (5)
 	{ module = "Assets.Districts.MercadoDelSol.Foods.Taco",       position = Vector3.new(12010, 6,    0) },
 	{ module = "Assets.Districts.MercadoDelSol.Foods.Burrito",    position = Vector3.new(12020, 6,    0) },
 	{ module = "Assets.Districts.MercadoDelSol.Foods.Quesadilla", position = Vector3.new(12030, 6,    0) },
 	{ module = "Assets.Districts.MercadoDelSol.Foods.Tamale",     position = Vector3.new(12040, 6,    0) },
 	{ module = "Assets.Districts.MercadoDelSol.Foods.Elote",      position = Vector3.new(12050, 6,    0) },
 
-	-- Buildings (5)
-	{ module = "Assets.Districts.MercadoDelSol.Buildings.TaqueriaStall",       position = Vector3.new(12050, 0, 100), yaw = 0 },
-	{ module = "Assets.Districts.MercadoDelSol.Buildings.MercadoCanopy",       position = Vector3.new(12100, 0, 100), yaw = 0 },
-	{ module = "Assets.Districts.MercadoDelSol.Buildings.SalsaCart",           position = Vector3.new(12150, 0, 100), yaw = 0 },
+	{ module = "Assets.Districts.MercadoDelSol.Buildings.TaqueriaStall",      position = Vector3.new(12050, 0, 100), yaw = 0 },
+	{ module = "Assets.Districts.MercadoDelSol.Buildings.MercadoCanopy",      position = Vector3.new(12100, 0, 100), yaw = 0 },
+	{ module = "Assets.Districts.MercadoDelSol.Buildings.SalsaCart",          position = Vector3.new(12150, 0, 100), yaw = 0 },
 	{ module = "Assets.Districts.MercadoDelSol.Buildings.CathedralArchEntry", position = Vector3.new(12200, 0, 100), yaw = 0 },
-	{ module = "Assets.Districts.MercadoDelSol.Buildings.PinataTower",         position = Vector3.new(12250, 0, 100), yaw = 0 },
+	{ module = "Assets.Districts.MercadoDelSol.Buildings.PinataTower",        position = Vector3.new(12250, 0, 100), yaw = 0 },
 
-	-- NPCs (4)
 	{ module = "Assets.Districts.MercadoDelSol.Npcs.DonPepe",  position = Vector3.new(12020, 6, 30) },
 	{ module = "Assets.Districts.MercadoDelSol.Npcs.Lucia",    position = Vector3.new(12040, 6, 30) },
 	{ module = "Assets.Districts.MercadoDelSol.Npcs.Memo",     position = Vector3.new(12060, 6, 30) },
 	{ module = "Assets.Districts.MercadoDelSol.Npcs.DonaRosa", position = Vector3.new(12080, 6, 30) },
 
 	-- ============================================================
-	-- Other districts go here as parallel sessions complete:
-	-- TOKYO TOWN              (X = 4000)
-	-- DONUT DYNASTY           (X = 6000)
-	-- BURGER BOULEVARD        (X = 8000)
-	-- BBQ HOLLER              (X = 10000)
+	-- Remaining districts to be merged in: TOKYO, DONUT, BBQ HOLLER
 	-- ============================================================
 }
