@@ -520,4 +520,101 @@ return {
 	{ module = "Assets.Districts.DonutDynasty.V2.Npcs.WeddingPhotoCouple", position = Vector3.new(2265, 6, 25), yaw = 180 },
 	{ module = "Assets.Districts.DonutDynasty.V2.Npcs.BalletDancerKid",    position = Vector3.new(2245, 6, 65) },
 	{ module = "Assets.Districts.DonutDynasty.V2.Npcs.BakerWithApron",     position = Vector3.new(2125, 6, 110) },
+
+	-- ============================================================
+	-- MERCADO DEL SOL — V2 EXPANSION (base X = 4200)
+	-- Real-neighborhood density: 10 buildings, 22 props, 30 decor,
+	-- 4 landmarks, 11 NPCs = 77 placements for a walkable street feel.
+	-- ============================================================
+
+	-- ── V2 Buildings (4200 + 50*i, 0, 100) ──
+	{ module = "Assets.Districts.MercadoDelSol.Buildings.TaqueriaElSol",        position = Vector3.new(4250, 0, 100), yaw = 0 },
+	{ module = "Assets.Districts.MercadoDelSol.Buildings.BurritoCasa",          position = Vector3.new(4300, 0, 100), yaw = 0 },
+	{ module = "Assets.Districts.MercadoDelSol.Buildings.QuesadillaStand",      position = Vector3.new(4350, 0, 100), yaw = 0 },
+	{ module = "Assets.Districts.MercadoDelSol.Buildings.TamaleTia",            position = Vector3.new(4400, 0, 100), yaw = 0 },
+	{ module = "Assets.Districts.MercadoDelSol.Buildings.EloteTruck",           position = Vector3.new(4450, 0, 100), yaw = 0 },
+	{ module = "Assets.Districts.MercadoDelSol.Buildings.TerracottaHacienda",   position = Vector3.new(4500, 0, 100), yaw = 0 },
+	{ module = "Assets.Districts.MercadoDelSol.Buildings.CantinaStainedGlass",  position = Vector3.new(4550, 0, 100), yaw = 0 },
+	{ module = "Assets.Districts.MercadoDelSol.Buildings.PinkGreenStuccoShops", position = Vector3.new(4600, 0, 100), yaw = 0 },
+	{ module = "Assets.Districts.MercadoDelSol.Buildings.FountainCourtyard",    position = Vector3.new(4650, 0, 100), yaw = 0 },
+	{ module = "Assets.Districts.MercadoDelSol.Buildings.BellTower",            position = Vector3.new(4700, 0, 100), yaw = 0 },
+
+	-- ── V2 Props row 1 (4200 + 15*i, 0, 60) ──
+	{ module = "Assets.Districts.MercadoDelSol.Props.PapelPicadoBanner",  position = Vector3.new(4215, 0, 60) },
+	{ module = "Assets.Districts.MercadoDelSol.Props.PapelPicadoBanner",  position = Vector3.new(4230, 0, 60) },
+	{ module = "Assets.Districts.MercadoDelSol.Props.PapelPicadoBanner",  position = Vector3.new(4245, 0, 60) },
+	{ module = "Assets.Districts.MercadoDelSol.Props.PapelPicadoBanner",  position = Vector3.new(4260, 0, 60) },
+	{ module = "Assets.Districts.MercadoDelSol.Props.PapelPicadoBanner",  position = Vector3.new(4275, 0, 60) },
+	{ module = "Assets.Districts.MercadoDelSol.Props.PapelPicadoBanner",  position = Vector3.new(4290, 0, 60) },
+	{ module = "Assets.Districts.MercadoDelSol.Props.SombreroRack",       position = Vector3.new(4305, 0, 60) },
+	{ module = "Assets.Districts.MercadoDelSol.Props.DonkeyCart",         position = Vector3.new(4320, 0, 60) },
+	{ module = "Assets.Districts.MercadoDelSol.Props.MariachiGearPile",   position = Vector3.new(4335, 0, 60) },
+	{ module = "Assets.Districts.MercadoDelSol.Props.SucculentPlanter",   position = Vector3.new(4350, 0, 60) },
+	{ module = "Assets.Districts.MercadoDelSol.Props.CalaveraSugarSkull", position = Vector3.new(4365, 0, 60) },
+	{ module = "Assets.Districts.MercadoDelSol.Props.WovenBasket",        position = Vector3.new(4380, 0, 60) },
+	{ module = "Assets.Districts.MercadoDelSol.Props.DanceRibbon",        position = Vector3.new(4395, 0, 60) },
+	{ module = "Assets.Districts.MercadoDelSol.Props.ChiliRistraPole",    position = Vector3.new(4410, 0, 60) },
+
+	-- ── V2 Props row 2 (4200 + 15*i, 0, 80) — ceramic pot collection ──
+	{ module = "Assets.Districts.MercadoDelSol.Props.CeramicPot", position = Vector3.new(4215, 0, 80) },
+	{ module = "Assets.Districts.MercadoDelSol.Props.CeramicPot", position = Vector3.new(4230, 0, 80) },
+	{ module = "Assets.Districts.MercadoDelSol.Props.CeramicPot", position = Vector3.new(4245, 0, 80) },
+	{ module = "Assets.Districts.MercadoDelSol.Props.CeramicPot", position = Vector3.new(4260, 0, 80) },
+	{ module = "Assets.Districts.MercadoDelSol.Props.CeramicPot", position = Vector3.new(4275, 0, 80) },
+	{ module = "Assets.Districts.MercadoDelSol.Props.CeramicPot", position = Vector3.new(4290, 0, 80) },
+	{ module = "Assets.Districts.MercadoDelSol.Props.CeramicPot", position = Vector3.new(4305, 0, 80) },
+	{ module = "Assets.Districts.MercadoDelSol.Props.CeramicPot", position = Vector3.new(4320, 0, 80) },
+
+	-- ── V2 Decor grid (4200 + 10*i, 12, 80 + 5*j), cycling 5 types ──
+	{ module = "Assets.Districts.MercadoDelSol.Decor.MarigoldFlowerArch", position = Vector3.new(4210, 12, 80) },
+	{ module = "Assets.Districts.MercadoDelSol.Decor.PaintedTileWall",    position = Vector3.new(4220, 12, 80) },
+	{ module = "Assets.Districts.MercadoDelSol.Decor.CandleAltar",        position = Vector3.new(4230, 12, 80) },
+	{ module = "Assets.Districts.MercadoDelSol.Decor.WovenHammock",       position = Vector3.new(4240, 12, 80) },
+	{ module = "Assets.Districts.MercadoDelSol.Decor.PapelPicadoString",  position = Vector3.new(4250, 12, 80) },
+	{ module = "Assets.Districts.MercadoDelSol.Decor.MarigoldFlowerArch", position = Vector3.new(4260, 12, 80) },
+	{ module = "Assets.Districts.MercadoDelSol.Decor.PaintedTileWall",    position = Vector3.new(4270, 12, 80) },
+	{ module = "Assets.Districts.MercadoDelSol.Decor.CandleAltar",        position = Vector3.new(4280, 12, 80) },
+	{ module = "Assets.Districts.MercadoDelSol.Decor.WovenHammock",       position = Vector3.new(4290, 12, 80) },
+	{ module = "Assets.Districts.MercadoDelSol.Decor.PapelPicadoString",  position = Vector3.new(4300, 12, 80) },
+
+	{ module = "Assets.Districts.MercadoDelSol.Decor.PaintedTileWall",    position = Vector3.new(4210, 12, 85) },
+	{ module = "Assets.Districts.MercadoDelSol.Decor.CandleAltar",        position = Vector3.new(4220, 12, 85) },
+	{ module = "Assets.Districts.MercadoDelSol.Decor.WovenHammock",       position = Vector3.new(4230, 12, 85) },
+	{ module = "Assets.Districts.MercadoDelSol.Decor.PapelPicadoString",  position = Vector3.new(4240, 12, 85) },
+	{ module = "Assets.Districts.MercadoDelSol.Decor.MarigoldFlowerArch", position = Vector3.new(4250, 12, 85) },
+	{ module = "Assets.Districts.MercadoDelSol.Decor.PaintedTileWall",    position = Vector3.new(4260, 12, 85) },
+	{ module = "Assets.Districts.MercadoDelSol.Decor.CandleAltar",        position = Vector3.new(4270, 12, 85) },
+	{ module = "Assets.Districts.MercadoDelSol.Decor.WovenHammock",       position = Vector3.new(4280, 12, 85) },
+	{ module = "Assets.Districts.MercadoDelSol.Decor.PapelPicadoString",  position = Vector3.new(4290, 12, 85) },
+	{ module = "Assets.Districts.MercadoDelSol.Decor.MarigoldFlowerArch", position = Vector3.new(4300, 12, 85) },
+
+	{ module = "Assets.Districts.MercadoDelSol.Decor.CandleAltar",        position = Vector3.new(4210, 12, 90) },
+	{ module = "Assets.Districts.MercadoDelSol.Decor.WovenHammock",       position = Vector3.new(4220, 12, 90) },
+	{ module = "Assets.Districts.MercadoDelSol.Decor.PapelPicadoString",  position = Vector3.new(4230, 12, 90) },
+	{ module = "Assets.Districts.MercadoDelSol.Decor.MarigoldFlowerArch", position = Vector3.new(4240, 12, 90) },
+	{ module = "Assets.Districts.MercadoDelSol.Decor.PaintedTileWall",    position = Vector3.new(4250, 12, 90) },
+	{ module = "Assets.Districts.MercadoDelSol.Decor.CandleAltar",        position = Vector3.new(4260, 12, 90) },
+	{ module = "Assets.Districts.MercadoDelSol.Decor.WovenHammock",       position = Vector3.new(4270, 12, 90) },
+	{ module = "Assets.Districts.MercadoDelSol.Decor.PapelPicadoString",  position = Vector3.new(4280, 12, 90) },
+	{ module = "Assets.Districts.MercadoDelSol.Decor.MarigoldFlowerArch", position = Vector3.new(4290, 12, 90) },
+	{ module = "Assets.Districts.MercadoDelSol.Decor.PaintedTileWall",    position = Vector3.new(4300, 12, 90) },
+
+	-- ── V2 Landmarks (4200 + 100*i, 0, 130) ──
+	{ module = "Assets.Districts.MercadoDelSol.Buildings.PinataTower",         position = Vector3.new(4300, 0, 130), yaw = 0 },
+	{ module = "Assets.Districts.MercadoDelSol.Buildings.CathedralArchEntry",  position = Vector3.new(4400, 0, 130), yaw = 0 },
+	{ module = "Assets.Districts.MercadoDelSol.Landmarks.MariachiBandstand",   position = Vector3.new(4500, 0, 130), yaw = 0 },
+	{ module = "Assets.Districts.MercadoDelSol.Landmarks.GiantCactusSculpture", position = Vector3.new(4600, 0, 130), yaw = 0 },
+
+	-- ── V2 NPCs (4200 + 20*i, 6, 30) — 11 figures: 4 named + 7 pedestrians ──
+	{ module = "Assets.Districts.MercadoDelSol.Npcs.DonPepe",            position = Vector3.new(4220, 6, 30) },
+	{ module = "Assets.Districts.MercadoDelSol.Npcs.Lucia",              position = Vector3.new(4240, 6, 30) },
+	{ module = "Assets.Districts.MercadoDelSol.Npcs.Memo",               position = Vector3.new(4260, 6, 30) },
+	{ module = "Assets.Districts.MercadoDelSol.Npcs.DonaRosa",           position = Vector3.new(4280, 6, 30) },
+	{ module = "Assets.Districts.MercadoDelSol.Npcs.MariachiMusician",   position = Vector3.new(4300, 6, 30) },
+	{ module = "Assets.Districts.MercadoDelSol.Npcs.AbuelaTortillaCart", position = Vector3.new(4320, 6, 30) },
+	{ module = "Assets.Districts.MercadoDelSol.Npcs.KidWithElote",       position = Vector3.new(4340, 6, 30) },
+	{ module = "Assets.Districts.MercadoDelSol.Npcs.MaskedLuchador",     position = Vector3.new(4360, 6, 30) },
+	{ module = "Assets.Districts.MercadoDelSol.Npcs.DancingCouple",      position = Vector3.new(4380, 6, 30) },
+	{ module = "Assets.Districts.MercadoDelSol.Npcs.ChurroVendor",       position = Vector3.new(4400, 6, 30) },
+	{ module = "Assets.Districts.MercadoDelSol.Npcs.KidsKickingBall",    position = Vector3.new(4420, 6, 30) },
 }
