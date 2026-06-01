@@ -10,6 +10,7 @@ local Utils         = require(Common.Utils)
 local Types         = require(Common.Types)
 local DataManager   = require(script.Parent.DataManager)
 local NpcService    = require(script.Parent.NpcService)
+local CookbookService = require(script.Parent.CookbookService)
 
 local ContestService = {}
 
@@ -266,7 +267,7 @@ local function resolveResults(arena: Types.Arena)
 		local streak   = data.winStreak or 0
 		local streakMult = Utils.streakMultiplier(streak)
 		local baseCoins  = Constants.COIN_BY_PLACE[entry.place] or Constants.COIN_PARTICIPATION
-		local coins      = math.floor(baseCoins * streakMult)
+		local coins      = math.floor(baseCoins * streakMult * (1 + CookbookService.getCoinBonus(player)))
 
 		-- Pity Pit: last-place finisher gets a small consolation bonus on top.
 		-- Reframes "you got rekt" as "tried hard, here's a token". State fair 8th-place tradition.
@@ -278,6 +279,7 @@ local function resolveResults(arena: Types.Arena)
 
 		DataManager.addCoins(player, coins)
 		DataManager.recordContest(player)
+		CookbookService.recordContestFood(player, arena.currentFood)
 
 		if entry.place == 1 then
 			DataManager.recordWin(player)

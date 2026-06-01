@@ -81,6 +81,8 @@ function Utils.defaultPlayerData(): any
 		winStreak        = 0,
 		lastWinDate      = "",
 		firstContestDone = false,
+		cookbook         = {},   -- [foodName] = { firstEatenDate = "YYYY-MM-DD", timesEaten = N }
+		cookbookCoinBonus = 0,   -- 0..0.04 (+1% per completed tier of 5 foods, max +4%)
 		version          = 1,
 	}
 end

@@ -75,6 +75,13 @@ function DataManager.load(player: Player): any
 		if data.statXp == nil then
 			data.statXp = {}
 		end
+		-- Cookbook collection meta (feature/cookbook)
+		if data.cookbook == nil then
+			data.cookbook = {}
+		end
+		if data.cookbookCoinBonus == nil then
+			data.cookbookCoinBonus = 0
+		end
 	else
 		data = Utils.defaultPlayerData()
 		if not ok then

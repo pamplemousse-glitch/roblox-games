@@ -39,6 +39,8 @@ local remoteNames = {
 	"CosmeticBought",       -- server → client
 	-- Coaster
 	"CoasterFade",          -- server → client  (true = fade-in, false = fade-out)
+	-- Cookbook
+	"CookbookUpdate",       -- server → client  (cookbook table + cookbookCoinBonus)
 }
 
 for _, name in remoteNames do
@@ -60,6 +62,7 @@ local NpcVendorService   = require(Services.NpcVendorService)
 local CosmeticsService   = require(Services.CosmeticsService)
 local MonetizationService = require(Services.MonetizationService)
 local RideController     = require(Services.RideController)
+local CookbookService    = require(Services.CookbookService)
 
 DataManager.init()
 PlayerService.init(remotesFolder)
@@ -70,3 +73,4 @@ MiniGameService.init(remotesFolder)
 NpcVendorService.init(remotesFolder)
 CosmeticsService.init(remotesFolder)
 RideController.init(remotesFolder)
+CookbookService.init(remotesFolder)
