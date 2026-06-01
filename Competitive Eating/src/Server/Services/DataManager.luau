@@ -75,6 +75,9 @@ function DataManager.load(player: Player): any
 		if data.statXp == nil then
 			data.statXp = {}
 		end
+		if data.npcEncounters == nil then
+			data.npcEncounters = {}
+		end
 	else
 		data = Utils.defaultPlayerData()
 		if not ok then
@@ -240,6 +243,41 @@ function DataManager.spendTickets(player: Player, amount: number): boolean
 	data.carnivalTickets = data.carnivalTickets - amount
 	dirty[player.UserId] = true
 	return true
+end
+
+-- ── NPC encounters (rivalry memory) ──────────────────────────────────────────
+-- Each entry: { count, wins, losses, lastContestDate }
+-- count = total times this player has contested against this NPC.
+-- wins  = times the player beat this NPC.
+-- losses = times this NPC beat the player.
+
+function DataManager.getNpcEncounter(player: Player, npcName: string): any
+	local data = cache[player.UserId]
+	if not data then return nil end
+	data.npcEncounters = data.npcEncounters or {}
+	return data.npcEncounters[npcName]
+end
+
+function DataManager.recordNpcEncounter(player: Player, npcName: string, outcome: string?)
+	local data = cache[player.UserId]
+	if not data then return end
+	data.npcEncounters = data.npcEncounters or {}
+
+	local rec = data.npcEncounters[npcName]
+	if not rec then
+		rec = { count = 0, wins = 0, losses = 0, lastContestDate = "" }
+		data.npcEncounters[npcName] = rec
+	end
+
+	rec.count = (rec.count or 0) + 1
+	if outcome == "win" then
+		rec.wins = (rec.wins or 0) + 1
+	elseif outcome == "loss" then
+		rec.losses = (rec.losses or 0) + 1
+	end
+	rec.lastContestDate = Utils.todayString()
+
+	dirty[player.UserId] = true
 end
 
 -- ── Stat XP ───────────────────────────────────────────────────────────────────

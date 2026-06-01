@@ -8,8 +8,9 @@ local Common        = ReplicatedStorage.Common
 local Constants     = require(Common.Constants)
 local Utils         = require(Common.Utils)
 local Types         = require(Common.Types)
-local DataManager   = require(script.Parent.DataManager)
-local NpcService    = require(script.Parent.NpcService)
+local DataManager      = require(script.Parent.DataManager)
+local NpcService       = require(script.Parent.NpcService)
+local NpcMemoryService = require(script.Parent.NpcMemoryService)
 
 local ContestService = {}
 
@@ -285,6 +286,16 @@ local function resolveResults(arena: Types.Arena)
 			DataManager.recordLoss(player)
 		end
 
+		-- Record this player's encounter with every NPC in the contest.
+		-- Per-pairing outcome: "win" if player placed ahead of that NPC, else "loss".
+		-- Drives familiar/rival catchphrase escalation on future contests.
+		for _, opponent in results do
+			if opponent.npcName then
+				local outcome = (entry.place < opponent.place) and "win" or "loss"
+				DataManager.recordNpcEncounter(player, opponent.npcName, outcome)
+			end
+		end
+
 		local updatedData = DataManager.get(player)
 		remotes.StatsUpdate:FireClient(player, updatedData.stats, updatedData.coins, updatedData.highestTier)
 		remotes.ShowResults:FireClient(player, results, coins)
@@ -341,7 +352,19 @@ local function runCountdown(arena: Types.Arena)
 		if not c.isNpc then
 			local player = Players:GetPlayerByUserId(c.userId)
 			if player then
-				remotes.ContestPhaseChanged:FireClient(player, arena.id, "Countdown", arena.tier, arena.currentFood, intro)
+				-- Resolve each NPC's catchphrase against this player's history.
+				-- 1st-2nd meeting → catchphrase; 3rd+ → familiar; 10th+ → rival.
+				local npcDialogLines: { [string]: string } = {}
+				for _, other in arena.contestants do
+					if other.isNpc and other.npcName then
+						local line = NpcMemoryService.pickDialogLine(player, other.npcName, "intro")
+						if line then
+							npcDialogLines[other.npcName] = line
+						end
+					end
+				end
+				-- 8th positional slot — additive to existing payload (slots 6-7 unused for Countdown).
+				remotes.ContestPhaseChanged:FireClient(player, arena.id, "Countdown", arena.tier, arena.currentFood, intro, nil, nil, npcDialogLines)
 			end
 		end
 	end
