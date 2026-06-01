@@ -109,20 +109,24 @@ local function buildShopGui()
 	shopGui.Enabled        = false
 	shopGui.Parent         = playerGui
 
-	-- Dark overlay
+	-- Dark overlay — only visible while the shop panel is open
 	local overlay = Instance.new("Frame")
+	overlay.Name              = "Overlay"
 	overlay.Size              = UDim2.new(1, 0, 1, 0)
 	overlay.BackgroundColor3  = Color3.new(0, 0, 0)
 	overlay.BackgroundTransparency = 0.5
 	overlay.BorderSizePixel   = 0
+	overlay.Visible           = false
 	overlay.Parent            = shopGui
 
 	-- Panel
 	local panel = Instance.new("Frame")
+	panel.Name              = "Panel"
 	panel.Size              = UDim2.fromOffset(PANEL_W, PANEL_H)
 	panel.Position          = UDim2.new(0.5, -PANEL_W / 2, 0.5, -PANEL_H / 2)
 	panel.BackgroundColor3  = Color3.fromRGB(20, 20, 20)
 	panel.BorderSizePixel   = 0
+	panel.Visible           = false   -- closed by default; ShopController.open() shows it
 	panel.Parent            = shopGui
 	shopPanel = panel
 	Instance.new("UICorner", panel).CornerRadius = UDim.new(0, 12)
@@ -235,12 +239,16 @@ end
 function ShopController.open()
 	shopOpen = true
 	shopPanel.Visible = true
+	local overlay = shopGui:FindFirstChild("Overlay")
+	if overlay then overlay.Visible = true end
 	refreshRows()
 end
 
 function ShopController.close()
 	shopOpen = false
 	shopPanel.Visible = false
+	local overlay = shopGui:FindFirstChild("Overlay")
+	if overlay then overlay.Visible = false end
 end
 
 -- ── Init ─────────────────────────────────────────────────────────────────────
