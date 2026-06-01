@@ -8,6 +8,8 @@ local Common    = ReplicatedStorage:WaitForChild("Common")
 local Constants = require(Common:WaitForChild("Constants"))
 local Types     = require(Common:WaitForChild("Types"))
 
+require(script.Parent:WaitForChild("PhotoModeController"))  -- self-inits, owns its own ScreenGui
+
 local HudController = {}
 
 local remotes: { [string]: RemoteEvent } = {}
