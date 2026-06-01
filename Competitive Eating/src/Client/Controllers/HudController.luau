@@ -412,6 +412,13 @@ end
 local countdownTask: thread? = nil
 
 local function onPhaseChanged(arenaId: number, state: string, _tier: any, food: any, announcement: any, _unused: any, seatCount: any, queueTimeLeft: any)
+	-- Ignore broadcasts for arenas the local player isn't in
+	-- (server broadcasts every arena's state to every player; we only render our own).
+	-- Exception: the first Queuing broadcast (myArena is nil) is how we learn we joined.
+	if myArena ~= nil and myArena ~= arenaId and state ~= "Idle" then
+		return
+	end
+
 	-- Cancel any running local countdown or danger pulse
 	if countdownTask then
 		task.cancel(countdownTask)
@@ -429,7 +436,10 @@ local function onPhaseChanged(arenaId: number, state: string, _tier: any, food: 
 		resultsGui.Enabled = false
 		dqLabel.Visible    = false
 		wasDqd             = false
+		myArena            = nil
 		if biteLabel then biteLabel.Text = "" end
+		if timerLabel then timerLabel.Text = "" end
+		if phaseLabel then phaseLabel.Text = "" end
 		return
 	end
 

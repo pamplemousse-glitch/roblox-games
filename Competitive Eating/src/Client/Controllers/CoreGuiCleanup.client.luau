@@ -1,24 +1,25 @@
--- Disable Roblox's built-in topbar elements (mobile-app icon, etc).
--- AAA_ prefix so it runs first.
+-- Suppress Roblox built-in CoreGui topbar elements that clutter our HUD
+-- (Captures icon, voice chat indicator, mobile-app/phone icon, etc).
 
-local StarterGui = game:GetService("Players").LocalPlayer:WaitForChild("PlayerScripts") and game:GetService("StarterGui")
+local Players    = game:GetService("Players")
+local StarterGui = game:GetService("StarterGui")
 
-local function kill()
-	-- Modern API
-	pcall(function()
-		StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.All, false)
-	end)
-	-- Re-enable only what we actually want
-	pcall(function()
-		StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Chat, true)
-	end)
-	-- Legacy fallback
+local _ = Players.LocalPlayer or Players:GetPropertyChangedSignal("LocalPlayer"):Wait()
+
+local function suppress()
+	-- Hide every CoreGui type except chat
+	pcall(function() StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.All, false) end)
+	pcall(function() StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Chat, true) end)
+	-- Legacy topbar disable
 	pcall(function() StarterGui:SetCore("TopbarEnabled", false) end)
+	-- Newer unibar items
+	for _, key in {"PhoneIcon", "MobileLinkIcon", "OpenInAppIcon", "RobloxAppCTA", "ContextMenuButton", "ChromeMenuButton"} do
+		pcall(function() StarterGui:SetCore(key, false) end)
+	end
 end
 
--- Run immediately + retry a few times (some CoreGui items load lazily)
-kill()
-for i = 1, 5 do
+suppress()
+for i = 1, 10 do
 	task.wait(0.5)
-	kill()
+	suppress()
 end

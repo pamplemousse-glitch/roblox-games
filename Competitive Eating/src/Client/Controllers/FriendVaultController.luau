@@ -21,6 +21,12 @@ local currentBalance = 0
 
 -- ── UI build ──────────────────────────────────────────────────────────────────
 
+local panelRef: Frame? = nil
+
+local function setPanelOpen(open: boolean)
+	if panelRef then panelRef.Visible = open end
+end
+
 local function build()
 	local gui = Instance.new("ScreenGui")
 	gui.Name           = "FriendVaultGui"
@@ -28,13 +34,30 @@ local function build()
 	gui.IgnoreGuiInset = true
 	gui.Parent         = playerGui
 
+	-- Toggle button (small icon, top-left below the BOOK button)
+	local toggle = Instance.new("TextButton")
+	toggle.Name             = "VaultToggle"
+	toggle.Size             = UDim2.fromOffset(56, 56)
+	toggle.Position         = UDim2.new(0, 20, 0, 86)  -- BOOK is at (20, 22) with 56h; this sits below
+	toggle.BackgroundColor3 = Color3.fromRGB(30, 30, 38)
+	toggle.TextColor3       = Color3.new(1, 1, 1)
+	toggle.TextScaled       = true
+	toggle.Font             = Enum.Font.GothamBold
+	toggle.Text             = "VAULT"
+	toggle.BorderSizePixel  = 0
+	toggle.Parent           = gui
+	Instance.new("UICorner", toggle).CornerRadius = UDim.new(0, 6)
+
 	local panel = Instance.new("Frame")
 	panel.Name             = "Panel"
 	panel.Size             = UDim2.fromOffset(220, 130)
-	panel.Position         = UDim2.new(1, -240, 0, 20)
+	panel.Position         = UDim2.new(0, 86, 0, 86)  -- to the right of toggle
 	panel.BackgroundColor3 = Color3.fromRGB(30, 30, 38)
 	panel.BorderSizePixel  = 0
+	panel.Visible          = false  -- hidden by default
 	panel.Parent           = gui
+	panelRef = panel
+	toggle.MouseButton1Click:Connect(function() setPanelOpen(not panel.Visible) end)
 
 	local corner = Instance.new("UICorner")
 	corner.CornerRadius = UDim.new(0, 8)

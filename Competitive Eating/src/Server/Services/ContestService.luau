@@ -327,9 +327,16 @@ local function runQueuing(arena: Types.Arena)
 		lastBroadcast = tick()
 		local timeLeft    = math.max(0, math.floor(deadline - tick()))
 		local seatsTaken  = #arena.contestants
-		for _, player in Players:GetPlayers() do
-			-- 8-arg signature: (arenaId, state, tier, food, announcement, _unused, seatCount, queueTimeLeft)
-			remotes.ContestPhaseChanged:FireClient(player, arena.id, "Queuing", arena.tier, arena.currentFood, nil, nil, seatsTaken, timeLeft)
+		-- Only fire to players ACTUALLY in this arena. Otherwise every player
+		-- gets HUD updates for arenas they aren't in (caused "Arena 2 Waiting"
+		-- to show on screens of players who never joined Arena 2).
+		for _, c in arena.contestants do
+			if not c.isNpc then
+				local player = Players:GetPlayerByUserId(c.userId)
+				if player then
+					remotes.ContestPhaseChanged:FireClient(player, arena.id, "Queuing", arena.tier, arena.currentFood, nil, nil, seatsTaken, timeLeft)
+				end
+			end
 		end
 	end
 
