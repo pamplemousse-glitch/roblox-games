@@ -59,6 +59,45 @@ return {
 	{ module = "Assets.Districts.PizzaPlaza.Props.Lamppost",                  position = Vector3.new(805, 0, 80) },
 	{ module = "Assets.Districts.PizzaPlaza.Props.Lamppost",                  position = Vector3.new(820, 0, 80) },
 
+	-- Decor (32 small entries on the high shelf at y=12, z=80-90) ---------
+	-- Flag bunting strung across at 5 positions
+	{ module = "Assets.Districts.PizzaPlaza.Decor.ItalianFlagBunting",        position = Vector3.new(710, 12, 80) },
+	{ module = "Assets.Districts.PizzaPlaza.Decor.ItalianFlagBunting",        position = Vector3.new(770, 12, 80) },
+	{ module = "Assets.Districts.PizzaPlaza.Decor.ItalianFlagBunting",        position = Vector3.new(830, 12, 80) },
+	{ module = "Assets.Districts.PizzaPlaza.Decor.ItalianFlagBunting",        position = Vector3.new(890, 12, 80) },
+	{ module = "Assets.Districts.PizzaPlaza.Decor.ItalianFlagBunting",        position = Vector3.new(950, 12, 80) },
+	-- Other decor modules, one entry each, laid along the strip
+	{ module = "Assets.Districts.PizzaPlaza.Decor.OpenNeonSign",              position = Vector3.new(720, 12, 85) },
+	{ module = "Assets.Districts.PizzaPlaza.Decor.DryingPastaRack",           position = Vector3.new(740, 12, 85) },
+	{ module = "Assets.Districts.PizzaPlaza.Decor.LemonGarlandString",        position = Vector3.new(760, 12, 85) },
+	{ module = "Assets.Districts.PizzaPlaza.Decor.CafeChairRow",              position = Vector3.new(780, 0, 90) },
+	{ module = "Assets.Districts.PizzaPlaza.Decor.VinePlanter",               position = Vector3.new(800, 0, 90) },
+	{ module = "Assets.Districts.PizzaPlaza.Decor.CiaoMural",                 position = Vector3.new(820, 12, 85) },
+	{ module = "Assets.Districts.PizzaPlaza.Decor.WindowFlowerBox",           position = Vector3.new(840, 12, 85) },
+	{ module = "Assets.Districts.PizzaPlaza.Decor.AwningStripeBanner",        position = Vector3.new(860, 12, 80) },
+	{ module = "Assets.Districts.PizzaPlaza.Decor.PizzaBoxTower",             position = Vector3.new(880, 0, 90) },
+	{ module = "Assets.Districts.PizzaPlaza.Decor.RedCheckTableCloth",        position = Vector3.new(900, 0, 90) },
+	{ module = "Assets.Districts.PizzaPlaza.Decor.EspressoCupStack",          position = Vector3.new(920, 0, 90) },
+	{ module = "Assets.Districts.PizzaPlaza.Decor.WineGlassDisplay",          position = Vector3.new(940, 0, 90) },
+	{ module = "Assets.Districts.PizzaPlaza.Decor.OliveOilJugs",              position = Vector3.new(960, 0, 90) },
+	{ module = "Assets.Districts.PizzaPlaza.Decor.GarlicBraidString",         position = Vector3.new(980, 12, 85) },
+	{ module = "Assets.Districts.PizzaPlaza.Decor.CheeseWheelDisplay",        position = Vector3.new(1000, 0, 90) },
+	{ module = "Assets.Districts.PizzaPlaza.Decor.BreadBasket",               position = Vector3.new(1020, 0, 90) },
+	{ module = "Assets.Districts.PizzaPlaza.Decor.ChiantiBottleStack",        position = Vector3.new(1040, 0, 90) },
+	{ module = "Assets.Districts.PizzaPlaza.Decor.TomatoCrate",               position = Vector3.new(1060, 0, 90) },
+	{ module = "Assets.Districts.PizzaPlaza.Decor.CafeUmbrellaSmall",         position = Vector3.new(1080, 0, 90) },
+	{ module = "Assets.Districts.PizzaPlaza.Decor.RedRoseVase",               position = Vector3.new(1100, 0, 90) },
+	{ module = "Assets.Districts.PizzaPlaza.Decor.NeonHeartSign",             position = Vector3.new(1120, 12, 85) },
+	{ module = "Assets.Districts.PizzaPlaza.Decor.SidewalkChalkArt",          position = Vector3.new(1140, 0, 90) },
+	{ module = "Assets.Districts.PizzaPlaza.Decor.ItalianFlagPole",           position = Vector3.new(1160, 0, 90) },
+	{ module = "Assets.Districts.PizzaPlaza.Decor.WoodWineBarrel",            position = Vector3.new(1180, 0, 90) },
+	{ module = "Assets.Districts.PizzaPlaza.Decor.GrapevineHanger",           position = Vector3.new(1200, 0, 90) },
+	{ module = "Assets.Districts.PizzaPlaza.Decor.BasilPotRow",               position = Vector3.new(1220, 0, 90) },
+	{ module = "Assets.Districts.PizzaPlaza.Decor.CherryTomatoPlant",         position = Vector3.new(1240, 0, 90) },
+	{ module = "Assets.Districts.PizzaPlaza.Decor.ParmesanShakerSet",         position = Vector3.new(1260, 0, 90) },
+	{ module = "Assets.Districts.PizzaPlaza.Decor.PepperGrinderStack",        position = Vector3.new(1280, 0, 90) },
+	{ module = "Assets.Districts.PizzaPlaza.Decor.CandleHolderRow",           position = Vector3.new(1300, 0, 90) },
+
 	-- ============================================================
 	-- TOKYO TOWN (base X = 1100) — Japanese Street genre
 	-- ============================================================
