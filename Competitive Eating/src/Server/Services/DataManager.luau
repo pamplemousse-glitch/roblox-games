@@ -78,6 +78,12 @@ function DataManager.load(player: Player): any
 		if data.npcEncounters == nil then
 			data.npcEncounters = {}
 		end
+		if data.cookbook == nil then
+			data.cookbook = {}
+		end
+		if data.cookbookCoinBonus == nil then
+			data.cookbookCoinBonus = 0
+		end
 	else
 		data = Utils.defaultPlayerData()
 		if not ok then

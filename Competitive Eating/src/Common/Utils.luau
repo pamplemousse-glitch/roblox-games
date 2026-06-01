@@ -81,7 +81,9 @@ function Utils.defaultPlayerData(): any
 		winStreak        = 0,
 		lastWinDate      = "",
 		firstContestDone = false,
-		npcEncounters    = {},  -- [npcName] -> { count, wins, losses, lastContestDate }
+		npcEncounters    = {},
+		cookbook         = {},
+		cookbookCoinBonus = 0,
 		version          = 1,
 	}
 end

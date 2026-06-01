@@ -40,8 +40,10 @@ local remoteNames = {
 	-- Coaster
 	"CoasterFade",          -- server → client  (true = fade-in, false = fade-out)
 	-- Friend Vault
-	"DepositToVault",       -- bidirectional: client→server requests deposit; server→client confirms (success, newBalance, newCoins)
-	"WithdrawFromVault",    -- bidirectional: same shape as DepositToVault
+	"DepositToVault",
+	"WithdrawFromVault",
+	-- Cookbook
+	"CookbookUpdate",
 }
 
 for _, name in remoteNames do
@@ -64,6 +66,7 @@ local CosmeticsService   = require(Services.CosmeticsService)
 local MonetizationService = require(Services.MonetizationService)
 local RideController     = require(Services.RideController)
 local FriendVaultService = require(Services.FriendVaultService)
+local CookbookService    = require(Services.CookbookService)
 
 DataManager.init()
 PlayerService.init(remotesFolder)
@@ -75,3 +78,4 @@ NpcVendorService.init(remotesFolder)
 CosmeticsService.init(remotesFolder)
 RideController.init(remotesFolder)
 FriendVaultService.init(remotesFolder)
+CookbookService.init(remotesFolder)
