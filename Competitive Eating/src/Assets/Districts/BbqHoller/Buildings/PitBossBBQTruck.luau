@@ -51,10 +51,10 @@ return function(parent: Instance, originCF: CFrame): Model
 	AB.block(Vector3.new(0.1, 4, 3), DARK_WOOD, AB.offset(originCF, -10, 4.5, 4.55), model, "CabDoorR")
 	AB.block(Vector3.new(0.1, 1.2, 2), GLASS, AB.offset(originCF, -10, 5.6, 4.6), model, "CabWindowR")
 
-	-- 4 wheels
+	-- 4 wheels (axles along Z, so flat faces visible from the side)
 	for i, p in {Vector3.new(-11, 1.4, 4.3), Vector3.new(-11, 1.4, -4.3), Vector3.new(7, 1.4, 4.3), Vector3.new(7, 1.4, -4.3)} do
-		AB.cylinder(2.8, 1.4, TIRE_BLACK, originCF * CFrame.new(p), model, "Wheel_" .. i)
-		AB.cylinder(1.6, 1.5, RIM_GRAY, originCF * CFrame.new(p), model, "Rim_" .. i)
+		AB.cylinder(2.8, 1.4, TIRE_BLACK, originCF * CFrame.new(p) * CFrame.Angles(math.rad(90), 0, 0), model, "Wheel_" .. i)
+		AB.cylinder(1.6, 1.5, RIM_GRAY, originCF * CFrame.new(p) * CFrame.Angles(math.rad(90), 0, 0), model, "Rim_" .. i)
 	end
 
 	-- Serving window (cut out on the right side of the box, hinged-up flap)

@@ -42,8 +42,8 @@ return function(parent: Instance, originCF: CFrame): Model
 
 	-- Head (front)
 	AB.sphere(5.5, PIG_PINK, AB.offset(originCF, 0, 11.5, 6.0), model, "Head")
-	-- Snout
-	AB.cylinder(2.4, 1.6, SNOUT, AB.offset(originCF, 0, 11.0, 9), model, "Snout")
+	-- Snout (cylinder sticking out forward — rotated to lie along Z)
+	AB.cylinder(2.4, 1.6, SNOUT, AB.offset(originCF, 0, 11.0, 9) * CFrame.Angles(math.rad(90), 0, 0), model, "Snout")
 	-- Snout nostrils
 	AB.sphere(0.4, PIG_DEEP, AB.offset(originCF, -0.6, 11.0, 9.7), model, "NostrilL")
 	AB.sphere(0.4, PIG_DEEP, AB.offset(originCF,  0.6, 11.0, 9.7), model, "NostrilR")
