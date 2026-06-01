@@ -36,6 +36,30 @@ return {
 	{ module = "Assets.Districts.PizzaPlaza.Npcs.Sal",      position = Vector3.new(2060, 6,   30) },
 
 	-- ============================================================
+	-- TOKYO TOWN (X = 4000) — Japanese Street genre
+	-- ============================================================
+
+	-- Tier 1 foods (5 dish displays)
+	{ module = "Assets.Districts.TokyoTown.Foods.RamenBowl",  position = Vector3.new(4010, 6,    0) },
+	{ module = "Assets.Districts.TokyoTown.Foods.GyozaTray",  position = Vector3.new(4020, 6,    0) },
+	{ module = "Assets.Districts.TokyoTown.Foods.Takoyaki",   position = Vector3.new(4030, 6,    0) },
+	{ module = "Assets.Districts.TokyoTown.Foods.SushiRoll",  position = Vector3.new(4040, 6,    0) },
+	{ module = "Assets.Districts.TokyoTown.Foods.Mochi",      position = Vector3.new(4050, 6,    0) },
+
+	-- Buildings (5 hero structures)
+	{ module = "Assets.Districts.TokyoTown.Buildings.RamenShop",           position = Vector3.new(4050, 0,  100), yaw = 0 },
+	{ module = "Assets.Districts.TokyoTown.Buildings.SushiBar",            position = Vector3.new(4100, 0,  100), yaw = 0 },
+	{ module = "Assets.Districts.TokyoTown.Buildings.IzakayaPub",          position = Vector3.new(4150, 0,  100), yaw = 0 },
+	{ module = "Assets.Districts.TokyoTown.Buildings.ShintoArchEntry",     position = Vector3.new(4200, 0,  100), yaw = 0 },
+	{ module = "Assets.Districts.TokyoTown.Buildings.StreetCartTakoyaki",  position = Vector3.new(4250, 0,  100), yaw = 0 },
+
+	-- NPC vendor stands (4)
+	{ module = "Assets.Districts.TokyoTown.Npcs.Kenji",  position = Vector3.new(4020, 6,   30) },
+	{ module = "Assets.Districts.TokyoTown.Npcs.Yumi",   position = Vector3.new(4040, 6,   30) },
+	{ module = "Assets.Districts.TokyoTown.Npcs.Riku",   position = Vector3.new(4060, 6,   30) },
+	{ module = "Assets.Districts.TokyoTown.Npcs.Akemi",  position = Vector3.new(4080, 6,   30) },
+
+	-- ============================================================
 	-- Other districts go here as parallel sessions complete:
 	-- TOKYO TOWN              (X = 4000)
 	-- DONUT DYNASTY           (X = 6000)
