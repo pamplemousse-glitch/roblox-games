@@ -30,6 +30,35 @@ return {
 	{ module = "Assets.Districts.PizzaPlaza.Buildings.BocceCourt",            position = Vector3.new(1150, 0, 100), yaw = 0 },
 	{ module = "Assets.Districts.PizzaPlaza.Buildings.RistoranteSignWall",    position = Vector3.new(1200, 0, 100), yaw = 0 },
 
+	-- Props (24 entries on the sidewalk at z=60-80) ------------------------
+	-- Row j=0 (z=60)
+	{ module = "Assets.Districts.PizzaPlaza.Props.CheckeredUmbrellaTable",    position = Vector3.new(715, 0, 60) },
+	{ module = "Assets.Districts.PizzaPlaza.Props.EspressoCart",              position = Vector3.new(730, 0, 60) },
+	{ module = "Assets.Districts.PizzaPlaza.Props.MiniVespa",                 position = Vector3.new(745, 0, 60) },
+	{ module = "Assets.Districts.PizzaPlaza.Props.WineBarrelStack",           position = Vector3.new(760, 0, 60) },
+	{ module = "Assets.Districts.PizzaPlaza.Props.FruitMarketCrate",          position = Vector3.new(775, 0, 60) },
+	{ module = "Assets.Districts.PizzaPlaza.Props.TrashCan",                  position = Vector3.new(790, 0, 60) },
+	{ module = "Assets.Districts.PizzaPlaza.Props.Lamppost",                  position = Vector3.new(805, 0, 60) },
+	{ module = "Assets.Districts.PizzaPlaza.Props.StreetSign",                position = Vector3.new(820, 0, 60) },
+	-- Row j=1 (z=70)
+	{ module = "Assets.Districts.PizzaPlaza.Props.FoodCrates",                position = Vector3.new(715, 0, 70) },
+	{ module = "Assets.Districts.PizzaPlaza.Props.BuskerAccordionStand",      position = Vector3.new(730, 0, 70) },
+	{ module = "Assets.Districts.PizzaPlaza.Props.SandwichBoardChalkMenu",    position = Vector3.new(745, 0, 70) },
+	{ module = "Assets.Districts.PizzaPlaza.Props.PigeonPerches",             position = Vector3.new(760, 0, 70) },
+	{ module = "Assets.Districts.PizzaPlaza.Props.PlanterBox",                position = Vector3.new(775, 0, 70) },
+	{ module = "Assets.Districts.PizzaPlaza.Props.NewspaperStand",            position = Vector3.new(790, 0, 70) },
+	{ module = "Assets.Districts.PizzaPlaza.Props.BikeRack",                  position = Vector3.new(805, 0, 70) },
+	{ module = "Assets.Districts.PizzaPlaza.Props.Lamppost",                  position = Vector3.new(820, 0, 70) },
+	-- Row j=2 (z=80) — repeats + remaining variants
+	{ module = "Assets.Districts.PizzaPlaza.Props.WineRack",                  position = Vector3.new(715, 0, 80) },
+	{ module = "Assets.Districts.PizzaPlaza.Props.PizzaBoxStack",             position = Vector3.new(730, 0, 80) },
+	{ module = "Assets.Districts.PizzaPlaza.Props.PastaCart",                 position = Vector3.new(745, 0, 80) },
+	{ module = "Assets.Districts.PizzaPlaza.Props.ChalkboardEasel",           position = Vector3.new(760, 0, 80) },
+	{ module = "Assets.Districts.PizzaPlaza.Props.CoffeeUrn",                 position = Vector3.new(775, 0, 80) },
+	{ module = "Assets.Districts.PizzaPlaza.Props.PicnicBench",               position = Vector3.new(790, 0, 80) },
+	{ module = "Assets.Districts.PizzaPlaza.Props.Lamppost",                  position = Vector3.new(805, 0, 80) },
+	{ module = "Assets.Districts.PizzaPlaza.Props.Lamppost",                  position = Vector3.new(820, 0, 80) },
+
 	-- ============================================================
 	-- TOKYO TOWN (base X = 1100) — Japanese Street genre
 	-- ============================================================
