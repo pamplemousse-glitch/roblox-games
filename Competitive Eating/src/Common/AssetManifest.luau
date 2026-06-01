@@ -103,6 +103,22 @@ return {
 	{ module = "Assets.Districts.PizzaPlaza.Landmarks.TreviFountain",         position = Vector3.new(900, 0, 130), yaw = 0 },
 	{ module = "Assets.Districts.PizzaPlaza.Landmarks.GiantPizzaOven",        position = Vector3.new(1000, 0, 130), yaw = 0 },
 
+	-- NPCs (12 pedestrians at z=30, 6 above ground) ------------------------
+	-- Named storefront owners
+	{ module = "Assets.Districts.PizzaPlaza.Npcs.Tony",                       position = Vector3.new(720, 6, 30) },
+	{ module = "Assets.Districts.PizzaPlaza.Npcs.Vinny",                      position = Vector3.new(740, 6, 30) },
+	{ module = "Assets.Districts.PizzaPlaza.Npcs.Carmela",                    position = Vector3.new(760, 6, 30) },
+	{ module = "Assets.Districts.PizzaPlaza.Npcs.Sal",                        position = Vector3.new(780, 6, 30) },
+	-- Pedestrians
+	{ module = "Assets.Districts.PizzaPlaza.Npcs.OldManBenchReader",          position = Vector3.new(800, 6, 30) },
+	{ module = "Assets.Districts.PizzaPlaza.Npcs.KidWithGelato",              position = Vector3.new(820, 6, 30) },
+	{ module = "Assets.Districts.PizzaPlaza.Npcs.NonnaShoppingBag",           position = Vector3.new(840, 6, 30) },
+	{ module = "Assets.Districts.PizzaPlaza.Npcs.AccordionBusker",            position = Vector3.new(860, 6, 30) },
+	{ module = "Assets.Districts.PizzaPlaza.Npcs.FashionWoman",               position = Vector3.new(880, 6, 30) },
+	{ module = "Assets.Districts.PizzaPlaza.Npcs.FashionMan",                 position = Vector3.new(900, 6, 30) },
+	{ module = "Assets.Districts.PizzaPlaza.Npcs.StreetSweeper",              position = Vector3.new(920, 6, 30) },
+	{ module = "Assets.Districts.PizzaPlaza.Npcs.DeliveryBoyOnBike",          position = Vector3.new(940, 6, 30) },
+
 	-- ============================================================
 	-- TOKYO TOWN (base X = 1100) — Japanese Street genre
 	-- ============================================================
