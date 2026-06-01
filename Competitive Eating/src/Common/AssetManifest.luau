@@ -36,11 +36,34 @@ return {
 	{ module = "Assets.Districts.PizzaPlaza.Npcs.Sal",      position = Vector3.new(2060, 6,   30) },
 
 	-- ============================================================
+	-- MERCADO DEL SOL (X = 12000) — Mexican Street genre
+	-- ============================================================
+
+	-- Foods (5)
+	{ module = "Assets.Districts.MercadoDelSol.Foods.Taco",       position = Vector3.new(12010, 6,    0) },
+	{ module = "Assets.Districts.MercadoDelSol.Foods.Burrito",    position = Vector3.new(12020, 6,    0) },
+	{ module = "Assets.Districts.MercadoDelSol.Foods.Quesadilla", position = Vector3.new(12030, 6,    0) },
+	{ module = "Assets.Districts.MercadoDelSol.Foods.Tamale",     position = Vector3.new(12040, 6,    0) },
+	{ module = "Assets.Districts.MercadoDelSol.Foods.Elote",      position = Vector3.new(12050, 6,    0) },
+
+	-- Buildings (5)
+	{ module = "Assets.Districts.MercadoDelSol.Buildings.TaqueriaStall",       position = Vector3.new(12050, 0, 100), yaw = 0 },
+	{ module = "Assets.Districts.MercadoDelSol.Buildings.MercadoCanopy",       position = Vector3.new(12100, 0, 100), yaw = 0 },
+	{ module = "Assets.Districts.MercadoDelSol.Buildings.SalsaCart",           position = Vector3.new(12150, 0, 100), yaw = 0 },
+	{ module = "Assets.Districts.MercadoDelSol.Buildings.CathedralArchEntry", position = Vector3.new(12200, 0, 100), yaw = 0 },
+	{ module = "Assets.Districts.MercadoDelSol.Buildings.PinataTower",         position = Vector3.new(12250, 0, 100), yaw = 0 },
+
+	-- NPCs (4)
+	{ module = "Assets.Districts.MercadoDelSol.Npcs.DonPepe",  position = Vector3.new(12020, 6, 30) },
+	{ module = "Assets.Districts.MercadoDelSol.Npcs.Lucia",    position = Vector3.new(12040, 6, 30) },
+	{ module = "Assets.Districts.MercadoDelSol.Npcs.Memo",     position = Vector3.new(12060, 6, 30) },
+	{ module = "Assets.Districts.MercadoDelSol.Npcs.DonaRosa", position = Vector3.new(12080, 6, 30) },
+
+	-- ============================================================
 	-- Other districts go here as parallel sessions complete:
 	-- TOKYO TOWN              (X = 4000)
 	-- DONUT DYNASTY           (X = 6000)
 	-- BURGER BOULEVARD        (X = 8000)
 	-- BBQ HOLLER              (X = 10000)
-	-- MERCADO DEL SOL         (X = 12000)
 	-- ============================================================
 }
