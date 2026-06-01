@@ -12,12 +12,14 @@ local Controllers = script.Parent.Controllers
 
 local ContestController    = require(Controllers.ContestController)
 local HudController        = require(Controllers.HudController)
-local ShopController       = require(Controllers.ShopController)
-local OnboardingController = require(Controllers.OnboardingController)
-local GloryReelController  = require(Controllers.GloryReelController)
+local ShopController        = require(Controllers.ShopController)
+local OnboardingController  = require(Controllers.OnboardingController)
+local GloryReelController   = require(Controllers.GloryReelController)
+local FriendVaultController = require(Controllers.FriendVaultController)
 
 ContestController.init(remotesFolder)
 HudController.init(remotesFolder)
 ShopController.init(remotesFolder)
 OnboardingController.init(remotesFolder)
 GloryReelController.init(remotesFolder)
+FriendVaultController.init(remotesFolder)
