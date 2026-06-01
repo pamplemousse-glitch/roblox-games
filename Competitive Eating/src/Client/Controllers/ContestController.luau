@@ -12,6 +12,8 @@ local Common    = ReplicatedStorage:WaitForChild("Common")
 local Constants = require(Common:WaitForChild("Constants"))
 local Types     = require(Common:WaitForChild("Types"))
 
+local GloryReelController = require(script.Parent:WaitForChild("GloryReelController"))
+
 local ContestController = {}
 
 local remotes: { [string]: RemoteEvent } = {}
@@ -224,6 +226,7 @@ local function startRing(params: Types.SkillCheckParams)
 			isGreat   = isGreat,
 		}
 		remotes.SkillCheckResult:FireServer(result)
+		GloryReelController.recordBite(hit, isGreat, params.biteIndex)
 
 		-- Haptic feedback on mobile (haptic motor pulse)
 		if UserInputService.TouchEnabled and HapticService and HapticService:IsVibrationSupported(Enum.UserInputType.Gamepad1) then
