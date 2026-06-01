@@ -223,6 +223,14 @@ local function resolveResults(arena: Types.Arena)
 		local baseCoins  = Constants.COIN_BY_PLACE[entry.place] or Constants.COIN_PARTICIPATION
 		local coins      = math.floor(baseCoins * streakMult)
 
+		-- Pity Pit: last-place finisher gets a small consolation bonus on top.
+		-- Reframes "you got rekt" as "tried hard, here's a token". State fair 8th-place tradition.
+		-- Worst player experience fixed without making losses too rewarding.
+		local isLastPlace = (entry.place == Constants.SEATS_PER_ARENA)
+		if isLastPlace then
+			coins = coins + 15  -- pity pit consolation
+		end
+
 		DataManager.addCoins(player, coins)
 		DataManager.recordContest(player)
 

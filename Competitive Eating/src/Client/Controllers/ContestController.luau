@@ -213,6 +213,62 @@ local function startRing(params: Types.SkillCheckParams)
 
 		if isGreat then
 			showFeedback("GREAT!", Color3.fromRGB(255, 200, 0))
+			-- Foodgasm reaction burst (Food Wars-coded): cheap TikTok bait, screenshot-bait
+			task.spawn(function()
+				local foodgasm = Instance.new("ScreenGui")
+				foodgasm.Name           = "FoodgasmBurst"
+				foodgasm.ResetOnSpawn   = false
+				foodgasm.IgnoreGuiInset = true
+				foodgasm.DisplayOrder   = 10
+				foodgasm.Parent         = playerGui
+
+				-- 12 radial sparkle bursts emanating from screen center
+				for i = 1, 12 do
+					local sparkle = Instance.new("TextLabel")
+					sparkle.Size                = UDim2.fromOffset(64, 64)
+					sparkle.Position            = UDim2.new(0.5, -32, 0.5, -32)
+					sparkle.BackgroundTransparency = 1
+					sparkle.TextColor3          = Color3.fromRGB(255, 220, 80)
+					sparkle.TextStrokeColor3    = Color3.fromRGB(255, 80, 80)
+					sparkle.TextStrokeTransparency = 0
+					sparkle.TextScaled          = true
+					sparkle.Font                = Enum.Font.LuckiestGuy
+					sparkle.Text                = ({"✨", "⭐", "💥", "✦"})[((i - 1) % 4) + 1]
+					sparkle.Rotation            = math.random(0, 360)
+					sparkle.Parent              = foodgasm
+					local angle = (i / 12) * math.pi * 2
+					local dx, dy = math.cos(angle) * 280, math.sin(angle) * 280
+					TweenService:Create(sparkle, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+						Position = UDim2.new(0.5, -32 + dx, 0.5, -32 + dy),
+						TextTransparency = 1,
+						TextStrokeTransparency = 1,
+						Rotation = sparkle.Rotation + 360,
+					}):Play()
+				end
+
+				-- Big "PERFECT!" text burst in center
+				local bang = Instance.new("TextLabel")
+				bang.Size                = UDim2.fromOffset(360, 120)
+				bang.Position            = UDim2.new(0.5, -180, 0.5, -250)
+				bang.BackgroundTransparency = 1
+				bang.TextColor3          = Color3.fromRGB(255, 255, 100)
+				bang.TextStrokeColor3    = Color3.fromRGB(220, 30, 30)
+				bang.TextStrokeTransparency = 0
+				bang.TextScaled          = true
+				bang.Font                = Enum.Font.LuckiestGuy
+				bang.Text                = ({"FOODGASM!", "PERFECT!", "SUBLIME!", "GLORIOUS!"})[math.random(4)]
+				bang.Rotation            = math.random(-8, 8)
+				bang.Parent              = foodgasm
+				TweenService:Create(bang, TweenInfo.new(0.55, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+					Size = UDim2.fromOffset(520, 160),
+					Position = UDim2.new(0.5, -260, 0.5, -270),
+					TextTransparency = 1,
+					TextStrokeTransparency = 1,
+				}):Play()
+
+				task.wait(0.7)
+				foodgasm:Destroy()
+			end)
 		elseif hit then
 			showFeedback("GOOD", Color3.fromRGB(100, 255, 100))
 		else
@@ -236,15 +292,27 @@ end
 local activeArenaId: number? = nil
 
 local function onPhaseChanged(arenaId: number, state: string)
-	activeArenaId = if state ~= "Idle" then arenaId else nil
-
-	if state == "Queuing" then
-		-- Server guards against double-joins; safe to fire every broadcast
-		remotes.JoinQueue:FireServer(arenaId)
+	-- Only track the arena we're personally in (Active/Results/Idle messages are per-player).
+	-- Queuing broadcasts go to all players — don't auto-join.
+	if state == "Active" or state == "Results" or state == "Idle" then
+		activeArenaId = if state ~= "Idle" then arenaId else nil
 	end
 
 	if state ~= "Active" then
 		clearRing()
+	end
+end
+
+-- Wire ProximityPrompts on the contest stage to trigger JoinQueue.
+local function setupContestPrompts()
+	local stage = workspace:WaitForChild("ContestStage_T1", 60)
+	if not stage then return end
+	for _, desc in stage:GetDescendants() do
+		if desc:IsA("ProximityPrompt") then
+			desc.Triggered:Connect(function()
+				remotes.JoinQueue:FireServer(nil) -- server picks first available arena
+			end)
+		end
 	end
 end
 
@@ -267,6 +335,8 @@ function ContestController.init(remotesFolder: Folder)
 	remotes.ContestPhaseChanged.OnClientEvent:Connect(function(arenaId: any, state: any)
 		onPhaseChanged(arenaId, state)
 	end)
+
+	task.spawn(setupContestPrompts)
 end
 
 return ContestController

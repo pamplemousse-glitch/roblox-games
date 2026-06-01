@@ -173,6 +173,19 @@ function DataManager.recordWin(player: Player)
 
 	local streak = (data.winStreak or 0) + 1
 	data.winStreak = streak
+
+	-- v1 free starter cosmetic: first-ever win grants Hot Dog Hat for instant identity.
+	-- Player has a visible flex from minute 2 of play.
+	if data.totalWins == 1 then
+		data.ownedCosmetics = data.ownedCosmetics or {}
+		if not data.ownedCosmetics["Hat_HotDog"] then
+			data.ownedCosmetics["Hat_HotDog"] = true
+			-- Optional: auto-equip
+			data.equippedCosmetics = data.equippedCosmetics or {}
+			data.equippedCosmetics.hat = "Hat_HotDog"
+		end
+	end
+
 	dirty[player.UserId] = true
 end
 

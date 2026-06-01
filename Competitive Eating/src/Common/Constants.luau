@@ -81,8 +81,62 @@ Constants.NPC_PAUSE_DURATION = 0.8
 Constants.NPC_BACKFILL_TIME = 10    -- seconds before contest start, fill empty seats
 
 Constants.NPC_NAMES = {
-	"Chomping Charlie", "Big Belly Beatrice", "Rapid Ray",
-	"The Rookie", "Steady Susan", "Gut-Busting Greg",
+	"'Jaws' Beasley McGraw", "Tsunami Tyler", "MIKI", "Lil' Stuff",
+	"The Mouth Mason", "Doc", "Bigtop Bob", "Mrs. Pickles",
+}
+
+-- Per-NPC personality data — catchphrases + signature tells.
+-- Tells = predictable difficulty curve a good player can exploit.
+-- ContestService fires the catchphrase at countdown; tell drives NpcService.tick variance.
+Constants.NPC_CHARACTERS = {
+	["'Jaws' Beasley McGraw"] = {
+		catchphrase = "Don't blink, kid. I never do.",
+		tell        = "steady",        -- consistent pace, no panic spikes
+		winLine     = "Just like old times.",
+		loseLine    = "...lucky.",
+	},
+	["Tsunami Tyler"] = {
+		catchphrase = "Hope you brought a bib.",
+		tell        = "fast_early",    -- huge head start, fades in last 30s
+		winLine     = "SURF'S UP, BABY!",
+		loseLine    = "I peaked too early...",
+	},
+	["MIKI"] = {
+		catchphrase = "...",            -- silent menace
+		tell        = "late_surge",    -- quiet until last 20s, then explodes
+		winLine     = "[smiles]",
+		loseLine    = "[silent shrug]",
+	},
+	["Lil' Stuff"] = {
+		catchphrase = "Heh heh, watch me go!",
+		tell        = "consistent",    -- steady mid-range eater
+		winLine     = "DID YOU SEE THAT?! DID YOU?!",
+		loseLine    = "Aww, beans.",
+	},
+	["The Mouth Mason"] = {
+		catchphrase = "Shall we begin?",
+		tell        = "calm_strong",   -- methodical, high baseline
+		winLine     = "Quite satisfactory.",
+		loseLine    = "Well played.",
+	},
+	["Doc"] = {
+		catchphrase = "Anatomically, this should be impossible.",
+		tell        = "scientific",    -- predictable bursts every 15s
+		winLine     = "Just as my calculations predicted.",
+		loseLine    = "Fascinating. Back to the lab.",
+	},
+	["Bigtop Bob"] = {
+		catchphrase = "STEP RIGHT UP! WATCH ME EAT!",
+		tell        = "theatrical",    -- big swings, big pauses
+		winLine     = "AND THE CROWD GOES WILD!",
+		loseLine    = "...the show must go on.",
+	},
+	["Mrs. Pickles"] = {
+		catchphrase = "Oh dearie, don't go easy on me.",
+		tell        = "deceptive",     -- slow start, terrifying finish
+		winLine     = "Sweet potato pie, that was a treat!",
+		loseLine    = "Bless your heart, dear.",
+	},
 }
 
 -- ── Tiers ────────────────────────────────────────────────────────────────────
@@ -134,5 +188,26 @@ Constants.ONBOARDING_HIT_LABEL_BITES           = 3     -- show "HIT HERE" label 
 Constants.DATASTORE_NAME     = "PlayerData_v1"
 Constants.SAVE_INTERVAL      = 60    -- auto-save every 60 seconds
 Constants.SESSION_LOCK_KEY   = "_lock"
+
+-- ── Cosmetics shop items ──────────────────────────────────────────────────────
+-- id: must match the Accessory name in ServerStorage.Cosmetics
+-- currency: "coins" | "tickets" (Carnival Tickets from mini-games)
+Constants.COSMETICS = {
+    { id = "Hat_HotDog",    label = "Hot Dog Hat",           price = 150,  currency = "coins",   category = "hat" },
+    { id = "Hat_Donut",     label = "Donut Ring Crown",      price = 120,  currency = "coins",   category = "hat" },
+    { id = "Hat_Pizza",     label = "Pizza Slice Hat",        price = 130,  currency = "coins",   category = "hat" },
+    { id = "Belt_Champion", label = "Eating Champion Belt",   price = 500,  currency = "coins",   category = "belt",
+      unlockCondition = "winStreak >= 3" },  -- shown only after 3-win streak
+}
+
+-- ── Food props (used in contest/shop visuals) ─────────────────────────────────
+-- Names match Workspace.FoodProps children
+Constants.FOOD_PROPS = {
+    "FoodProp_HotDog",
+    "FoodProp_Burger",
+    "FoodProp_Pizza",
+    "FoodProp_Donut",
+    "FoodProp_IceCream",
+}
 
 return Constants
