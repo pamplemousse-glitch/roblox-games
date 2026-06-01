@@ -36,11 +36,34 @@ return {
 	{ module = "Assets.Districts.PizzaPlaza.Npcs.Sal",      position = Vector3.new(2060, 6,   30) },
 
 	-- ============================================================
+	-- BBQ HOLLER (X = 10000) — American BBQ genre
+	-- ============================================================
+
+	-- Foods (5)
+	{ module = "Assets.Districts.BbqHoller.Foods.Brisket",       position = Vector3.new(10010, 6,   0) },
+	{ module = "Assets.Districts.BbqHoller.Foods.PulledPork",    position = Vector3.new(10020, 6,   0) },
+	{ module = "Assets.Districts.BbqHoller.Foods.Ribs",          position = Vector3.new(10030, 6,   0) },
+	{ module = "Assets.Districts.BbqHoller.Foods.HotLink",       position = Vector3.new(10040, 6,   0) },
+	{ module = "Assets.Districts.BbqHoller.Foods.MacAndCheese",  position = Vector3.new(10050, 6,   0) },
+
+	-- Buildings (5)
+	{ module = "Assets.Districts.BbqHoller.Buildings.SmokehouseShack", position = Vector3.new(10050, 0, 100), yaw = 0 },
+	{ module = "Assets.Districts.BbqHoller.Buildings.PicnicPavilion",  position = Vector3.new(10100, 0, 100), yaw = 0 },
+	{ module = "Assets.Districts.BbqHoller.Buildings.ChuckwagonStand", position = Vector3.new(10150, 0, 100), yaw = 0 },
+	{ module = "Assets.Districts.BbqHoller.Buildings.BarnLandmark",    position = Vector3.new(10200, 0, 100), yaw = 0 },
+	{ module = "Assets.Districts.BbqHoller.Buildings.FirepitCircle",   position = Vector3.new(10250, 0, 100), yaw = 0 },
+
+	-- NPCs (4)
+	{ module = "Assets.Districts.BbqHoller.Npcs.BigEarl",    position = Vector3.new(10020, 6, 30) },
+	{ module = "Assets.Districts.BbqHoller.Npcs.MamaHattie", position = Vector3.new(10040, 6, 30) },
+	{ module = "Assets.Districts.BbqHoller.Npcs.TexDiggs",   position = Vector3.new(10060, 6, 30) },
+	{ module = "Assets.Districts.BbqHoller.Npcs.SkinnyJoe",  position = Vector3.new(10080, 6, 30) },
+
+	-- ============================================================
 	-- Other districts go here as parallel sessions complete:
 	-- TOKYO TOWN              (X = 4000)
 	-- DONUT DYNASTY           (X = 6000)
 	-- BURGER BOULEVARD        (X = 8000)
-	-- BBQ HOLLER              (X = 10000)
 	-- MERCADO DEL SOL         (X = 12000)
 	-- ============================================================
 }
