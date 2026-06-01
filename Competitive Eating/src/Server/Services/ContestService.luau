@@ -8,8 +8,9 @@ local Common        = ReplicatedStorage.Common
 local Constants     = require(Common.Constants)
 local Utils         = require(Common.Utils)
 local Types         = require(Common.Types)
-local DataManager   = require(script.Parent.DataManager)
-local NpcService    = require(script.Parent.NpcService)
+local DataManager       = require(script.Parent.DataManager)
+local NpcService        = require(script.Parent.NpcService)
+local TournamentService = require(script.Parent.TournamentService)
 
 local ContestService = {}
 
@@ -284,6 +285,8 @@ local function resolveResults(arena: Types.Arena)
 		else
 			DataManager.recordLoss(player)
 		end
+
+		TournamentService.onContestResult(player, entry.place == 1, sorted, entry.place, arena.tier)
 
 		local updatedData = DataManager.get(player)
 		remotes.StatsUpdate:FireClient(player, updatedData.stats, updatedData.coins, updatedData.highestTier)

@@ -210,4 +210,64 @@ Constants.FOOD_PROPS = {
     "FoodProp_IceCream",
 }
 
+-- ── Tournament arc: Road to The Bear ──────────────────────────────────────────
+-- 4-stage multi-week storyline. Each stage has objectives the player completes
+-- through normal contest play. Completing every objective in a stage grants the
+-- reward and unlocks the next stage. Stage 4 grants the "Bear-Bound" title and
+-- triggers the placeholder "BEAR PREVIEW (coming soon)" cutscene — the real
+-- Bear boss fight is deferred to a later content drop.
+--
+-- Objective counters are stored in playerData.tournamentProgress.objectives.
+-- Objective kinds:
+--   "tierWin"  -> win a contest at the given tier
+--   "beatNpc"  -> finish a contest ahead of the named NPC (any tier)
+
+Constants.TOURNAMENT_ARC_NAME = "Road to The Bear"
+
+Constants.TOURNAMENT_STAGES = {
+    {
+        id          = 1,
+        name        = "Boardwalk Rookie",
+        description = "Cut your teeth at the Local Diner.",
+        objectives  = {
+            { key = "stage1_tier1_wins",    kind = "tierWin", tier = 1,           target = 5, label = "Win 5 Tier 1 contests" },
+            { key = "stage1_beat_lilstuff", kind = "beatNpc", npc = "Lil' Stuff", target = 1, label = "Beat Lil' Stuff once" },
+        },
+        reward = { cosmeticId = "Hat_PierRookie",        title = "Boardwalk Rookie" },
+    },
+    {
+        id          = 2,
+        name        = "Regional Threat",
+        description = "Make a name on the Regional Fairground circuit.",
+        objectives  = {
+            { key = "stage2_tier2_wins",   kind = "tierWin", tier = 2,                 target = 3, label = "Win 3 Tier 2 contests" },
+            { key = "stage2_beat_tsunami", kind = "beatNpc", npc = "Tsunami Tyler",    target = 1, label = "Beat Tsunami Tyler once" },
+        },
+        reward = { cosmeticId = "Hat_RegionalThreat",    title = "Regional Threat" },
+    },
+    {
+        id          = 3,
+        name        = "National Contender",
+        description = "Take the National Stadium by storm.",
+        objectives  = {
+            { key = "stage3_tier3_wins", kind = "tierWin", tier = 3,     target = 3, label = "Win 3 Tier 3 contests" },
+            { key = "stage3_beat_miki",  kind = "beatNpc", npc = "MIKI", target = 1, label = "Beat MIKI once" },
+        },
+        reward = { cosmeticId = "Hat_NationalContender", title = "National Contender" },
+    },
+    {
+        id          = 4,
+        name        = "Bear-Bound",
+        description = "World Championship gauntlet. The Bear is watching.",
+        objectives  = {
+            { key = "stage4_tier4_wins", kind = "tierWin", tier = 4,                          target = 2, label = "Win 2 Tier 4 contests" },
+            { key = "stage4_beat_jaws",  kind = "beatNpc", npc = "'Jaws' Beasley McGraw",     target = 1, label = "Beat 'Jaws' Beasley McGraw once" },
+        },
+        -- Stage 4 grants the title only. The placeholder "BEAR PREVIEW
+        -- (coming soon)" cutscene is triggered via the bearPreview flag on
+        -- TournamentProgressUpdate. The real Bear boss fight is deferred.
+        reward = { title = "Bear-Bound", bearPreview = true },
+    },
+}
+
 return Constants

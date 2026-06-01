@@ -75,6 +75,24 @@ function DataManager.load(player: Player): any
 		if data.statXp == nil then
 			data.statXp = {}
 		end
+		-- Tournament arc (Road to The Bear): existing saves get a fresh block.
+		if data.tournamentProgress == nil then
+			data.tournamentProgress = {
+				currentStage = 1,
+				objectives   = {},
+				arcComplete  = false,
+			}
+		else
+			if data.tournamentProgress.currentStage == nil then
+				data.tournamentProgress.currentStage = 1
+			end
+			if data.tournamentProgress.objectives == nil then
+				data.tournamentProgress.objectives = {}
+			end
+			if data.tournamentProgress.arcComplete == nil then
+				data.tournamentProgress.arcComplete = false
+			end
+		end
 	else
 		data = Utils.defaultPlayerData()
 		if not ok then

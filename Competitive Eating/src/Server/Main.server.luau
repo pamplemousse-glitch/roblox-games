@@ -42,6 +42,8 @@ local remoteNames = {
 	-- Friend Vault
 	"DepositToVault",       -- bidirectional: client→server requests deposit; server→client confirms (success, newBalance, newCoins)
 	"WithdrawFromVault",    -- bidirectional: same shape as DepositToVault
+	-- Tournament arc (Road to The Bear)
+	"TournamentProgressUpdate", -- server → client (snapshot + stage-complete + bearPreview cue)
 }
 
 for _, name in remoteNames do
@@ -64,11 +66,13 @@ local CosmeticsService   = require(Services.CosmeticsService)
 local MonetizationService = require(Services.MonetizationService)
 local RideController     = require(Services.RideController)
 local FriendVaultService = require(Services.FriendVaultService)
+local TournamentService  = require(Services.TournamentService)
 
 DataManager.init()
 PlayerService.init(remotesFolder)
 MonetizationService.init()
 UpgradeService.init(remotesFolder)
+TournamentService.init(remotesFolder)
 ContestService.init(remotesFolder)
 MiniGameService.init(remotesFolder)
 NpcVendorService.init(remotesFolder)

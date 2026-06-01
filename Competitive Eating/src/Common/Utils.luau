@@ -81,6 +81,14 @@ function Utils.defaultPlayerData(): any
 		winStreak        = 0,
 		lastWinDate      = "",
 		firstContestDone = false,
+		-- Road to The Bear tournament arc state. currentStage is the stage
+		-- the player is actively working on (1-4); on stage 4 completion it
+		-- stays at 4 and arcComplete flips true.
+		tournamentProgress = {
+			currentStage = 1,
+			objectives   = {},   -- [objectiveKey: string] -> currentValue: number
+			arcComplete  = false,
+		},
 		version          = 1,
 	}
 end
