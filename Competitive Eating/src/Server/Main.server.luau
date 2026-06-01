@@ -71,6 +71,7 @@ local FriendVaultService = require(Services.FriendVaultService)
 local CookbookService    = require(Services.CookbookService)
 local TournamentService  = require(Services.TournamentService)
 local NpcMemoryService   = require(Services.NpcMemoryService)  -- transitively loaded by ContestService; declared explicitly for clarity
+local AssetSpawner       = require(Services.AssetSpawner)
 
 DataManager.init()
 PlayerService.init(remotesFolder)
@@ -84,3 +85,4 @@ NpcVendorService.init(remotesFolder)
 RideController.init(remotesFolder)
 FriendVaultService.init(remotesFolder)
 CookbookService.init(remotesFolder)
+AssetSpawner.init()

@@ -10,6 +10,9 @@
       "$className": "ReplicatedStorage",
       "Common": {
         "$path": "src/Common"
+      },
+      "Assets": {
+        "$path": "src/Assets"
       }
     },
     "StarterPlayer": {
