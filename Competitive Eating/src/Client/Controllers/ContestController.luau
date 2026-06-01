@@ -228,6 +228,26 @@ local function startRing(params: Types.SkillCheckParams)
 		remotes.SkillCheckResult:FireServer(result)
 		GloryReelController.recordBite(hit, isGreat, params.biteIndex)
 
+		-- Player bite-bob: lean character forward + down briefly on every successful bite
+		if hit then
+			local char = localPlayer.Character
+			local hrp  = char and char:FindFirstChild("HumanoidRootPart")
+			if hrp then
+				local original = hrp.CFrame
+				local bobOffset = CFrame.new(0, -0.4, -0.4) * CFrame.Angles(math.rad(-15), 0, 0)
+				TweenService:Create(hrp, TweenInfo.new(0.08, Enum.EasingStyle.Quad), {
+					CFrame = original * bobOffset,
+				}):Play()
+				task.delay(0.12, function()
+					if hrp and hrp.Parent then
+						TweenService:Create(hrp, TweenInfo.new(0.14, Enum.EasingStyle.Quad), {
+							CFrame = original,
+						}):Play()
+					end
+				end)
+			end
+		end
+
 		-- Haptic feedback on mobile (haptic motor pulse)
 		if UserInputService.TouchEnabled and HapticService and HapticService:IsVibrationSupported(Enum.UserInputType.Gamepad1) then
 			pcall(function()

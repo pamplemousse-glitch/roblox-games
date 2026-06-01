@@ -239,12 +239,15 @@ Constants.TIER_NAMES = {
 	"Local Diner", "Regional Fairground", "National Stadium", "World Championship",
 }
 
--- Foods per tier (MVP: Tier 1 only — Hot Dog ring mechanic for all)
+-- Frank's Fairground = American Carnival genre. Progression: bigger / spicier
+-- / weirder within the carnival theme. Future maps (Pizza Plaza, Tokyo Town,
+-- Donut Dynasty, Burger Boulevard, Mexico City Lot) get their own per-genre
+-- progression sets.
 Constants.TIER_FOODS = {
-	{ "Hot Dog", "Hamburger", "Corn Dog", "Donut", "Chicken Wings" },
-	{ "Ramen Bowl", "Gyoza Tray", "Pizza Slice", "Fried Chicken", "Taco Platter" },
-	{ "Spray Cheese", "Butter Log", "Brain Taco", "Donut Holes", "Deep Dish Pizza" },
-	{ "Nathan's Hot Dog", "Dragon Pepper Roll", "Steel Gyoza", "Double Smashburger", "Coney Dog Stack" },
+	{ "Hot Dog", "Hamburger", "Corn Dog", "Pretzel Bites", "Chicken Wings" },
+	{ "Chili Dog", "Double Burger", "Loaded Nachos", "Funnel Cake", "Wing Bucket" },
+	{ "Footlong Hot Dog", "Triple-Stack Burger", "Deep-Fried Twinkie", "Turkey Leg", "Cheese Curd Mountain" },
+	{ "Nathan's Famous Dog", "Smash Tower", "Bloomin' Onion", "World's Hottest Wings", "Carnival Champion Plate" },
 }
 
 -- ── George Shea announcer lines ──────────────────────────────────────────────

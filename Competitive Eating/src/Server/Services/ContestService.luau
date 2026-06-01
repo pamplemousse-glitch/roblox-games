@@ -13,6 +13,7 @@ local NpcService        = require(script.Parent.NpcService)
 local NpcMemoryService  = require(script.Parent.NpcMemoryService)
 local CookbookService   = require(script.Parent.CookbookService)
 local TournamentService = require(script.Parent.TournamentService)
+local ContestStaging    = require(script.Parent.ContestStaging)
 
 local ContestService = {}
 
@@ -229,6 +230,11 @@ local function onSkillCheckResult(player: Player, result: any)
 		contestant.biteCount   = contestant.biteCount + 1
 		contestant.lastBiteTime = tick()
 
+		-- Visible consume: pop one food item from this contestant's pile, bob rig
+		local contestantIdx
+		for i, c in arena.contestants do if c == contestant then contestantIdx = i; break end end
+		if contestantIdx then ContestStaging.onConsume(arena, contestantIdx) end
+
 		if contestant.fillValue >= Constants.FILL_OVERFLOW then
 			contestant.isDqd    = true
 			contestant.fillValue = Constants.FILL_OVERFLOW
@@ -381,13 +387,25 @@ local function runActive(arena: Types.Arena)
 	arena.phaseStartTime = tick()
 	local endTime        = tick() + Constants.CONTEST_DURATION
 
+	-- Spawn visible NPCs at chairs + food piles per contestant
+	ContestStaging.spawnArena(arena)
+
+	-- Send food name to all players in this arena so HUD shows "🍴 HOT DOG"
+	for _, c in arena.contestants do
+		if not c.isNpc then
+			local p = Players:GetPlayerByUserId(c.userId)
+			if p then
+				remotes.ContestPhaseChanged:FireClient(p, arena.id, "Active", arena.tier, arena.currentFood)
+			end
+		end
+	end
+
 	-- Register players to this arena
 	for _, c in arena.contestants do
 		if not c.isNpc then
 			playerArena[c.userId] = arena.id
 			local player = Players:GetPlayerByUserId(c.userId)
 			if player then
-				remotes.ContestPhaseChanged:FireClient(player, arena.id, "Active")
 				task.spawn(playerRingLoop, player, arena, c)
 			end
 		end
@@ -459,6 +477,9 @@ local function runResults(arena: Types.Arena)
 	end
 
 	task.wait(Constants.RESULTS_DURATION)
+
+	-- Cleanup visible NPCs + food piles
+	ContestStaging.cleanupArena(arena)
 
 	-- Remove contestants from arena
 	for _, c in arena.contestants do
