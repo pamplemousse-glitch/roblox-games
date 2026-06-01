@@ -88,56 +88,143 @@ Constants.NPC_NAMES = {
 -- Per-NPC personality data — catchphrases + signature tells.
 -- Tells = predictable difficulty curve a good player can exploit.
 -- ContestService fires the catchphrase at countdown; tell drives NpcService.tick variance.
+-- familiarLines fire when player has met NPC ≥ NPC_FAMILIAR_THRESHOLD times.
+-- rivalLines fire at ≥ NPC_RIVAL_THRESHOLD encounters. See NpcMemoryService.
 Constants.NPC_CHARACTERS = {
 	["'Jaws' Beasley McGraw"] = {
 		catchphrase = "Don't blink, kid. I never do.",
 		tell        = "steady",        -- consistent pace, no panic spikes
 		winLine     = "Just like old times.",
 		loseLine    = "...lucky.",
+		familiarLines = {
+			"You're still showing up. I respect that.",
+			"Same dance, different day, kid.",
+			"Back for another round, huh?",
+		},
+		rivalLines = {
+			"You and me again. Let's settle this for real.",
+			"I've been waiting for you to come back.",
+			"Every contest with you is a chapter, kid.",
+		},
 	},
 	["Tsunami Tyler"] = {
 		catchphrase = "Hope you brought a bib.",
 		tell        = "fast_early",    -- huge head start, fades in last 30s
 		winLine     = "SURF'S UP, BABY!",
 		loseLine    = "I peaked too early...",
+		familiarLines = {
+			"Oh hey, you're back! Hope you brought floaties this time.",
+			"Round whatever, baby! Let's GO!",
+			"You again? Cool, cool, cool.",
+		},
+		rivalLines = {
+			"We're basically nemeses at this point, dude.",
+			"You're my white whale. Or hot dog. Whatever.",
+			"This rivalry has GOT to end today!",
+		},
 	},
 	["MIKI"] = {
 		catchphrase = "...",            -- silent menace
 		tell        = "late_surge",    -- quiet until last 20s, then explodes
 		winLine     = "[smiles]",
 		loseLine    = "[silent shrug]",
+		familiarLines = {
+			"[recognizes you]",
+			"[nods slightly]",
+			"...you.",
+		},
+		rivalLines = {
+			"[stares longer than usual]",
+			"[locks eyes]",
+			"...again.",
+		},
 	},
 	["Lil' Stuff"] = {
 		catchphrase = "Heh heh, watch me go!",
 		tell        = "consistent",    -- steady mid-range eater
 		winLine     = "DID YOU SEE THAT?! DID YOU?!",
 		loseLine    = "Aww, beans.",
+		familiarLines = {
+			"Hey! You came back to watch me eat again?!",
+			"I remember you! You're the one!",
+			"Yay, my buddy's back!",
+		},
+		rivalLines = {
+			"You and me, FOREVER!",
+			"You're like my eating partner now, sorta!",
+			"Mom said you'd come back!",
+		},
 	},
 	["The Mouth Mason"] = {
 		catchphrase = "Shall we begin?",
 		tell        = "calm_strong",   -- methodical, high baseline
 		winLine     = "Quite satisfactory.",
 		loseLine    = "Well played.",
+		familiarLines = {
+			"A familiar face. Welcome back.",
+			"We meet once more.",
+			"Ah. You return.",
+		},
+		rivalLines = {
+			"My old friend. Shall we?",
+			"You are persistent. I admire that.",
+			"Few have crossed plates with me this often.",
+		},
 	},
 	["Doc"] = {
 		catchphrase = "Anatomically, this should be impossible.",
 		tell        = "scientific",    -- predictable bursts every 15s
 		winLine     = "Just as my calculations predicted.",
 		loseLine    = "Fascinating. Back to the lab.",
+		familiarLines = {
+			"Subject returns. Adjusting hypothesis.",
+			"Recurring contestant: noted in journal.",
+			"You again. The data thickens.",
+		},
+		rivalLines = {
+			"You have become a control group, fascinatingly.",
+			"We are now a longitudinal study, you and I.",
+			"My paper on you is nearly publishable.",
+		},
 	},
 	["Bigtop Bob"] = {
 		catchphrase = "STEP RIGHT UP! WATCH ME EAT!",
 		tell        = "theatrical",    -- big swings, big pauses
 		winLine     = "AND THE CROWD GOES WILD!",
 		loseLine    = "...the show must go on.",
+		familiarLines = {
+			"AND OUR RETURNING CHALLENGER!",
+			"BACK FOR THE ENCORE, FOLKS!",
+			"GIVE 'EM A HAND, THEY'VE EARNED IT!",
+		},
+		rivalLines = {
+			"OUR ETERNAL DUEL CONTINUES!",
+			"THIS IS BECOMING A LEGEND, FOLKS!",
+			"THE RIVALRY OF THE CENTURY, LIVE!",
+		},
 	},
 	["Mrs. Pickles"] = {
 		catchphrase = "Oh dearie, don't go easy on me.",
 		tell        = "deceptive",     -- slow start, terrifying finish
 		winLine     = "Sweet potato pie, that was a treat!",
 		loseLine    = "Bless your heart, dear.",
+		familiarLines = {
+			"Oh dearie, you're back again!",
+			"Bless your heart for returning, sugar.",
+			"Land sakes, look who it is.",
+		},
+		rivalLines = {
+			"Sugar, we've done this dance a few times now.",
+			"Oh sweetie, I know your tells by heart.",
+			"You and me are practically family, dear.",
+		},
 	},
 }
+
+-- Encounter thresholds — see NpcMemoryService.pickDialogLine.
+-- Counts represent PRIOR encounters: threshold=2 means 3rd meeting triggers familiar.
+Constants.NPC_FAMILIAR_THRESHOLD = 2
+Constants.NPC_RIVAL_THRESHOLD    = 9
 
 -- ── Tiers ────────────────────────────────────────────────────────────────────
 Constants.TIER_COUNT = 4
