@@ -11,11 +11,24 @@
 
 return {
 	-- ============================================================
-	-- PIZZA PLAZA (base X = 600) — Italian-American genre
+	-- PIZZA PLAZA V2 (base X = 700) — Italian-American street neighborhood
+	-- 10 buildings · 1 food · 24 props · 32 decor · 3 landmarks · 12 NPCs ≈ 82 entries
 	-- ============================================================
 
-	{ module = "Assets.Districts.PizzaPlaza.Foods.PizzaSlice",      position = Vector3.new(600, 6,    0) },
-	{ module = "Assets.Districts.PizzaPlaza.Buildings.PizzaParlor", position = Vector3.new(600, 0,  100), yaw = 0 },
+	-- Foods (kept from v1, shifted into V2 base) ---------------------------
+	{ module = "Assets.Districts.PizzaPlaza.Foods.PizzaSlice",                position = Vector3.new(710, 6,   0) },
+
+	-- Buildings (10 modules along the main street at z=100) ---------------
+	{ module = "Assets.Districts.PizzaPlaza.Buildings.TonysPizzeria",         position = Vector3.new(750, 0, 100), yaw = 0 },
+	{ module = "Assets.Districts.PizzaPlaza.Buildings.MammaCarmelasTrattoria",position = Vector3.new(800, 0, 100), yaw = 0 },
+	{ module = "Assets.Districts.PizzaPlaza.Buildings.VinnysSliceShop",       position = Vector3.new(850, 0, 100), yaw = 0 },
+	{ module = "Assets.Districts.PizzaPlaza.Buildings.RomeosGelatoStand",     position = Vector3.new(900, 0, 100), yaw = 0 },
+	{ module = "Assets.Districts.PizzaPlaza.Buildings.SalsCalzoneCart",       position = Vector3.new(950, 0, 100), yaw = 0 },
+	{ module = "Assets.Districts.PizzaPlaza.Buildings.TenementWalkup",        position = Vector3.new(1000, 0, 100), yaw = 0 },
+	{ module = "Assets.Districts.PizzaPlaza.Buildings.BrickAlleyWall",        position = Vector3.new(1050, 0, 100), yaw = 0 },
+	{ module = "Assets.Districts.PizzaPlaza.Buildings.LaundryLineBuildings",  position = Vector3.new(1100, 0, 100), yaw = 0 },
+	{ module = "Assets.Districts.PizzaPlaza.Buildings.BocceCourt",            position = Vector3.new(1150, 0, 100), yaw = 0 },
+	{ module = "Assets.Districts.PizzaPlaza.Buildings.RistoranteSignWall",    position = Vector3.new(1200, 0, 100), yaw = 0 },
 
 	-- ============================================================
 	-- TOKYO TOWN (base X = 1100) — Japanese Street genre
