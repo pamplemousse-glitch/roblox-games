@@ -36,9 +36,32 @@ return {
 	{ module = "Assets.Districts.PizzaPlaza.Npcs.Sal",      position = Vector3.new(2060, 6,   30) },
 
 	-- ============================================================
+	-- DONUT DYNASTY (X = 6000) — Sweets / Pastries genre
+	-- ============================================================
+
+	-- Tier 1 foods
+	{ module = "Assets.Districts.DonutDynasty.Foods.Donut",         position = Vector3.new(6010, 6,    0) },
+	{ module = "Assets.Districts.DonutDynasty.Foods.Eclair",        position = Vector3.new(6020, 6,    0) },
+	{ module = "Assets.Districts.DonutDynasty.Foods.Churro",        position = Vector3.new(6030, 6,    0) },
+	{ module = "Assets.Districts.DonutDynasty.Foods.Beignet",       position = Vector3.new(6040, 6,    0) },
+	{ module = "Assets.Districts.DonutDynasty.Foods.CinnamonRoll",  position = Vector3.new(6050, 6,    0) },
+
+	-- Buildings
+	{ module = "Assets.Districts.DonutDynasty.Buildings.DonutShop",         position = Vector3.new(6050, 0, 100), yaw = 0 },
+	{ module = "Assets.Districts.DonutDynasty.Buildings.GlazeFountain",     position = Vector3.new(6100, 0, 100), yaw = 0 },
+	{ module = "Assets.Districts.DonutDynasty.Buildings.CoffeeKiosk",       position = Vector3.new(6150, 0, 100), yaw = 0 },
+	{ module = "Assets.Districts.DonutDynasty.Buildings.BakeryArchEntry",   position = Vector3.new(6200, 0, 100), yaw = 0 },
+	{ module = "Assets.Districts.DonutDynasty.Buildings.SugarSiloTower",    position = Vector3.new(6250, 0, 100), yaw = 0 },
+
+	-- NPC vendor stands
+	{ module = "Assets.Districts.DonutDynasty.Npcs.Marie",      position = Vector3.new(6020, 6, 30) },
+	{ module = "Assets.Districts.DonutDynasty.Npcs.Bernard",    position = Vector3.new(6040, 6, 30) },
+	{ module = "Assets.Districts.DonutDynasty.Npcs.Lulu",       position = Vector3.new(6060, 6, 30) },
+	{ module = "Assets.Districts.DonutDynasty.Npcs.Stephane",   position = Vector3.new(6080, 6, 30) },
+
+	-- ============================================================
 	-- Other districts go here as parallel sessions complete:
 	-- TOKYO TOWN              (X = 4000)
-	-- DONUT DYNASTY           (X = 6000)
 	-- BURGER BOULEVARD        (X = 8000)
 	-- BBQ HOLLER              (X = 10000)
 	-- MERCADO DEL SOL         (X = 12000)
