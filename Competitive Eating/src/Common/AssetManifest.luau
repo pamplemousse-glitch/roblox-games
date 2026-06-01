@@ -36,6 +36,7 @@ return {
 	{ module = "Assets.Districts.PizzaPlaza.Npcs.Sal",      position = Vector3.new(2060, 6,   30) },
 
 	-- ============================================================
+<<<<<<< HEAD
 	-- BURGER BOULEVARD (X = 8000) — 50s diner / burger variants genre
 	-- ============================================================
 
@@ -99,6 +100,27 @@ return {
 	{ module = "Assets.Districts.BbqHoller.Npcs.SkinnyJoe",  position = Vector3.new(10080, 6, 30) },
 
 	-- ============================================================
-	-- Remaining districts to be merged: TOKYO TOWN, DONUT DYNASTY
+	-- TOKYO TOWN (X = 4000) — Japanese Street genre
+	-- ============================================================
+
+	{ module = "Assets.Districts.TokyoTown.Foods.RamenBowl",  position = Vector3.new(4010, 6,    0) },
+	{ module = "Assets.Districts.TokyoTown.Foods.GyozaTray",  position = Vector3.new(4020, 6,    0) },
+	{ module = "Assets.Districts.TokyoTown.Foods.Takoyaki",   position = Vector3.new(4030, 6,    0) },
+	{ module = "Assets.Districts.TokyoTown.Foods.SushiRoll",  position = Vector3.new(4040, 6,    0) },
+	{ module = "Assets.Districts.TokyoTown.Foods.Mochi",      position = Vector3.new(4050, 6,    0) },
+
+	{ module = "Assets.Districts.TokyoTown.Buildings.RamenShop",          position = Vector3.new(4050, 0, 100), yaw = 0 },
+	{ module = "Assets.Districts.TokyoTown.Buildings.SushiBar",           position = Vector3.new(4100, 0, 100), yaw = 0 },
+	{ module = "Assets.Districts.TokyoTown.Buildings.IzakayaPub",         position = Vector3.new(4150, 0, 100), yaw = 0 },
+	{ module = "Assets.Districts.TokyoTown.Buildings.ShintoArchEntry",    position = Vector3.new(4200, 0, 100), yaw = 0 },
+	{ module = "Assets.Districts.TokyoTown.Buildings.StreetCartTakoyaki", position = Vector3.new(4250, 0, 100), yaw = 0 },
+
+	{ module = "Assets.Districts.TokyoTown.Npcs.Kenji", position = Vector3.new(4020, 6, 30) },
+	{ module = "Assets.Districts.TokyoTown.Npcs.Yumi",  position = Vector3.new(4040, 6, 30) },
+	{ module = "Assets.Districts.TokyoTown.Npcs.Riku",  position = Vector3.new(4060, 6, 30) },
+	{ module = "Assets.Districts.TokyoTown.Npcs.Akemi", position = Vector3.new(4080, 6, 30) },
+
+	-- ============================================================
+	-- Remaining district to be merged: DONUT DYNASTY
 	-- ============================================================
 }
