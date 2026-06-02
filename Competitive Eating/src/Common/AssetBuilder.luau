@@ -351,6 +351,129 @@ function AssetBuilder.r6NameTag(model: Model, displayName: string)
 	lbl.Parent         = bb
 end
 
+-- ── R15 NPC rig ──────────────────────────────────────────────────────────────
+-- Builds an R15 character (16 parts including HRP + Humanoid + Animator + 15
+-- Motor6Ds) at originCF. Same world convention as r6Rig: passing
+-- `manifestCF * CFrame.new(0, -3, 0)` puts foot bottoms at the manifest's Y.
+-- HipHeight = 2, all parts anchored. Joint NAMES match the Roblox R15
+-- convention so default R15 animations (e.g. idle) play correctly.
+--
+-- Per-part colors honour the same RigColors table as r6Rig:
+--   skin  → head + arms (all 6 arm segments)
+--   shirt → upper + lower torso
+--   pants → legs (all 6 leg segments)
+-- The leftArm/rightArm/leftLeg/rightLeg aliases tint that whole limb chain
+-- (upper + lower + hand/foot) the same way they tint a single R6 limb.
+
+function AssetBuilder.r15Rig(parent: Instance, originCF: CFrame, name: string, colors: RigColors): Model
+	colors = colors or {}
+	local skin   = colors.skin     or Color3.fromRGB(255, 220, 180)
+	local shirt  = colors.shirt    or Color3.fromRGB(80, 80, 130)
+	local pants  = colors.pants    or Color3.fromRGB(45, 45, 60)
+	local cHead  = colors.head     or skin
+	local cTorso = colors.torso    or shirt
+	local cLArm  = colors.leftArm  or skin
+	local cRArm  = colors.rightArm or skin
+	local cLLeg  = colors.leftLeg  or pants
+	local cRLeg  = colors.rightLeg or pants
+
+	local model = Instance.new("Model")
+	model.Name   = name
+	model.Parent = parent
+
+	local function mkPart(pname: string, size: Vector3, color: Color3, localPos: Vector3): Part
+		local p = Instance.new("Part")
+		p.Name          = pname
+		p.Size          = size
+		p.Color         = color
+		p.Material      = Enum.Material.SmoothPlastic
+		p.TopSurface    = Enum.SurfaceType.Smooth
+		p.BottomSurface = Enum.SurfaceType.Smooth
+		p.Anchored      = true
+		p.CanCollide    = pname ~= "HumanoidRootPart"
+		p.Transparency  = pname == "HumanoidRootPart" and 1 or 0
+		p.CFrame        = originCF * CFrame.new(localPos)
+		p.Parent        = model
+		return p
+	end
+
+	-- Vertical layout (Y, local): foot bottom at -3, head top at +2.9.
+	-- Foot 0.4 → LowerLeg 1.4 → UpperLeg 1.2 → LowerTorso 0.5 → UpperTorso 1.2 → Head 1.0
+	local hrp        = mkPart("HumanoidRootPart", Vector3.new(2, 2, 1),   Color3.new(0.4, 0.4, 0.4), Vector3.new(0, 0, 0))
+	local lowerTorso = mkPart("LowerTorso",       Vector3.new(2, 0.5, 1), cTorso, Vector3.new(0, 0.25, 0))
+	local upperTorso = mkPart("UpperTorso",       Vector3.new(2, 1.2, 1), cTorso, Vector3.new(0, 1.1, 0))
+	local head       = mkPart("Head",             Vector3.new(2, 1, 1),   cHead,  Vector3.new(0, 2.3, 0))
+
+	-- Arms hang from the UpperTorso shoulders.
+	local rUpperArm = mkPart("RightUpperArm", Vector3.new(1, 1.4, 1), cRArm, Vector3.new( 1.5,  1.0,  0))
+	local rLowerArm = mkPart("RightLowerArm", Vector3.new(1, 1.4, 1), cRArm, Vector3.new( 1.5, -0.3,  0))
+	local rHand     = mkPart("RightHand",     Vector3.new(1, 0.4, 1), cRArm, Vector3.new( 1.5, -1.2,  0))
+	local lUpperArm = mkPart("LeftUpperArm",  Vector3.new(1, 1.4, 1), cLArm, Vector3.new(-1.5,  1.0,  0))
+	local lLowerArm = mkPart("LeftLowerArm",  Vector3.new(1, 1.4, 1), cLArm, Vector3.new(-1.5, -0.3,  0))
+	local lHand     = mkPart("LeftHand",      Vector3.new(1, 0.4, 1), cLArm, Vector3.new(-1.5, -1.2,  0))
+
+	-- Legs hang from the LowerTorso hips.
+	local rUpperLeg = mkPart("RightUpperLeg", Vector3.new(1, 1.2, 1), cRLeg, Vector3.new( 0.5, -0.6,  0))
+	local rLowerLeg = mkPart("RightLowerLeg", Vector3.new(1, 1.4, 1), cRLeg, Vector3.new( 0.5, -1.9,  0))
+	local rFoot     = mkPart("RightFoot",     Vector3.new(1, 0.4, 1), cRLeg, Vector3.new( 0.5, -2.8,  0))
+	local lUpperLeg = mkPart("LeftUpperLeg",  Vector3.new(1, 1.2, 1), cLLeg, Vector3.new(-0.5, -0.6,  0))
+	local lLowerLeg = mkPart("LeftLowerLeg",  Vector3.new(1, 1.4, 1), cLLeg, Vector3.new(-0.5, -1.9,  0))
+	local lFoot     = mkPart("LeftFoot",      Vector3.new(1, 0.4, 1), cLLeg, Vector3.new(-0.5, -2.8,  0))
+
+	-- Mesh on head to round it (matches Roblox default head)
+	local headMesh = Instance.new("SpecialMesh")
+	headMesh.MeshType = Enum.MeshType.Head
+	headMesh.Scale    = Vector3.new(1.25, 1.25, 1.25)
+	headMesh.Parent   = head
+
+	local function motor(jointName: string, p0: BasePart, p1: BasePart, c0: CFrame, c1: CFrame, parentPart: BasePart)
+		local m = Instance.new("Motor6D")
+		m.Name   = jointName
+		m.Part0  = p0
+		m.Part1  = p1
+		m.C0     = c0
+		m.C1     = c1
+		m.Parent = parentPart
+		return m
+	end
+
+	-- Torso column. Joints anchor at the seam between successive parts.
+	motor("Root",  hrp,        lowerTorso, CFrame.new(0,  0,    0), CFrame.new(0,  0.25, 0), hrp)
+	motor("Waist", lowerTorso, upperTorso, CFrame.new(0,  0.25, 0), CFrame.new(0, -0.6,  0), lowerTorso)
+	motor("Neck",  upperTorso, head,       CFrame.new(0,  0.6,  0), CFrame.new(0, -0.5,  0), upperTorso)
+
+	-- Arm chain: Shoulder/Elbow/Wrist pivot at the seam between segments.
+	motor("RightShoulder", upperTorso, rUpperArm, CFrame.new( 1.0,  0.5, 0), CFrame.new(0,  0.7, 0), upperTorso)
+	motor("RightElbow",    rUpperArm,  rLowerArm, CFrame.new(0,   -0.7, 0), CFrame.new(0,  0.7, 0), rUpperArm)
+	motor("RightWrist",    rLowerArm,  rHand,     CFrame.new(0,   -0.7, 0), CFrame.new(0,  0.2, 0), rLowerArm)
+	motor("LeftShoulder",  upperTorso, lUpperArm, CFrame.new(-1.0,  0.5, 0), CFrame.new(0,  0.7, 0), upperTorso)
+	motor("LeftElbow",     lUpperArm,  lLowerArm, CFrame.new(0,   -0.7, 0), CFrame.new(0,  0.7, 0), lUpperArm)
+	motor("LeftWrist",     lLowerArm,  lHand,     CFrame.new(0,   -0.7, 0), CFrame.new(0,  0.2, 0), lLowerArm)
+
+	-- Leg chain: Hip/Knee/Ankle pivot at the seam between segments.
+	motor("RightHip",   lowerTorso, rUpperLeg, CFrame.new( 0.5, -0.25, 0), CFrame.new(0,  0.6, 0), lowerTorso)
+	motor("RightKnee",  rUpperLeg,  rLowerLeg, CFrame.new(0,   -0.6,  0), CFrame.new(0,  0.7, 0), rUpperLeg)
+	motor("RightAnkle", rLowerLeg,  rFoot,     CFrame.new(0,   -0.7,  0), CFrame.new(0,  0.2, 0), rLowerLeg)
+	motor("LeftHip",    lowerTorso, lUpperLeg, CFrame.new(-0.5, -0.25, 0), CFrame.new(0,  0.6, 0), lowerTorso)
+	motor("LeftKnee",   lUpperLeg,  lLowerLeg, CFrame.new(0,   -0.6,  0), CFrame.new(0,  0.7, 0), lUpperLeg)
+	motor("LeftAnkle",  lLowerLeg,  lFoot,     CFrame.new(0,   -0.7,  0), CFrame.new(0,  0.2, 0), lLowerLeg)
+
+	local humanoid = Instance.new("Humanoid")
+	humanoid.RigType             = Enum.HumanoidRigType.R15
+	humanoid.MaxHealth           = 100
+	humanoid.Health              = 100
+	humanoid.HipHeight           = 2
+	humanoid.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None
+	humanoid.HealthDisplayType   = Enum.HumanoidHealthDisplayType.AlwaysOff
+	humanoid.Parent              = model
+
+	local animator = Instance.new("Animator")
+	animator.Parent = humanoid
+
+	model.PrimaryPart = hrp
+	return model
+end
+
 -- Add a single anchored part as a hat/accessory above the rig's head.
 function AssetBuilder.r6Hat(model: Model, size: Vector3, color: Color3, yOffset: number, hatName: string?, shape: Enum.PartType?): Part?
 	local head = model:FindFirstChild("Head")
@@ -374,5 +497,11 @@ function AssetBuilder.r6Hat(model: Model, size: Vector3, color: Color3, yOffset:
 	w.Parent = p
 	return p
 end
+
+-- r6Hat and r6NameTag both work by looking up the rig's "Head" child, which
+-- is named the same in R6 and R15 rigs — so they are rig-agnostic. Expose
+-- r15Hat / r15NameTag aliases so R15 callers read symmetrically.
+AssetBuilder.r15Hat     = AssetBuilder.r6Hat
+AssetBuilder.r15NameTag = AssetBuilder.r6NameTag
 
 return AssetBuilder

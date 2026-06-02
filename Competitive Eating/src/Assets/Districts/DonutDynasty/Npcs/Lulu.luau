@@ -1,4 +1,4 @@
--- Lulu — sprinkle-loving young pâtissière. R6 rig with pink skirt + gold trim + pigtails.
+-- Lulu — sprinkle-loving young pâtissière. R15 rig with pink skirt + gold trim + pigtails.
 
 local AB = require(game:GetService("ReplicatedStorage").Common.AssetBuilder)
 
@@ -22,20 +22,21 @@ local function weldTo(parent: Model, base: BasePart, name: string, size: Vector3
 end
 
 return function(parent: Instance, originCF: CFrame): Model
-	local rig = AB.r6Rig(parent, originCF * CFrame.new(0, -3, 0), NAME, {
+	local rig = AB.r15Rig(parent, originCF * CFrame.new(0, -3, 0), NAME, {
 		skin  = Color3.fromRGB(250, 220, 195),
 		shirt = CREAM,
 		pants = PINK,   -- pink skirt/pants
 	})
-	local torso = rig:FindFirstChild("Torso") :: BasePart
-	if torso then
-		weldTo(rig, torso, "Apron",   Vector3.new(1.8, 1.9, 0.1), PINK,  CFrame.new(0, 0, 0.6))
-		weldTo(rig, torso, "Belt",    Vector3.new(2.05, 0.25, 1.05), GOLD, CFrame.new(0, -0.85, 0))
-		weldTo(rig, torso, "BowL",    Vector3.new(0.35, 0.35, 0.3), DEEP, CFrame.new(-0.4, -0.85, 0.65), Enum.PartType.Ball)
-		weldTo(rig, torso, "BowR",    Vector3.new(0.35, 0.35, 0.3), DEEP, CFrame.new( 0.4, -0.85, 0.65), Enum.PartType.Ball)
+	-- Torso accessories ride on HumanoidRootPart so existing R6 Torso offsets work.
+	local hrp = rig:FindFirstChild("HumanoidRootPart") :: BasePart
+	if hrp then
+		weldTo(rig, hrp, "Apron",   Vector3.new(1.8, 1.9, 0.1), PINK,  CFrame.new(0, 0, 0.6))
+		weldTo(rig, hrp, "Belt",    Vector3.new(2.05, 0.25, 1.05), GOLD, CFrame.new(0, -0.85, 0))
+		weldTo(rig, hrp, "BowL",    Vector3.new(0.35, 0.35, 0.3), DEEP, CFrame.new(-0.4, -0.85, 0.65), Enum.PartType.Ball)
+		weldTo(rig, hrp, "BowR",    Vector3.new(0.35, 0.35, 0.3), DEEP, CFrame.new( 0.4, -0.85, 0.65), Enum.PartType.Ball)
 	end
 	-- Hair top
-	AB.r6Hat(rig, Vector3.new(2.1, 0.6, 1.1), HAIR, 0.55, "HairTop")
+	AB.r15Hat(rig, Vector3.new(2.1, 0.6, 1.1), HAIR, 0.55, "HairTop")
 	-- Pigtails on each side
 	local head = rig:FindFirstChild("Head") :: BasePart
 	if head then
@@ -46,6 +47,6 @@ return function(parent: Instance, originCF: CFrame): Model
 		weldTo(rig, head, "BowPigL",  Vector3.new(0.3, 0.25, 0.3),  DEEP, CFrame.new(-1.0, 0.35, 0), Enum.PartType.Ball)
 		weldTo(rig, head, "BowPigR",  Vector3.new(0.3, 0.25, 0.3),  DEEP, CFrame.new( 1.0, 0.35, 0), Enum.PartType.Ball)
 	end
-	AB.r6NameTag(rig, NAME)
+	AB.r15NameTag(rig, NAME)
 	return rig
 end

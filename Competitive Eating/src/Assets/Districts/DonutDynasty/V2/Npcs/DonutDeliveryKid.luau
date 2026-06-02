@@ -1,4 +1,4 @@
--- DonutDeliveryKid — R6 rig in cream uniform + mint cap + pink donut-box stack.
+-- DonutDeliveryKid — R15 rig in cream uniform + mint cap + pink donut-box stack.
 
 local AB = require(game:GetService("ReplicatedStorage").Common.AssetBuilder)
 
@@ -23,35 +23,36 @@ local function weldTo(parent: Model, base: BasePart, name: string, size: Vector3
 end
 
 return function(parent: Instance, originCF: CFrame): Model
-	local rig = AB.r6Rig(parent, originCF * CFrame.new(0, -3, 0), NAME, {
+	local rig = AB.r15Rig(parent, originCF * CFrame.new(0, -3, 0), NAME, {
 		skin  = Color3.fromRGB(232, 195, 168),
 		shirt = CREAM,
 		pants = Color3.fromRGB(92, 57, 36),
 	})
-	local torso = rig:FindFirstChild("Torso") :: BasePart
-	if torso then
+	-- Torso accessories ride on HumanoidRootPart so existing R6 Torso offsets work.
+	local hrp = rig:FindFirstChild("HumanoidRootPart") :: BasePart
+	if hrp then
 		-- Pink belt
-		weldTo(rig, torso, "Belt", Vector3.new(2.05, 0.3, 1.05), DEEP, CFrame.new(0, -0.85, 0))
+		weldTo(rig, hrp, "Belt", Vector3.new(2.05, 0.3, 1.05), DEEP, CFrame.new(0, -0.85, 0))
 		-- Stack of 3 pink donut boxes in front of torso
 		for i = 1, 3 do
 			local y = -0.6 + (i - 1) * 0.45
-			weldTo(rig, torso, "Box_" .. i,    Vector3.new(2.0, 0.4, 1.4), PINK, CFrame.new(0, y, 1.2))
-			weldTo(rig, torso, "Ribbon_" .. i, Vector3.new(2.05, 0.08, 0.3), DEEP, CFrame.new(0, y + 0.2, 1.2))
-			weldTo(rig, torso, "Logo_" .. i,   Vector3.new(0.18, 0.18, 0.18), GOLD, CFrame.new(0.5, y + 0.22, 1.2), Enum.PartType.Ball)
+			weldTo(rig, hrp, "Box_" .. i,    Vector3.new(2.0, 0.4, 1.4), PINK, CFrame.new(0, y, 1.2))
+			weldTo(rig, hrp, "Ribbon_" .. i, Vector3.new(2.05, 0.08, 0.3), DEEP, CFrame.new(0, y + 0.2, 1.2))
+			weldTo(rig, hrp, "Logo_" .. i,   Vector3.new(0.18, 0.18, 0.18), GOLD, CFrame.new(0.5, y + 0.22, 1.2), Enum.PartType.Ball)
 		end
 		-- Peek donut on top box
-		weldTo(rig, torso, "PeekDonut", Vector3.new(0.5, 0.25, 0.5), PINK, CFrame.new(0, 0.4, 1.2), Enum.PartType.Cylinder)
+		weldTo(rig, hrp, "PeekDonut", Vector3.new(0.5, 0.25, 0.5), PINK, CFrame.new(0, 0.4, 1.2), Enum.PartType.Cylinder)
 	end
 	-- Hair tuft
-	AB.r6Hat(rig, Vector3.new(2.1, 0.35, 1.1), HAIR, 0.5, "Hair")
+	AB.r15Hat(rig, Vector3.new(2.1, 0.35, 1.1), HAIR, 0.5, "Hair")
 	-- Mint baseball-style cap (crown + peak + logo)
-	AB.r6Hat(rig, Vector3.new(1.7, 0.6, 1.7), MINT, 1.0, "CapCrown")
+	AB.r15Hat(rig, Vector3.new(1.7, 0.6, 1.7), MINT, 1.0, "CapCrown")
 	-- Peak (front brim)
 	local head = rig:FindFirstChild("Head") :: BasePart
 	if head then
 		weldTo(rig, head, "CapPeak", Vector3.new(1.7, 0.15, 0.9), MINT, CFrame.new(0, 0.85, 0.7))
 		weldTo(rig, head, "CapLogo", Vector3.new(0.45, 0.45, 0.1), PINK, CFrame.new(0, 1.05, 0.55), Enum.PartType.Cylinder)
 	end
-	AB.r6NameTag(rig, NAME)
+	AB.r15NameTag(rig, NAME)
 	return rig
 end

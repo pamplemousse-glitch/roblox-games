@@ -1,4 +1,4 @@
--- KidCottonCandy — R6 rig (child colors) holding an oversized pink cotton-candy swirl on a stick.
+-- KidCottonCandy — R15 rig (child colors) holding an oversized pink cotton-candy swirl on a stick.
 
 local AB = require(game:GetService("ReplicatedStorage").Common.AssetBuilder)
 
@@ -23,17 +23,18 @@ local function weldTo(parent: Model, base: BasePart, name: string, size: Vector3
 end
 
 return function(parent: Instance, originCF: CFrame): Model
-	local rig = AB.r6Rig(parent, originCF * CFrame.new(0, -3, 0), NAME, {
+	local rig = AB.r15Rig(parent, originCF * CFrame.new(0, -3, 0), NAME, {
 		skin  = Color3.fromRGB(248, 220, 195),
 		shirt = MINT,
 		pants = Color3.fromRGB(100, 80, 90),
 	})
-	local torso = rig:FindFirstChild("Torso") :: BasePart
-	if torso then
+	-- Torso accessories ride on HumanoidRootPart so existing R6 Torso offsets work.
+	local hrp = rig:FindFirstChild("HumanoidRootPart") :: BasePart
+	if hrp then
 		-- Heart on shirt (two balls + a wedge would be heavy — use two balls + small block as point)
-		weldTo(rig, torso, "HeartL", Vector3.new(0.4, 0.4, 0.4), DEEP, CFrame.new(-0.18, 0.25, 0.55), Enum.PartType.Ball)
-		weldTo(rig, torso, "HeartR", Vector3.new(0.4, 0.4, 0.4), DEEP, CFrame.new( 0.18, 0.25, 0.55), Enum.PartType.Ball)
-		weldTo(rig, torso, "HeartP", Vector3.new(0.35, 0.35, 0.2), DEEP, CFrame.new(0, -0.05, 0.55))
+		weldTo(rig, hrp, "HeartL", Vector3.new(0.4, 0.4, 0.4), DEEP, CFrame.new(-0.18, 0.25, 0.55), Enum.PartType.Ball)
+		weldTo(rig, hrp, "HeartR", Vector3.new(0.4, 0.4, 0.4), DEEP, CFrame.new( 0.18, 0.25, 0.55), Enum.PartType.Ball)
+		weldTo(rig, hrp, "HeartP", Vector3.new(0.35, 0.35, 0.2), DEEP, CFrame.new(0, -0.05, 0.55))
 	end
 	-- Curly hair tufts
 	local head = rig:FindFirstChild("Head") :: BasePart
@@ -45,15 +46,17 @@ return function(parent: Instance, originCF: CFrame): Model
 		weldTo(rig, head, "CheekL", Vector3.new(0.2, 0.2, 0.1), PINK, CFrame.new(-0.45, -0.05, 0.45), Enum.PartType.Ball)
 		weldTo(rig, head, "CheekR", Vector3.new(0.2, 0.2, 0.1), PINK, CFrame.new( 0.45, -0.05, 0.45), Enum.PartType.Ball)
 	end
-	-- Cotton candy swirl held in right hand
-	local rArm = rig:FindFirstChild("Right Arm") :: BasePart
-	if rArm then
-		weldTo(rig, rArm, "Stick",  Vector3.new(0.2, 2.5, 0.2), STICK, CFrame.new(0, -0.5, 0.3), Enum.PartType.Cylinder)
-		weldTo(rig, rArm, "CCMain", Vector3.new(2.0, 2.0, 2.0), PINK, CFrame.new(0, -2.3, 0.3), Enum.PartType.Ball)
-		weldTo(rig, rArm, "CCL",    Vector3.new(1.3, 1.3, 1.3), DEEP, CFrame.new(-0.6, -2.0, 0.3), Enum.PartType.Ball)
-		weldTo(rig, rArm, "CCR",    Vector3.new(1.3, 1.3, 1.3), CREAM, CFrame.new(0.6, -2.0, 0.3), Enum.PartType.Ball)
-		weldTo(rig, rArm, "CCTop",  Vector3.new(1.1, 1.1, 1.1), DEEP, CFrame.new(0, -2.8, 0.3), Enum.PartType.Ball)
+	-- Cotton candy swirl held in right hand. Originally anchored to the R6 "Right
+	-- Arm" (centered at local Y=0); R15 RightHand is centered at local Y=-1.2,
+	-- so each offset's Y shifts by +1.2 to preserve world position.
+	local rHand = rig:FindFirstChild("RightHand") :: BasePart
+	if rHand then
+		weldTo(rig, rHand, "Stick",  Vector3.new(0.2, 2.5, 0.2), STICK, CFrame.new(0,  0.7, 0.3), Enum.PartType.Cylinder)
+		weldTo(rig, rHand, "CCMain", Vector3.new(2.0, 2.0, 2.0), PINK,  CFrame.new(0, -1.1, 0.3), Enum.PartType.Ball)
+		weldTo(rig, rHand, "CCL",    Vector3.new(1.3, 1.3, 1.3), DEEP,  CFrame.new(-0.6, -0.8, 0.3), Enum.PartType.Ball)
+		weldTo(rig, rHand, "CCR",    Vector3.new(1.3, 1.3, 1.3), CREAM, CFrame.new( 0.6, -0.8, 0.3), Enum.PartType.Ball)
+		weldTo(rig, rHand, "CCTop",  Vector3.new(1.1, 1.1, 1.1), DEEP,  CFrame.new(0, -1.6, 0.3), Enum.PartType.Ball)
 	end
-	AB.r6NameTag(rig, NAME)
+	AB.r15NameTag(rig, NAME)
 	return rig
 end
