@@ -38,7 +38,9 @@ function AssetSpawner.init()
 		return
 	end
 
-	local districtsFolder = workspace:FindFirstChild("Districts") or Instance.new("Folder")
+	local districtsFolder = workspace:FindFirstChild("Districts")
+	if districtsFolder then districtsFolder:ClearAllChildren() end
+	districtsFolder = districtsFolder or Instance.new("Folder")
 	districtsFolder.Name   = "Districts"
 	districtsFolder.Parent = workspace
 
