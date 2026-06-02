@@ -1,76 +1,37 @@
--- Yumi — Tokyo Town NPC. Pastel pink + cream kimono palette.
+-- Yumi — Tokyo NPC. R6 rig with pastel pink kimono + dark long hair.
 
 local AB = require(game:GetService("ReplicatedStorage").Common.AssetBuilder)
 
-local NAME    = "Yumi"
-local SKIN    = Color3.fromRGB(255, 220, 195)
-local KIMONO  = Color3.fromRGB(245, 195, 210)   -- pastel pink
-local OBI     = Color3.fromRGB(200, 50, 40)     -- vermilion sash
-local HAIR    = Color3.fromRGB(40, 30, 30)
-local FLOWER  = Color3.fromRGB(255, 180, 70)
+local NAME = "Yumi"
 
 return function(parent: Instance, originCF: CFrame): Model
-	local model = AB.model(NAME, parent)
-
-	local torso = AB.part({
-		size      = Vector3.new(2.6, 3, 1.2),
-		color     = KIMONO,
-		cf        = originCF,
-		canCollide = false,
-		name      = "Torso",
-	}, model)
-
-	-- Obi (sash across the middle)
-	AB.part({
-		size      = Vector3.new(2.7, 0.8, 1.25),
-		color     = OBI,
-		cf        = AB.offset(originCF, 0, -0.2, 0),
-		canCollide = false,
-		name      = "Obi",
-	}, model)
-
-	local head = AB.part({
-		size      = Vector3.new(1.8, 1.8, 1.8),
-		color     = SKIN,
-		cf        = AB.offset(originCF, 0, 2.2, 0),
-		shape     = Enum.PartType.Ball,
-		canCollide = false,
-		name      = "Head",
-	}, model)
-
-	-- Long hair (back panel down to shoulders)
-	AB.part({
-		size      = Vector3.new(2.0, 2.4, 0.5),
-		color     = HAIR,
-		cf        = AB.offset(originCF, 0, 1.6, 0.6),
-		canCollide = false,
-		name      = "HairBack",
-	}, model)
-	-- Hair top
-	AB.part({
-		size      = Vector3.new(1.9, 0.7, 1.9),
-		color     = HAIR,
-		cf        = AB.offset(originCF, 0, 2.95, 0),
-		canCollide = false,
-		name      = "HairTop",
-	}, model)
-
-	-- Hair flower (yellow dot on the side)
-	AB.sphere(0.5, FLOWER, AB.offset(originCF, -0.9, 2.7, 0.3), model, "Flower")
-
-	for _, side in {-1, 1} do
-		AB.part({
-			size      = Vector3.new(0.9, 0.9, 2.4),
-			color     = KIMONO,
-			cf        = AB.offset(originCF, side * 1.6, 0.4, -1.2),
-			canCollide = false,
-			name      = "Arm_" .. (side == -1 and "L" or "R"),
-		}, model)
+	local rig = AB.r6Rig(parent, originCF, NAME, {
+		skin  = Color3.fromRGB(255, 220, 195),
+		shirt = Color3.fromRGB(245, 195, 210),   -- pastel pink kimono top
+		pants = Color3.fromRGB(220, 170, 185),   -- kimono skirt
+	})
+	-- Vermilion obi sash
+	local head = rig:FindFirstChild("Head")
+	local torso = rig:FindFirstChild("Torso")
+	if torso then
+		local obi = Instance.new("Part")
+		obi.Name        = "Obi"
+		obi.Size        = Vector3.new(2.05, 0.5, 1.05)
+		obi.Color       = Color3.fromRGB(200, 50, 40)
+		obi.Material    = Enum.Material.SmoothPlastic
+		obi.Anchored    = true
+		obi.CanCollide  = false
+		obi.CFrame      = torso.CFrame * CFrame.new(0, -0.3, 0)
+		obi.Parent      = rig
+		local w = Instance.new("WeldConstraint"); w.Part0 = torso; w.Part1 = obi; w.Parent = obi
 	end
-
-	AB.billboard(head, NAME, Vector2.new(200, 36), 3)
-
-	AB.pivot(model, torso)
-	AB.weldAll(model)
-	return model
+	-- Long hair back panel
+	AB.r6Hat(rig, Vector3.new(2.05, 2, 0.4), Color3.fromRGB(40, 30, 30), -0.6, "HairBack")
+	AB.r6Hat(rig, Vector3.new(2.05, 0.6, 1.05), Color3.fromRGB(40, 30, 30), 0.6, "HairTop")
+	-- Flower
+	if head then
+		AB.r6Hat(rig, Vector3.new(0.45, 0.45, 0.45), Color3.fromRGB(255, 180, 70), 0.2, "Flower", Enum.PartType.Ball)
+	end
+	AB.r6NameTag(rig, NAME)
+	return rig
 end
