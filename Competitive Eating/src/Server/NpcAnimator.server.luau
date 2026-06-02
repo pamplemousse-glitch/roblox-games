@@ -1,6 +1,8 @@
--- NpcAnimator: finds every R6 NPC under workspace.Districts and starts the
--- default Roblox idle animation looping on it. Handles both rigs that exist
--- at startup and rigs spawned later by AssetSpawner / runtime systems.
+-- NpcAnimator: finds every NPC under workspace.Districts and starts the
+-- appropriate default idle animation looping on it. Picks the animation
+-- per rig from Humanoid.RigType so R6 and R15 NPCs can coexist while we
+-- migrate districts one at a time. Handles both rigs that exist at startup
+-- and rigs spawned later by AssetSpawner / runtime systems.
 --
 -- Why a single sweeper instead of an animation per asset module:
 --   * keeps NPC modules pure builders (no script lifecycle inside them)
@@ -8,10 +10,11 @@
 --     return-value chain — a sweeper avoids touching the asset-module contract
 --   * easy to swap to per-NPC animations later by tagging rigs with attributes
 
-local IDLE_ANIM_ID = "rbxassetid://180435571"  -- classic R6 idle, Roblox-owned, always public
+local IDLE_ANIM_R6  = "rbxassetid://180435571"  -- classic R6 idle, Roblox-owned
+local IDLE_ANIM_R15 = "rbxassetid://507766388"  -- default R15 idle 1, Roblox-owned
 
-local idleAnim = Instance.new("Animation")
-idleAnim.AnimationId = IDLE_ANIM_ID
+local idleR6  = Instance.new("Animation"); idleR6.AnimationId  = IDLE_ANIM_R6
+local idleR15 = Instance.new("Animation"); idleR15.AnimationId = IDLE_ANIM_R15
 
 local function isNpcRig(model: Instance): boolean
 	if not model:IsA("Model") then return false end
@@ -38,8 +41,9 @@ local function playIdle(rig: Model)
 		animator.Parent = hum
 	end
 
+	local anim = (hum.RigType == Enum.HumanoidRigType.R15) and idleR15 or idleR6
 	local ok, track = pcall(function()
-		return animator:LoadAnimation(idleAnim)
+		return animator:LoadAnimation(anim)
 	end)
 	if not ok or not track then
 		warn("[NpcAnimator] LoadAnimation failed for " .. rig:GetFullName() .. ": " .. tostring(track))

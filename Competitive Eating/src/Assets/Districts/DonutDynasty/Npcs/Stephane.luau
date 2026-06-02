@@ -1,4 +1,4 @@
--- Stéphane — head chef. R6 rig with cream coat + gold trim + silver hair + handlebar mustache + tall toque.
+-- Stéphane — head chef. R15 rig with cream coat + gold trim + silver hair + handlebar mustache + tall toque.
 
 local AB = require(game:GetService("ReplicatedStorage").Common.AssetBuilder)
 
@@ -20,16 +20,17 @@ local function weldTo(parent: Model, base: BasePart, name: string, size: Vector3
 end
 
 return function(parent: Instance, originCF: CFrame): Model
-	local rig = AB.r6Rig(parent, originCF * CFrame.new(0, -3, 0), NAME, {
+	local rig = AB.r15Rig(parent, originCF * CFrame.new(0, -3, 0), NAME, {
 		skin  = Color3.fromRGB(225, 190, 160),
 		shirt = CREAM,
 		pants = Color3.fromRGB(50, 45, 55),
 	})
-	local torso = rig:FindFirstChild("Torso") :: BasePart
-	if torso then
+	-- Torso accessories ride on HumanoidRootPart so existing R6 Torso offsets work.
+	local hrp = rig:FindFirstChild("HumanoidRootPart") :: BasePart
+	if hrp then
 		-- Gold lapel seam down the center + gold waist trim
-		weldTo(rig, torso, "LapelSeam", Vector3.new(0.18, 1.95, 0.05), GOLD, CFrame.new(0, 0, 0.55))
-		weldTo(rig, torso, "WaistTrim", Vector3.new(2.05, 0.22, 1.05), GOLD, CFrame.new(0, -0.9, 0))
+		weldTo(rig, hrp, "LapelSeam", Vector3.new(0.18, 1.95, 0.05), GOLD, CFrame.new(0, 0, 0.55))
+		weldTo(rig, hrp, "WaistTrim", Vector3.new(2.05, 0.22, 1.05), GOLD, CFrame.new(0, -0.9, 0))
 	end
 	local head = rig:FindFirstChild("Head") :: BasePart
 	if head then
@@ -41,11 +42,11 @@ return function(parent: Instance, originCF: CFrame): Model
 		weldTo(rig, head, "MustacheL", Vector3.new(0.28, 0.28, 0.28), SILVER, CFrame.new(-0.55, -0.12, 0.5), Enum.PartType.Ball)
 		weldTo(rig, head, "MustacheR", Vector3.new(0.28, 0.28, 0.28), SILVER, CFrame.new( 0.55, -0.12, 0.5), Enum.PartType.Ball)
 	end
-	AB.r6Hat(rig, Vector3.new(2.1, 0.4, 1.1), SILVER, 0.55, "Hair")
+	AB.r15Hat(rig, Vector3.new(2.1, 0.4, 1.1), SILVER, 0.55, "Hair")
 	-- Toque with gold band, tall shaft, puff
-	AB.r6Hat(rig, Vector3.new(1.7, 0.35, 1.7), GOLD,  1.0, "ToqueBand")
-	AB.r6Hat(rig, Vector3.new(1.5, 1.4, 1.5), CREAM, 1.95, "ToqueShaft", Enum.PartType.Cylinder)
-	AB.r6Hat(rig, Vector3.new(2.0, 1.6, 2.0), CREAM, 2.85, "ToquePuff", Enum.PartType.Ball)
-	AB.r6NameTag(rig, NAME)
+	AB.r15Hat(rig, Vector3.new(1.7, 0.35, 1.7), GOLD,  1.0, "ToqueBand")
+	AB.r15Hat(rig, Vector3.new(1.5, 1.4, 1.5), CREAM, 1.95, "ToqueShaft", Enum.PartType.Cylinder)
+	AB.r15Hat(rig, Vector3.new(2.0, 1.6, 2.0), CREAM, 2.85, "ToquePuff", Enum.PartType.Ball)
+	AB.r15NameTag(rig, NAME)
 	return rig
 end

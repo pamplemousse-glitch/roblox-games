@@ -1,4 +1,4 @@
--- WeddingPhotoCouple — pair of R6 rigs (Bride + Groom) standing on an aisle, ready for a photo.
+-- WeddingPhotoCouple — pair of R15 rigs (Bride + Groom) standing on an aisle, ready for a photo.
 
 local AB = require(game:GetService("ReplicatedStorage").Common.AssetBuilder)
 
@@ -35,41 +35,42 @@ return function(parent: Instance, originCF: CFrame): Model
 	aisle.Material = Enum.Material.SmoothPlastic; aisle.Anchored = true; aisle.CanCollide = false
 	aisle.CFrame = originCF * CFrame.new(0, -5.9, 0); aisle.Parent = wrapper
 
-	-- Bride: cream dress, light updo, veil, bouquet
-	local bride = AB.r6Rig(wrapper, originCF * CFrame.new(-2, -3, 0), "Bride", {
+	-- Bride: cream dress, light updo, veil, bouquet. Torso accessories ride on
+	-- HumanoidRootPart so the original R6-Torso offsets keep their world Y.
+	local bride = AB.r15Rig(wrapper, originCF * CFrame.new(-2, -3, 0), "Bride", {
 		skin = Color3.fromRGB(248, 218, 198), shirt = CREAM, pants = CREAM,
 	})
-	local bTorso = bride:FindFirstChild("Torso") :: BasePart
-	if bTorso then
-		weldTo(bride, bTorso, "Belt", Vector3.new(2.05, 0.25, 1.05), PINK, CFrame.new(0, -0.9, 0))
+	local bHrp = bride:FindFirstChild("HumanoidRootPart") :: BasePart
+	if bHrp then
+		weldTo(bride, bHrp, "Belt", Vector3.new(2.05, 0.25, 1.05), PINK, CFrame.new(0, -0.9, 0))
 		-- Veil hanging behind torso
-		weldTo(bride, bTorso, "Veil", Vector3.new(2.3, 2.6, 0.15), CREAM, CFrame.new(0, 0.5, -0.6))
+		weldTo(bride, bHrp, "Veil", Vector3.new(2.3, 2.6, 0.15), CREAM, CFrame.new(0, 0.5, -0.6))
 		-- Bouquet held in right hand area
-		weldTo(bride, bTorso, "BouquetStems", Vector3.new(0.5, 0.2, 0.5), MINT, CFrame.new(1.05, -0.4, 0.8), Enum.PartType.Cylinder)
-		weldTo(bride, bTorso, "BouquetA", Vector3.new(0.55, 0.55, 0.55), PINK, CFrame.new(0.95, -0.15, 0.85), Enum.PartType.Ball)
-		weldTo(bride, bTorso, "BouquetB", Vector3.new(0.55, 0.55, 0.55), DEEP, CFrame.new(1.20, -0.15, 0.85), Enum.PartType.Ball)
-		weldTo(bride, bTorso, "BouquetC", Vector3.new(0.55, 0.55, 0.55), PINK, CFrame.new(1.05,  0.10, 0.95), Enum.PartType.Ball)
+		weldTo(bride, bHrp, "BouquetStems", Vector3.new(0.5, 0.2, 0.5), MINT, CFrame.new(1.05, -0.4, 0.8), Enum.PartType.Cylinder)
+		weldTo(bride, bHrp, "BouquetA", Vector3.new(0.55, 0.55, 0.55), PINK, CFrame.new(0.95, -0.15, 0.85), Enum.PartType.Ball)
+		weldTo(bride, bHrp, "BouquetB", Vector3.new(0.55, 0.55, 0.55), DEEP, CFrame.new(1.20, -0.15, 0.85), Enum.PartType.Ball)
+		weldTo(bride, bHrp, "BouquetC", Vector3.new(0.55, 0.55, 0.55), PINK, CFrame.new(1.05,  0.10, 0.95), Enum.PartType.Ball)
 	end
-	AB.r6Hat(bride, Vector3.new(2.1, 0.6, 1.1), HAIR_B, 0.55, "BrideHair")
-	AB.r6Hat(bride, Vector3.new(1.4, 0.2, 1.4), GOLD,   1.0,  "Tiara")
-	AB.r6Hat(bride, Vector3.new(0.7, 0.7, 0.7), HAIR_B, 1.3,  "Bun", Enum.PartType.Ball)
-	AB.r6NameTag(bride, "Bride")
+	AB.r15Hat(bride, Vector3.new(2.1, 0.6, 1.1), HAIR_B, 0.55, "BrideHair")
+	AB.r15Hat(bride, Vector3.new(1.4, 0.2, 1.4), GOLD,   1.0,  "Tiara")
+	AB.r15Hat(bride, Vector3.new(0.7, 0.7, 0.7), HAIR_B, 1.3,  "Bun", Enum.PartType.Ball)
+	AB.r15NameTag(bride, "Bride")
 
 	-- Groom: brown tux, pink bowtie, white shirt strip
-	local groom = AB.r6Rig(wrapper, originCF * CFrame.new(2, -3, 0), "Groom", {
+	local groom = AB.r15Rig(wrapper, originCF * CFrame.new(2, -3, 0), "Groom", {
 		skin = Color3.fromRGB(230, 195, 170), shirt = TUX, pants = TUX,
 	})
-	local gTorso = groom:FindFirstChild("Torso") :: BasePart
-	if gTorso then
+	local gHrp = groom:FindFirstChild("HumanoidRootPart") :: BasePart
+	if gHrp then
 		-- White shirt strip + pink bowtie
-		weldTo(groom, gTorso, "Shirt",     Vector3.new(0.7, 1.6, 0.1), CREAM, CFrame.new(0, 0.2, 0.55))
-		weldTo(groom, gTorso, "BowtieL",   Vector3.new(0.35, 0.35, 0.3), PINK, CFrame.new(-0.3, 0.85, 0.6), Enum.PartType.Ball)
-		weldTo(groom, gTorso, "BowtieR",   Vector3.new(0.35, 0.35, 0.3), PINK, CFrame.new( 0.3, 0.85, 0.6), Enum.PartType.Ball)
-		weldTo(groom, gTorso, "BowKnot",   Vector3.new(0.22, 0.22, 0.2), PINK, CFrame.new(0, 0.85, 0.6))
-		weldTo(groom, gTorso, "LapelFlw",  Vector3.new(0.3, 0.3, 0.3), DEEP, CFrame.new(-0.5, 0.4, 0.6), Enum.PartType.Ball)
+		weldTo(groom, gHrp, "Shirt",     Vector3.new(0.7, 1.6, 0.1), CREAM, CFrame.new(0, 0.2, 0.55))
+		weldTo(groom, gHrp, "BowtieL",   Vector3.new(0.35, 0.35, 0.3), PINK, CFrame.new(-0.3, 0.85, 0.6), Enum.PartType.Ball)
+		weldTo(groom, gHrp, "BowtieR",   Vector3.new(0.35, 0.35, 0.3), PINK, CFrame.new( 0.3, 0.85, 0.6), Enum.PartType.Ball)
+		weldTo(groom, gHrp, "BowKnot",   Vector3.new(0.22, 0.22, 0.2), PINK, CFrame.new(0, 0.85, 0.6))
+		weldTo(groom, gHrp, "LapelFlw",  Vector3.new(0.3, 0.3, 0.3), DEEP, CFrame.new(-0.5, 0.4, 0.6), Enum.PartType.Ball)
 	end
-	AB.r6Hat(groom, Vector3.new(2.1, 0.55, 1.1), HAIR_G, 0.55, "GroomHair")
-	AB.r6NameTag(groom, "Groom")
+	AB.r15Hat(groom, Vector3.new(2.1, 0.55, 1.1), HAIR_G, 0.55, "GroomHair")
+	AB.r15NameTag(groom, "Groom")
 
 	wrapper.PrimaryPart = bride.PrimaryPart
 	return wrapper

@@ -1,4 +1,4 @@
--- PastryChef — R6 rig in cream uniform with pink kerchief + tall chef hat + gold buttons.
+-- PastryChef — R15 rig in cream uniform with pink kerchief + tall chef hat + gold buttons.
 
 local AB = require(game:GetService("ReplicatedStorage").Common.AssetBuilder)
 
@@ -21,31 +21,32 @@ local function weldTo(parent: Model, base: BasePart, name: string, size: Vector3
 end
 
 return function(parent: Instance, originCF: CFrame): Model
-	local rig = AB.r6Rig(parent, originCF * CFrame.new(0, -3, 0), NAME, {
+	local rig = AB.r15Rig(parent, originCF * CFrame.new(0, -3, 0), NAME, {
 		skin  = Color3.fromRGB(225, 195, 165),
 		shirt = CREAM,
 		pants = Color3.fromRGB(80, 70, 80),
 	})
-	local torso = rig:FindFirstChild("Torso") :: BasePart
-	if torso then
+	-- Torso accessories ride on HumanoidRootPart so existing R6 Torso offsets work.
+	local hrp = rig:FindFirstChild("HumanoidRootPart") :: BasePart
+	if hrp then
 		-- Pink kerchief at neckline
-		weldTo(rig, torso, "Kerchief", Vector3.new(2.05, 0.35, 1.05), PINK, CFrame.new(0, 0.75, 0))
+		weldTo(rig, hrp, "Kerchief", Vector3.new(2.05, 0.35, 1.05), PINK, CFrame.new(0, 0.75, 0))
 		-- Gold double-breasted buttons
 		for i = 1, 3 do
 			local y = 0.4 - (i - 1) * 0.5
-			weldTo(rig, torso, "BtnL_" .. i, Vector3.new(0.2, 0.2, 0.2), GOLD, CFrame.new(-0.32, y, 0.55), Enum.PartType.Ball)
-			weldTo(rig, torso, "BtnR_" .. i, Vector3.new(0.2, 0.2, 0.2), GOLD, CFrame.new( 0.32, y, 0.55), Enum.PartType.Ball)
+			weldTo(rig, hrp, "BtnL_" .. i, Vector3.new(0.2, 0.2, 0.2), GOLD, CFrame.new(-0.32, y, 0.55), Enum.PartType.Ball)
+			weldTo(rig, hrp, "BtnR_" .. i, Vector3.new(0.2, 0.2, 0.2), GOLD, CFrame.new( 0.32, y, 0.55), Enum.PartType.Ball)
 		end
 	end
 	local head = rig:FindFirstChild("Head") :: BasePart
 	if head then
 		weldTo(rig, head, "Mustache", Vector3.new(0.7, 0.15, 0.3), HAIR, CFrame.new(0, -0.18, 0.45))
 	end
-	AB.r6Hat(rig, Vector3.new(2.1, 0.4, 1.1), HAIR,  0.55, "Hair")
+	AB.r15Hat(rig, Vector3.new(2.1, 0.4, 1.1), HAIR,  0.55, "Hair")
 	-- Tall puffy chef hat
-	AB.r6Hat(rig, Vector3.new(1.7, 0.35, 1.7), CREAM, 1.0, "HatBand")
-	AB.r6Hat(rig, Vector3.new(1.6, 1.8, 1.6), CREAM, 2.05, "HatShaft", Enum.PartType.Cylinder)
-	AB.r6Hat(rig, Vector3.new(2.2, 1.7, 2.2), CREAM, 3.05, "HatPuff", Enum.PartType.Ball)
-	AB.r6NameTag(rig, NAME)
+	AB.r15Hat(rig, Vector3.new(1.7, 0.35, 1.7), CREAM, 1.0, "HatBand")
+	AB.r15Hat(rig, Vector3.new(1.6, 1.8, 1.6), CREAM, 2.05, "HatShaft", Enum.PartType.Cylinder)
+	AB.r15Hat(rig, Vector3.new(2.2, 1.7, 2.2), CREAM, 3.05, "HatPuff", Enum.PartType.Ball)
+	AB.r15NameTag(rig, NAME)
 	return rig
 end
