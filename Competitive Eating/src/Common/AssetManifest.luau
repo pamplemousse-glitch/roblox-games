@@ -136,85 +136,111 @@ return {
 	{ module = "Assets.Districts.PizzaPlaza.Npcs.DeliveryBoyOnBike",          position = Vector3.new(-860, 6, 30) },
 
 	-- ============================================================
-	-- TOKYO TOWN V2 (base X = 1400) — Japanese Street genre
+	-- TOKYO TOWN V3 (Session D layout reorg)
+	-- Footprint: X 785..1030, Z 55..150 (per Session D spec).
+	-- Winding street + central plaza around the Maneki-neko + side alleys.
+	-- ContestStage_T1 (X=72, Z=-221) and Pizza Plaza (X=-1100..-450) untouched.
 	-- ============================================================
 
-	-- Foods (kept from v1, base shifted to 1400)
+	-- Foods (kept from v1, food row away from district at z=0)
 	{ module = "Assets.Districts.TokyoTown.Foods.RamenBowl",  position = Vector3.new(810, 6, 0) },
 	{ module = "Assets.Districts.TokyoTown.Foods.GyozaTray",  position = Vector3.new(820, 6, 0) },
 	{ module = "Assets.Districts.TokyoTown.Foods.Takoyaki",   position = Vector3.new(830, 6, 0) },
 	{ module = "Assets.Districts.TokyoTown.Foods.SushiRoll",  position = Vector3.new(840, 6, 0) },
 	{ module = "Assets.Districts.TokyoTown.Foods.Mochi",      position = Vector3.new(850, 6, 0) },
 
-	-- V2 Hero buildings (main street, z=100)
-	{ module = "Assets.Districts.TokyoTown.Buildings.DaikonRamen",      position = Vector3.new(800, 0, 100), yaw = 0 },
-	{ module = "Assets.Districts.TokyoTown.Buildings.SushiDaiko",       position = Vector3.new(845, 0, 100), yaw = 0 },
-	{ module = "Assets.Districts.TokyoTown.Buildings.IzakayaLantern",   position = Vector3.new(895, 0, 100), yaw = 0 },
-	{ module = "Assets.Districts.TokyoTown.Buildings.SakeBar",          position = Vector3.new(925, 0, 100), yaw = 0 },
-	{ module = "Assets.Districts.TokyoTown.Buildings.TakoyakiCart",     position = Vector3.new(960, 0, 105), yaw = 0 },
+	-- ─── Winding hero street ────────────────────────────────────────────
+	-- DaikonRamen → SushiDaiko → IzakayaLantern, staggered in Z and canted
+	-- so the row reads as a winding alley rather than a straight strip.
+	-- TakoyakiCart and SakeBar tucked into side alleys, bad faces away.
+	{ module = "Assets.Districts.TokyoTown.Buildings.DaikonRamen",     position = Vector3.new(815, 0, 108), yaw = -12 },
+	{ module = "Assets.Districts.TokyoTown.Buildings.SushiDaiko",      position = Vector3.new(852, 0, 122), yaw =   4 },
+	{ module = "Assets.Districts.TokyoTown.Buildings.IzakayaLantern",  position = Vector3.new(895, 0, 115), yaw =  18 },
+	{ module = "Assets.Districts.TokyoTown.Buildings.SakeBar",         position = Vector3.new(948, 0, 132), yaw = -30 },  -- north-east alley
+	{ module = "Assets.Districts.TokyoTown.Buildings.TakoyakiCart",    position = Vector3.new(872, 0,  62), yaw = 180 },  -- south alley vendor
 
-	-- V2 Backdrop buildings (further back, z=140-170)
-	{ module = "Assets.Districts.TokyoTown.Buildings.CapsuleHotel",         position = Vector3.new(795, 0, 170), yaw = 0 },
-	{ module = "Assets.Districts.TokyoTown.Buildings.VendingMachineWall",   position = Vector3.new(865, 0, 145), yaw = 0 },
-	{ module = "Assets.Districts.TokyoTown.Buildings.NarrowAlleyShops",     position = Vector3.new(910, 0, 155), yaw = 0 },
-	{ module = "Assets.Districts.TokyoTown.Buildings.SalarymanApartments",  position = Vector3.new(960, 0, 175), yaw = 0 },
-	{ module = "Assets.Districts.TokyoTown.Buildings.LanternNoodleRow",     position = Vector3.new(1005, 0, 105), yaw = 0 },
+	-- ─── Backdrop row (Z=140..150, masks the back of the heroes) ───────
+	{ module = "Assets.Districts.TokyoTown.Buildings.CapsuleHotel",        position = Vector3.new(815, 0, 148), yaw = 0 },
+	{ module = "Assets.Districts.TokyoTown.Buildings.VendingMachineWall",  position = Vector3.new(872, 0, 145), yaw = 180 },
+	{ module = "Assets.Districts.TokyoTown.Buildings.NarrowAlleyShops",    position = Vector3.new(920, 0, 150), yaw = 0 },
+	{ module = "Assets.Districts.TokyoTown.Buildings.SalarymanApartments", position = Vector3.new(985, 0, 145), yaw = 0 },
+	{ module = "Assets.Districts.TokyoTown.Buildings.LanternNoodleRow",    position = Vector3.new(998, 0, 122), yaw =  10 },
 
-	-- V2 Landmarks
-	{ module = "Assets.Districts.TokyoTown.Landmarks.ShintoTorii",      position = Vector3.new(775, 0,  60), yaw = 0 },
-	{ module = "Assets.Districts.TokyoTown.Landmarks.GiantManekiNeko",  position = Vector3.new(855, 0,  45), yaw = 0 },
-	{ module = "Assets.Districts.TokyoTown.Landmarks.MiniPagodaTower",  position = Vector3.new(1025, 0, 150), yaw = 0 },
+	-- ─── Landmarks ─────────────────────────────────────────────────────
+	-- Torii is the WEST entry gate; Maneki-neko anchors the PLAZA at Z=85;
+	-- Pagoda is the EAST landmark visible down the winding street.
+	{ module = "Assets.Districts.TokyoTown.Landmarks.ShintoTorii",     position = Vector3.new(790, 0,  82), yaw = 90 },
+	{ module = "Assets.Districts.TokyoTown.Landmarks.GiantManekiNeko", position = Vector3.new(875, 0,  85), yaw =  0 },
+	{ module = "Assets.Districts.TokyoTown.Landmarks.MiniPagodaTower", position = Vector3.new(1018, 0,  95), yaw =  0 },
 
-	-- V2 Named NPCs (kept from v1, shifted)
-	{ module = "Assets.Districts.TokyoTown.Npcs.Kenji", position = Vector3.new(820, 6, 30) },
-	{ module = "Assets.Districts.TokyoTown.Npcs.Yumi",  position = Vector3.new(840, 6, 30) },
-	{ module = "Assets.Districts.TokyoTown.Npcs.Riku",  position = Vector3.new(860, 6, 30) },
-	{ module = "Assets.Districts.TokyoTown.Npcs.Akemi", position = Vector3.new(880, 6, 30) },
+	-- ─── NPCs ──────────────────────────────────────────────────────────
+	-- Named locals: 4 along the winding street (Z 95..115)
+	{ module = "Assets.Districts.TokyoTown.Npcs.Akemi", position = Vector3.new(820, 6, 95),  yaw = -90 },
+	{ module = "Assets.Districts.TokyoTown.Npcs.Kenji", position = Vector3.new(852, 6, 108), yaw = -45 },
+	{ module = "Assets.Districts.TokyoTown.Npcs.Yumi",  position = Vector3.new(895, 6, 102), yaw =  45 },
+	{ module = "Assets.Districts.TokyoTown.Npcs.Riku",  position = Vector3.new(970, 6, 105), yaw = 180 },
+	-- Plaza ambient: 4 facing the Maneki-neko
+	{ module = "Assets.Districts.TokyoTown.Npcs.SushiChef",        position = Vector3.new(855, 6, 75), yaw =  20 },
+	{ module = "Assets.Districts.TokyoTown.Npcs.RamenSlurper",     position = Vector3.new(885, 6, 78), yaw =  -25 },
+	{ module = "Assets.Districts.TokyoTown.Npcs.SchoolgirlBento",  position = Vector3.new(872, 6, 95), yaw = 180 },
+	{ module = "Assets.Districts.TokyoTown.Npcs.BowingShopkeeper", position = Vector3.new(895, 6, 92), yaw = -90 },
+	-- Side-alley figures
+	{ module = "Assets.Districts.TokyoTown.Npcs.SalarymanSuited", position = Vector3.new(945, 6, 118), yaw = -50 },
+	{ module = "Assets.Districts.TokyoTown.Npcs.PachinkoPlayer",  position = Vector3.new(948, 6, 138), yaw = 180 },
+	-- Hotel guest + east-side cyclist
+	{ module = "Assets.Districts.TokyoTown.Npcs.CapsuleHotelGuest", position = Vector3.new(820, 6, 138), yaw =  90 },
+	{ module = "Assets.Districts.TokyoTown.Npcs.BicycleSchoolgirl", position = Vector3.new(1000, 6,  78), yaw =  90 },
 
-	-- V2 Pedestrian NPCs (scattered, z=15-80)
-	{ module = "Assets.Districts.TokyoTown.Npcs.SalarymanSuited",   position = Vector3.new(810, 6, 25),  yaw =  20 },
-	{ module = "Assets.Districts.TokyoTown.Npcs.SchoolgirlBento",   position = Vector3.new(832, 6, 70),  yaw = -30 },
-	{ module = "Assets.Districts.TokyoTown.Npcs.SushiChef",         position = Vector3.new(850, 6, 80),  yaw = 180 },
-	{ module = "Assets.Districts.TokyoTown.Npcs.RamenSlurper",      position = Vector3.new(875, 6, 78),  yaw = 180 },
-	{ module = "Assets.Districts.TokyoTown.Npcs.BowingShopkeeper",  position = Vector3.new(900, 6, 80),  yaw = 180 },
-	{ module = "Assets.Districts.TokyoTown.Npcs.CapsuleHotelGuest", position = Vector3.new(795, 6, 130), yaw =  90 },
-	{ module = "Assets.Districts.TokyoTown.Npcs.BicycleSchoolgirl", position = Vector3.new(940, 6, 50),  yaw =  90 },
-	{ module = "Assets.Districts.TokyoTown.Npcs.PachinkoPlayer",    position = Vector3.new(970, 6, 75),  yaw = 180 },
+	-- ─── Props ─────────────────────────────────────────────────────────
+	{ module = "Assets.Districts.TokyoTown.Props.DaikonRamenSignboard", position = Vector3.new(810, 0,  98), yaw = -12 },
 
-	-- V2 Props
-	-- Hero mesh signboard pairing with DaikonRamen (Cube 3D)
-	{ module = "Assets.Districts.TokyoTown.Props.DaikonRamenSignboard", position = Vector3.new(815, 0, 113), yaw = 0 },
+	-- Real kanji signs in front of each Cube 3D shop (Session D 7c)
+	{ module = "Assets.Districts.TokyoTown.Props.KanjiSign_Ramen",    position = Vector3.new(815, 0,  96), yaw = -12 },
+	{ module = "Assets.Districts.TokyoTown.Props.KanjiSign_Daikon",   position = Vector3.new(823, 0,  93), yaw = -12 },
+	{ module = "Assets.Districts.TokyoTown.Props.KanjiSign_Sushi",    position = Vector3.new(852, 0, 110), yaw =   4 },
+	{ module = "Assets.Districts.TokyoTown.Props.KanjiSign_Izakaya",  position = Vector3.new(895, 0, 104), yaw =  18 },
+	{ module = "Assets.Districts.TokyoTown.Props.KanjiSign_Takoyaki", position = Vector3.new(872, 0,  72), yaw = 180 },
 
-	{ module = "Assets.Districts.TokyoTown.Props.RedPaperLanternString", position = Vector3.new(815, 0, 50),  yaw = 0 },
-	{ module = "Assets.Districts.TokyoTown.Props.RedPaperLanternString", position = Vector3.new(900, 0, 50),  yaw = 0 },
-	{ module = "Assets.Districts.TokyoTown.Props.RedPaperLanternString", position = Vector3.new(985, 0, 50),  yaw = 0 },
+	-- Back-alley decor clusters behind each Cube 3D building (Session D 7b)
+	{ module = "Assets.Districts.TokyoTown.Decor.BackAlleyCluster", position = Vector3.new(815, 0, 122), yaw = -12 + 180 },
+	{ module = "Assets.Districts.TokyoTown.Decor.BackAlleyCluster", position = Vector3.new(852, 0, 138), yaw =   4 + 180 },
+	{ module = "Assets.Districts.TokyoTown.Decor.BackAlleyCluster", position = Vector3.new(895, 0, 130), yaw =  18 + 180 },
+	{ module = "Assets.Districts.TokyoTown.Decor.BackAlleyCluster", position = Vector3.new(948, 0, 118), yaw = -30 + 180 },
+	{ module = "Assets.Districts.TokyoTown.Decor.BackAlleyCluster", position = Vector3.new(872, 0,  55), yaw =   0 },  -- TakoyakiCart "back" is south
 
-	{ module = "Assets.Districts.TokyoTown.Props.VendingMachineSingle", position = Vector3.new(808, 0, 35),  yaw = 180 },
-	{ module = "Assets.Districts.TokyoTown.Props.VendingMachineSingle", position = Vector3.new(816, 0, 35),  yaw = 180 },
-	{ module = "Assets.Districts.TokyoTown.Props.VendingMachineSingle", position = Vector3.new(824, 0, 35),  yaw = 180 },
-	{ module = "Assets.Districts.TokyoTown.Props.VendingMachineSingle", position = Vector3.new(862, 0, 35),  yaw = 180 },
-	{ module = "Assets.Districts.TokyoTown.Props.VendingMachineSingle", position = Vector3.new(870, 0, 35),  yaw = 180 },
-	{ module = "Assets.Districts.TokyoTown.Props.VendingMachineSingle", position = Vector3.new(945, 0, 35),  yaw = 180 },
-	{ module = "Assets.Districts.TokyoTown.Props.VendingMachineSingle", position = Vector3.new(953, 0, 35),  yaw = 180 },
-	{ module = "Assets.Districts.TokyoTown.Props.VendingMachineSingle", position = Vector3.new(1015, 0, 35),  yaw = 180 },
+	-- Lantern strings spaced along the winding street
+	{ module = "Assets.Districts.TokyoTown.Props.RedPaperLanternString", position = Vector3.new(820, 0,  88), yaw = -12 },
+	{ module = "Assets.Districts.TokyoTown.Props.RedPaperLanternString", position = Vector3.new(870, 0,  90), yaw =   0 },
+	{ module = "Assets.Districts.TokyoTown.Props.RedPaperLanternString", position = Vector3.new(940, 0,  95), yaw =  18 },
 
-	{ module = "Assets.Districts.TokyoTown.Props.SakeBarrel",            position = Vector3.new(888, 0, 70),  yaw = 0 },
-	{ module = "Assets.Districts.TokyoTown.Props.PachinkoMachine",       position = Vector3.new(972, 0, 80),  yaw = 180 },
-	{ module = "Assets.Districts.TokyoTown.Props.BicycleRack",           position = Vector3.new(832, 0, 25),  yaw = 0 },
-	{ module = "Assets.Districts.TokyoTown.Props.ManholeCovers",         position = Vector3.new(900, 0, 22),  yaw = 0 },
-	{ module = "Assets.Districts.TokyoTown.Props.BroomAndDustpan",       position = Vector3.new(925, 0, 80),  yaw = 90 },
-	{ module = "Assets.Districts.TokyoTown.Props.KindergartenPullCart",  position = Vector3.new(870, 0, 20),  yaw = 90 },
-	{ module = "Assets.Districts.TokyoTown.Props.DarumaDoll",            position = Vector3.new(830, 0, 65),  yaw = 180 },
-	{ module = "Assets.Districts.TokyoTown.Props.OmikujiRack",           position = Vector3.new(780, 0, 75),  yaw = 0 },
-	{ module = "Assets.Districts.TokyoTown.Props.KoiPondStones",         position = Vector3.new(1030, 0, 90),  yaw = 0 },
+	-- Vending machine clusters in side alleys (away from main walking line)
+	{ module = "Assets.Districts.TokyoTown.Props.VendingMachineSingle", position = Vector3.new(940, 0, 105), yaw = -90 },
+	{ module = "Assets.Districts.TokyoTown.Props.VendingMachineSingle", position = Vector3.new(940, 0, 110), yaw = -90 },
+	{ module = "Assets.Districts.TokyoTown.Props.VendingMachineSingle", position = Vector3.new(940, 0, 115), yaw = -90 },
+	{ module = "Assets.Districts.TokyoTown.Props.VendingMachineSingle", position = Vector3.new(805, 0,  70), yaw =  90 },
+	{ module = "Assets.Districts.TokyoTown.Props.VendingMachineSingle", position = Vector3.new(805, 0,  75), yaw =  90 },
+	{ module = "Assets.Districts.TokyoTown.Props.VendingMachineSingle", position = Vector3.new(805, 0,  80), yaw =  90 },
+	{ module = "Assets.Districts.TokyoTown.Props.VendingMachineSingle", position = Vector3.new(1010, 0, 110), yaw = -90 },
+	{ module = "Assets.Districts.TokyoTown.Props.VendingMachineSingle", position = Vector3.new(1010, 0, 115), yaw = -90 },
 
-	-- V2 Decor
-	{ module = "Assets.Districts.TokyoTown.Decor.KatakanaNeon",          position = Vector3.new(925, 6, 95),  yaw = 180 },
-	{ module = "Assets.Districts.TokyoTown.Decor.CherryBlossomStrings",  position = Vector3.new(865, 0, 55),  yaw = 0 },
-	{ module = "Assets.Districts.TokyoTown.Decor.WashiPaperBanner",      position = Vector3.new(800, 0, 40),  yaw = 0 },
-	{ module = "Assets.Districts.TokyoTown.Decor.JapaneseFlagBunting",   position = Vector3.new(900, 0, 60),  yaw = 0 },
-	{ module = "Assets.Districts.TokyoTown.Decor.WhiteTileAlleyMarking", position = Vector3.new(885, 0, 25),  yaw = 0 },
-	{ module = "Assets.Districts.TokyoTown.Decor.SakuraPetalScatter",    position = Vector3.new(840, 0, 55),  yaw = 0 },
+	-- Plaza & street props
+	{ module = "Assets.Districts.TokyoTown.Props.SakeBarrel",           position = Vector3.new(932, 0, 122), yaw = -30 },
+	{ module = "Assets.Districts.TokyoTown.Props.PachinkoMachine",      position = Vector3.new(950, 0, 142), yaw = 180 },
+	{ module = "Assets.Districts.TokyoTown.Props.BicycleRack",          position = Vector3.new(800, 0,  92), yaw =   0 },
+	{ module = "Assets.Districts.TokyoTown.Props.ManholeCovers",        position = Vector3.new(870, 0,  88), yaw =   0 },  -- in plaza
+	{ module = "Assets.Districts.TokyoTown.Props.BroomAndDustpan",      position = Vector3.new(900, 0,  88), yaw =  90 },
+	{ module = "Assets.Districts.TokyoTown.Props.KindergartenPullCart", position = Vector3.new(880, 0,  62), yaw =  90 },
+	{ module = "Assets.Districts.TokyoTown.Props.DarumaDoll",           position = Vector3.new(862, 0,  88), yaw = 180 },
+	{ module = "Assets.Districts.TokyoTown.Props.OmikujiRack",          position = Vector3.new(792, 0,  88), yaw =  90 },  -- at torii
+	{ module = "Assets.Districts.TokyoTown.Props.KoiPondStones",        position = Vector3.new(880, 0,  78), yaw =   0 },  -- plaza pond
+
+	-- Decor
+	{ module = "Assets.Districts.TokyoTown.Decor.KatakanaNeon",          position = Vector3.new(895, 6, 105), yaw =  18 },
+	{ module = "Assets.Districts.TokyoTown.Decor.CherryBlossomStrings",  position = Vector3.new(870, 0,  72), yaw =   0 },
+	{ module = "Assets.Districts.TokyoTown.Decor.WashiPaperBanner",      position = Vector3.new(792, 0,  76), yaw =  90 },
+	{ module = "Assets.Districts.TokyoTown.Decor.JapaneseFlagBunting",   position = Vector3.new(870, 0,  82), yaw =   0 },
+	{ module = "Assets.Districts.TokyoTown.Decor.WhiteTileAlleyMarking", position = Vector3.new(880, 0,  88), yaw =   0 },
+	{ module = "Assets.Districts.TokyoTown.Decor.SakuraPetalScatter",    position = Vector3.new(875, 0,  85), yaw =   0 },
 
 	-- ============================================================
 	-- DONUT DYNASTY (base X = 1600) — Sweets / Pastries genre
