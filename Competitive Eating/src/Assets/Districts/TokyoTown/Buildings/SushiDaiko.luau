@@ -56,7 +56,7 @@ return function(parent: Instance, originCF: CFrame): Model
 
 	-- Glass display window (left side) with simulated nigiri inside
 	AB.block(Vector3.new(7, 4, 0.4), Color3.fromRGB(180, 210, 220),
-		AB.offset(originCF, -7.5, 5.5, 12.3), model, "DisplayGlass") :: BasePart
+		AB.offset(originCF, -7.5, 5.5, 12.3), model, "DisplayGlass")
 	-- Display platform
 	AB.block(Vector3.new(7, 0.3, 1.8), DARK_WOOD,
 		AB.offset(originCF, -7.5, 4.0, 11.8), model, "DisplayShelf")
