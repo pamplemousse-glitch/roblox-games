@@ -12,6 +12,7 @@ local AssetSpawner = {}
 local Common         = game:GetService("ReplicatedStorage").Common
 local AssetsFolder   = game:GetService("ReplicatedStorage"):FindFirstChild("Assets")
 local manifestModule = Common:FindFirstChild("AssetManifest")
+local polishModule   = Common:FindFirstChild("TokyoPolish")
 
 local function findModuleByPath(rootName: string, path: string): ModuleScript?
 	-- path like "Assets.Districts.PizzaPlaza.Buildings.PizzaParlor"
@@ -67,14 +68,27 @@ function AssetSpawner.init()
 				continue
 			end
 
-			local spawnOk, err = pcall(function()
-				builder(districtsFolder, cf)
+			local spawnOk, spawnResult = pcall(function()
+				return builder(districtsFolder, cf)
 			end)
 
 			if spawnOk then
 				spawned += 1
+				-- Tokyo polish: PBR materials + lantern/sign lighting on every
+				-- Tokyo Town asset after it spawns. AssetSpawner clears + respawns
+				-- Districts each server start, so the pass runs every session.
+				if polishModule and entry.module:sub(1, 28) == "Assets.Districts.TokyoTown." then
+					if typeof(spawnResult) == "Instance" and spawnResult:IsA("Model") then
+						local polishOk, polishErr = pcall(function()
+							require(polishModule).apply(spawnResult)
+						end)
+						if not polishOk then
+							warn("[AssetSpawner] TokyoPolish failed for " .. entry.module .. ": " .. tostring(polishErr))
+						end
+					end
+				end
 			else
-				warn("[AssetSpawner] spawn failed for " .. entry.module .. ": " .. tostring(err))
+				warn("[AssetSpawner] spawn failed for " .. entry.module .. ": " .. tostring(spawnResult))
 				failed += 1
 			end
 		end
