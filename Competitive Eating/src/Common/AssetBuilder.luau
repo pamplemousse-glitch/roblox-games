@@ -216,4 +216,163 @@ AssetBuilder.colors = {
 	deepWood        = Color3.fromRGB(80, 50, 30),
 }
 
+-- ── R6 NPC rig ───────────────────────────────────────────────────────────────
+-- Builds a Roblox-standard R6 character (6 parts + Humanoid + Animator + 6
+-- Motor6Ds) at originCF. originCF is the world-space pivot of the Torso center.
+-- Parts are anchored so NPCs stand in place without physics; animations still
+-- play through the Animator. Pass per-part colors to theme the NPC.
+
+type RigColors = {
+	head:     Color3?,
+	torso:    Color3?,
+	leftArm:  Color3?,
+	rightArm: Color3?,
+	leftLeg:  Color3?,
+	rightLeg: Color3?,
+	pants:    Color3?,   -- alias: colors both legs the same
+	skin:     Color3?,   -- alias: colors head + both arms the same
+	shirt:    Color3?,   -- alias: colors torso the same
+}
+
+function AssetBuilder.r6Rig(parent: Instance, originCF: CFrame, name: string, colors: RigColors): Model
+	colors = colors or {}
+	local skin     = colors.skin     or Color3.fromRGB(255, 220, 180)
+	local shirt    = colors.shirt    or Color3.fromRGB(80, 80, 130)
+	local pants    = colors.pants    or Color3.fromRGB(45, 45, 60)
+	local cHead    = colors.head     or skin
+	local cTorso   = colors.torso    or shirt
+	local cLArm    = colors.leftArm  or skin
+	local cRArm    = colors.rightArm or skin
+	local cLLeg    = colors.leftLeg  or pants
+	local cRLeg    = colors.rightLeg or pants
+
+	local model = Instance.new("Model")
+	model.Name   = name
+	model.Parent = parent
+
+	local function mkPart(pname: string, size: Vector3, color: Color3, localPos: Vector3): Part
+		local p = Instance.new("Part")
+		p.Name          = pname
+		p.Size          = size
+		p.Color         = color
+		p.Material      = Enum.Material.SmoothPlastic
+		p.TopSurface    = Enum.SurfaceType.Smooth
+		p.BottomSurface = Enum.SurfaceType.Smooth
+		p.Anchored      = true
+		p.CanCollide    = pname ~= "HumanoidRootPart"
+		p.Transparency  = pname == "HumanoidRootPart" and 1 or 0
+		p.CFrame        = originCF * CFrame.new(localPos)
+		p.Parent        = model
+		return p
+	end
+
+	local hrp   = mkPart("HumanoidRootPart", Vector3.new(2, 2, 1), Color3.new(0.4, 0.4, 0.4), Vector3.new(0, 0, 0))
+	local torso = mkPart("Torso",            Vector3.new(2, 2, 1), cTorso, Vector3.new(0, 0, 0))
+	local head  = mkPart("Head",             Vector3.new(2, 1, 1), cHead,  Vector3.new(0, 1.5, 0))
+	local lArm  = mkPart("Left Arm",         Vector3.new(1, 2, 1), cLArm,  Vector3.new(-1.5, 0, 0))
+	local rArm  = mkPart("Right Arm",        Vector3.new(1, 2, 1), cRArm,  Vector3.new( 1.5, 0, 0))
+	local lLeg  = mkPart("Left Leg",         Vector3.new(1, 2, 1), cLLeg,  Vector3.new(-0.5, -2, 0))
+	local rLeg  = mkPart("Right Leg",        Vector3.new(1, 2, 1), cRLeg,  Vector3.new( 0.5, -2, 0))
+
+	-- Mesh on head to round it (matches Roblox default R6 head)
+	local headMesh = Instance.new("SpecialMesh")
+	headMesh.MeshType = Enum.MeshType.Head
+	headMesh.Scale    = Vector3.new(1.25, 1.25, 1.25)
+	headMesh.Parent   = head
+
+	local function motor(jointName: string, p0: BasePart, p1: BasePart, c0: CFrame, c1: CFrame, parentPart: BasePart)
+		local m = Instance.new("Motor6D")
+		m.Name   = jointName
+		m.Part0  = p0
+		m.Part1  = p1
+		m.C0     = c0
+		m.C1     = c1
+		m.Parent = parentPart
+		return m
+	end
+
+	local PI = math.pi
+	motor("RootJoint", hrp, torso,
+		CFrame.new(0,0,0) * CFrame.Angles(-PI/2, 0, PI),
+		CFrame.new(0,0,0) * CFrame.Angles(-PI/2, 0, PI), hrp)
+	motor("Neck", torso, head,
+		CFrame.new(0,  1,   0) * CFrame.Angles(-PI/2, 0, PI),
+		CFrame.new(0, -0.5, 0) * CFrame.Angles(-PI/2, 0, PI), torso)
+	motor("Right Shoulder", torso, rArm,
+		CFrame.new( 1,  0.5, 0) * CFrame.Angles(0,  PI/2, 0),
+		CFrame.new(-0.5, 0.5, 0) * CFrame.Angles(0,  PI/2, 0), torso)
+	motor("Left Shoulder", torso, lArm,
+		CFrame.new(-1,  0.5, 0) * CFrame.Angles(0, -PI/2, 0),
+		CFrame.new( 0.5, 0.5, 0) * CFrame.Angles(0, -PI/2, 0), torso)
+	motor("Right Hip", torso, rLeg,
+		CFrame.new(0.5, -1, 0) * CFrame.Angles(0,  PI/2, 0),
+		CFrame.new(0,    1, 0) * CFrame.Angles(0,  PI/2, 0), torso)
+	motor("Left Hip", torso, lLeg,
+		CFrame.new(-0.5, -1, 0) * CFrame.Angles(0, -PI/2, 0),
+		CFrame.new( 0,    1, 0) * CFrame.Angles(0, -PI/2, 0), torso)
+
+	local humanoid = Instance.new("Humanoid")
+	humanoid.RigType        = Enum.HumanoidRigType.R6
+	humanoid.MaxHealth      = 100
+	humanoid.Health         = 100
+	humanoid.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None
+	humanoid.HealthDisplayType   = Enum.HumanoidHealthDisplayType.AlwaysOff
+	humanoid.Parent         = model
+
+	local animator = Instance.new("Animator")
+	animator.Parent = humanoid
+
+	model.PrimaryPart = hrp
+	return model
+end
+
+-- Add a name BillboardGui above a rig's head.
+function AssetBuilder.r6NameTag(model: Model, displayName: string)
+	local head = model:FindFirstChild("Head")
+	if not head then return end
+	local bb = Instance.new("BillboardGui")
+	bb.Name           = "NameTag"
+	bb.Adornee        = head
+	bb.Size           = UDim2.fromOffset(80, 16)
+	bb.StudsOffset    = Vector3.new(0, 2.5, 0)
+	bb.AlwaysOnTop    = false
+	bb.MaxDistance    = 50
+	bb.Parent         = head
+	local lbl = Instance.new("TextLabel")
+	lbl.Size           = UDim2.fromScale(1, 1)
+	lbl.BackgroundTransparency = 1
+	lbl.Text           = displayName
+	lbl.TextColor3     = Color3.fromRGB(255, 255, 255)
+	lbl.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+	lbl.TextStrokeTransparency = 0
+	lbl.TextScaled     = false
+	lbl.TextSize       = 12
+	lbl.Font           = Enum.Font.GothamBold
+	lbl.Parent         = bb
+end
+
+-- Add a single anchored part as a hat/accessory above the rig's head.
+function AssetBuilder.r6Hat(model: Model, size: Vector3, color: Color3, yOffset: number, hatName: string?, shape: Enum.PartType?): Part?
+	local head = model:FindFirstChild("Head")
+	if not head then return nil end
+	local p = Instance.new("Part")
+	p.Name          = hatName or "Hat"
+	p.Size          = size
+	p.Color         = color
+	p.Material      = Enum.Material.SmoothPlastic
+	p.TopSurface    = Enum.SurfaceType.Smooth
+	p.BottomSurface = Enum.SurfaceType.Smooth
+	p.Anchored      = true
+	p.CanCollide    = false
+	p.CFrame        = head.CFrame * CFrame.new(0, yOffset, 0)
+	if shape then p.Shape = shape end
+	p.Parent        = model
+	-- Weld so the hat moves with the head if the rig is ever moved.
+	local w = Instance.new("WeldConstraint")
+	w.Part0 = head
+	w.Part1 = p
+	w.Parent = p
+	return p
+end
+
 return AssetBuilder
