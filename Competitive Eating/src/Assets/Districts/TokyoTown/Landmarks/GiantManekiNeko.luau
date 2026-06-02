@@ -1,6 +1,24 @@
--- Giant Maneki Neko — 30-stud-tall lucky cat statue. White body, gold collar
--- with red ribbon, big black eyes, raised right paw with a glowing gold koban
--- coin behind. Landmark scale meant to be visible from across the district.
+-- Giant Maneki Neko — 30-stud-tall lucky cat statue.
+--
+-- TODO (Phase 3 followup): swap the primitive build below for a Meshy.ai
+-- preview-mode mesh. The GLB is staged at:
+--
+--   Competitive Eating/assets/raw/maneki-neko-preview.glb
+--
+-- Meshy task: 019e85a0-e403-7930-8706-a9a1374d0d22 (preview, no textures —
+-- refine pass not run; mesh is untextured grey clay).
+-- Generated 2026-06-01 (Session A, branch feature/tokyo-hero-A).
+--
+-- To finish the swap:
+--   1. In Studio: File → Import 3D → select the staged GLB above. Studio
+--      auto-uploads to Roblox and gives the new MeshPart a real rbxassetid.
+--   2. Copy the resulting MeshId.
+--   3. Replace this module's body with the same AssetService:CreateMeshPartAsync
+--      pattern used in TokyoTown.Buildings.DaikonRamen et al.
+--   4. Position SIZE so the bell hangs at ~17 studs (current y reference).
+--
+-- Until then the primitive build below is the live landmark — works fine in
+-- gameplay, just lower-fidelity than the planned Meshy hero.
 
 local AB = require(game:GetService("ReplicatedStorage").Common.AssetBuilder)
 
