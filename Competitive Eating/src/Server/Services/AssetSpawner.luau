@@ -12,7 +12,8 @@ local AssetSpawner = {}
 local Common         = game:GetService("ReplicatedStorage").Common
 local AssetsFolder   = game:GetService("ReplicatedStorage"):FindFirstChild("Assets")
 local manifestModule = Common:FindFirstChild("AssetManifest")
-local polishModule   = Common:FindFirstChild("TokyoPolish")
+local polishModule       = Common:FindFirstChild("TokyoPolish")
+local donutPolishModule  = Common:FindFirstChild("DonutPolish")
 
 local function findModuleByPath(rootName: string, path: string): ModuleScript?
 	-- path like "Assets.Districts.PizzaPlaza.Buildings.PizzaParlor"
@@ -84,6 +85,17 @@ function AssetSpawner.init()
 						end)
 						if not polishOk then
 							warn("[AssetSpawner] TokyoPolish failed for " .. entry.module .. ": " .. tostring(polishErr))
+						end
+					end
+				end
+				-- Donut polish: same pattern, gated on the Donut Dynasty path prefix.
+				if donutPolishModule and entry.module:sub(1, 30) == "Assets.Districts.DonutDynasty." then
+					if typeof(spawnResult) == "Instance" and spawnResult:IsA("Model") then
+						local polishOk, polishErr = pcall(function()
+							require(donutPolishModule).apply(spawnResult)
+						end)
+						if not polishOk then
+							warn("[AssetSpawner] DonutPolish failed for " .. entry.module .. ": " .. tostring(polishErr))
 						end
 					end
 				end
