@@ -8,22 +8,6 @@
 --   { module = "Assets.Districts.<District>.<Category>.<AssetName>",
 --     position = Vector3.new(x, y, z),
 --     yaw = 0 }
---
--- ── Cube 3D Hero Mesh Registry ──────────────────────────────────────────────
--- Buildings/props whose modules spawn an AI-generated mesh via
--- AssetService:CreateMeshPartAsync. MeshIds live inside the module file.
--- Captured 2026-06-01 (Session A, branch feature/tokyo-hero-A).
---
---   TokyoTown.Buildings.DaikonRamen         mesh=75544431962969  tex=130965101370131
---   TokyoTown.Buildings.SushiDaiko          mesh=77402181455281  tex=86689699985059
---   TokyoTown.Buildings.IzakayaLantern      mesh=76671062547649  tex=103008225475970
---   TokyoTown.Buildings.TakoyakiCart        mesh=78028463957182  tex=124012811191572
---   TokyoTown.Props.DaikonRamenSignboard    mesh=101763521457586 tex=106613461090793
---
--- Assets are owned by the generating Roblox account; for live publish, ensure
--- they are uploaded under the game owner / group or the asset distribution
--- permissions are open enough for CreateMeshPartAsync at runtime.
--- ─────────────────────────────────────────────────────────────────────────────
 
 return {
 	-- ============================================================
