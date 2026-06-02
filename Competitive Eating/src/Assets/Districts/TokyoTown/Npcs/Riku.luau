@@ -5,7 +5,7 @@ local AB = require(game:GetService("ReplicatedStorage").Common.AssetBuilder)
 local NAME = "Riku"
 
 return function(parent: Instance, originCF: CFrame): Model
-	local rig = AB.r6Rig(parent, originCF, NAME, {
+	local rig = AB.r6Rig(parent, originCF * CFrame.new(0, -3, 0), NAME, {
 		skin  = Color3.fromRGB(245, 210, 175),
 		shirt = Color3.fromRGB(60, 90, 140),
 		pants = Color3.fromRGB(50, 50, 60),
