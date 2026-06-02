@@ -153,11 +153,11 @@ return {
 	-- DaikonRamen → SushiDaiko → IzakayaLantern, staggered in Z and canted
 	-- so the row reads as a winding alley rather than a straight strip.
 	-- TakoyakiCart and SakeBar tucked into side alleys, bad faces away.
-	{ module = "Assets.Districts.TokyoTown.Buildings.DaikonRamen",     position = Vector3.new(815, 0, 108), yaw = -12 },
-	{ module = "Assets.Districts.TokyoTown.Buildings.SushiDaiko",      position = Vector3.new(852, 0, 122), yaw =   4 },
-	{ module = "Assets.Districts.TokyoTown.Buildings.IzakayaLantern",  position = Vector3.new(895, 0, 115), yaw =  18 },
+	{ module = "Assets.Districts.TokyoTown.Buildings.DaikonRamen",     position = Vector3.new(800, 0, 100), yaw = 0 },
+	{ module = "Assets.Districts.TokyoTown.Buildings.SushiDaiko",      position = Vector3.new(845, 0, 100), yaw =   0 },
+	{ module = "Assets.Districts.TokyoTown.Buildings.IzakayaLantern",  position = Vector3.new(895, 0, 100), yaw =  0 },
 	{ module = "Assets.Districts.TokyoTown.Buildings.SakeBar",         position = Vector3.new(948, 0, 132), yaw = -30 },  -- north-east alley
-	{ module = "Assets.Districts.TokyoTown.Buildings.TakoyakiCart",    position = Vector3.new(872, 0,  62), yaw = 180 },  -- south alley vendor
+	{ module = "Assets.Districts.TokyoTown.Buildings.TakoyakiCart",    position = Vector3.new(960, 0, 100), yaw = 0 },  -- south alley vendor
 
 	-- ─── Backdrop row (Z=140..150, masks the back of the heroes) ───────
 	{ module = "Assets.Districts.TokyoTown.Buildings.CapsuleHotel",        position = Vector3.new(815, 0, 148), yaw = 0 },
@@ -192,7 +192,7 @@ return {
 	{ module = "Assets.Districts.TokyoTown.Npcs.BicycleSchoolgirl", position = Vector3.new(1000, 6,  78), yaw =  90 },
 
 	-- ─── Props ─────────────────────────────────────────────────────────
-	{ module = "Assets.Districts.TokyoTown.Props.DaikonRamenSignboard", position = Vector3.new(810, 0,  98), yaw = -12 },
+	{ module = "Assets.Districts.TokyoTown.Props.DaikonRamenSignboard", position = Vector3.new(815, 4, 113), yaw = 0 },
 
 	-- Real kanji signs in front of each Cube 3D shop (Session D 7c)
 	{ module = "Assets.Districts.TokyoTown.Props.KanjiSign_Ramen",    position = Vector3.new(815, 0,  96), yaw = -12 },
