@@ -1,7 +1,8 @@
--- Lucia — young salsa-cart vendor: fiesta-yellow dress, floral apron, braid.
+-- Lucia — R15 retrofit (polish A): fiesta-yellow dress, floral apron, braid.
 
 local AB = require(game:GetService("ReplicatedStorage").Common.AssetBuilder)
 
+local NAME        = "Lucia"
 local SKIN        = Color3.fromRGB(225, 185, 145)
 local DRESS_YEL   = Color3.fromRGB(255, 184, 52)
 local APRON_WHITE = Color3.fromRGB(250, 245, 230)
@@ -9,84 +10,57 @@ local FLOWER_PINK = Color3.fromRGB(230, 130, 165)
 local FLOWER_TEAL = Color3.fromRGB(43, 140, 156)
 local HAIR_BLACK  = Color3.fromRGB(40, 25, 20)
 local LIP_PINK    = Color3.fromRGB(210, 110, 130)
-local SHOE_BROWN  = Color3.fromRGB(100, 70, 45)
+local EYE_BROWN   = Color3.fromRGB(60, 40, 25)
+
+local function weldTo(parent: Model, base: BasePart, name: string, size: Vector3, color: Color3, offset: CFrame, shape: Enum.PartType?): Part
+	local p = Instance.new("Part")
+	p.Name = name; p.Size = size; p.Color = color
+	p.Material = Enum.Material.SmoothPlastic
+	p.Anchored = true; p.CanCollide = false
+	p.CFrame   = base.CFrame * offset
+	if shape then p.Shape = shape end
+	p.Parent   = parent
+	local w = Instance.new("WeldConstraint"); w.Part0 = base; w.Part1 = p; w.Parent = p
+	return p
+end
 
 return function(parent: Instance, originCF: CFrame): Model
-	local model = AB.model("Lucia", parent)
+	local rig = AB.r15Rig(parent, originCF * CFrame.new(0, -3, 0), NAME, {
+		skin  = SKIN,
+		shirt = DRESS_YEL,
+		pants = DRESS_YEL,   -- dress drapes — color legs to match
+	})
 
-	-- Torso (dress upper)
-	local torso = AB.block(Vector3.new(2.4, 3, 1.2), DRESS_YEL,
-		AB.offset(originCF, 0, 1.5, 0), model, "Torso")
-
-	-- Apron front (white)
-	AB.block(Vector3.new(1.8, 2.6, 0.1), APRON_WHITE,
-		AB.offset(originCF, 0, 1.4, 0.65), model, "Apron")
-	-- Floral pattern dots on apron
-	for i, pos in {
-		Vector3.new(-0.6, 1.8, 0),
-		Vector3.new( 0.5, 2.1, 0),
-		Vector3.new(-0.3, 0.7, 0),
-		Vector3.new( 0.6, 0.4, 0),
-	} do
-		AB.sphere(0.3,
-			(i % 2 == 0) and FLOWER_PINK or FLOWER_TEAL,
-			AB.offset(originCF, pos.X, pos.Y, 0.71),
-			model, "Flower_" .. i)
+	-- White floral apron on the dress front.
+	local hrp = rig:FindFirstChild("HumanoidRootPart") :: BasePart
+	if hrp then
+		weldTo(rig, hrp, "Apron", Vector3.new(1.8, 1.95, 0.1), APRON_WHITE, CFrame.new(0, 0, 0.6))
+		-- Flower dots scattered on apron.
+		weldTo(rig, hrp, "Flower_1", Vector3.new(0.3, 0.3, 0.08), FLOWER_PINK, CFrame.new(-0.5,  0.5, 0.66), Enum.PartType.Ball)
+		weldTo(rig, hrp, "Flower_2", Vector3.new(0.3, 0.3, 0.08), FLOWER_TEAL, CFrame.new( 0.4,  0.7, 0.66), Enum.PartType.Ball)
+		weldTo(rig, hrp, "Flower_3", Vector3.new(0.3, 0.3, 0.08), FLOWER_PINK, CFrame.new(-0.3, -0.5, 0.66), Enum.PartType.Ball)
+		weldTo(rig, hrp, "Flower_4", Vector3.new(0.3, 0.3, 0.08), FLOWER_TEAL, CFrame.new( 0.55,-0.7, 0.66), Enum.PartType.Ball)
 	end
 
-	-- Dress skirt flare (slightly wider lower torso)
-	AB.block(Vector3.new(2.9, 1.5, 1.5), DRESS_YEL,
-		AB.offset(originCF, 0, -0.3, 0), model, "Skirt")
-
-	-- Head
-	AB.sphere(1.8, SKIN, AB.offset(originCF, 0, 3.9, 0), model, "Head")
-	-- Eyes
-	for i, x in {-0.35, 0.35} do
-		AB.sphere(0.16, Color3.fromRGB(60, 40, 25),
-			AB.offset(originCF, x, 4.0, 0.85), model, "Eye_" .. i)
-	end
-	-- Lipstick smile
-	AB.block(Vector3.new(0.5, 0.15, 0.15), LIP_PINK,
-		AB.offset(originCF, 0, 3.55, 0.85), model, "Mouth")
-
-	-- Hair cap (dome over head, black)
-	AB.sphere(1.95, HAIR_BLACK,
-		AB.offset(originCF, 0, 4.1, -0.15), model, "Hair")
-	-- Braid down the back
-	for i = 1, 4 do
-		AB.sphere(0.5, HAIR_BLACK,
-			AB.offset(originCF, 0, 3.6 - (i - 1) * 0.55, -0.9),
-			model, "Braid_" .. i)
-	end
-	-- Flower in hair
-	AB.sphere(0.45, FLOWER_PINK,
-		AB.offset(originCF, -0.9, 4.4, 0.4), model, "HairFlower")
-
-	-- Arms
-	for _, side in {-1, 1} do
-		AB.block(Vector3.new(0.8, 2.4, 0.8), DRESS_YEL,
-			AB.offset(originCF, side * 1.55, 1.5, 0),
-			model, "Arm_" .. (side == -1 and "L" or "R"))
-		AB.sphere(0.65, SKIN,
-			AB.offset(originCF, side * 1.55, 0.2, 0),
-			model, "Hand_" .. (side == -1 and "L" or "R"))
+	-- Face: eyes + lipstick smile
+	local head = rig:FindFirstChild("Head") :: BasePart
+	if head then
+		weldTo(rig, head, "Eye_L", Vector3.new(0.16, 0.16, 0.16), EYE_BROWN, CFrame.new(-0.35, 0.1, 0.5), Enum.PartType.Ball)
+		weldTo(rig, head, "Eye_R", Vector3.new(0.16, 0.16, 0.16), EYE_BROWN, CFrame.new( 0.35, 0.1, 0.5), Enum.PartType.Ball)
+		weldTo(rig, head, "Mouth", Vector3.new(0.5, 0.15, 0.12),  LIP_PINK,  CFrame.new(0, -0.35, 0.5))
 	end
 
-	-- Legs (peek of skin below skirt)
-	for _, side in {-1, 1} do
-		AB.block(Vector3.new(0.7, 1.4, 0.8), SKIN,
-			AB.offset(originCF, side * 0.55, -1.7, 0),
-			model, "Leg_" .. (side == -1 and "L" or "R"))
-		AB.block(Vector3.new(0.85, 0.3, 1.2), SHOE_BROWN,
-			AB.offset(originCF, side * 0.55, -2.5, 0.15),
-			model, "Shoe_" .. (side == -1 and "L" or "R"))
+	-- Hair: cap dome, single braid down the back, flower behind the ear.
+	AB.r15Hat(rig, Vector3.new(1.95, 1.95, 1.95), HAIR_BLACK, 0.4, "Hair", Enum.PartType.Ball)
+	if head then
+		for i = 1, 4 do
+			weldTo(rig, head, "Braid_" .. i, Vector3.new(0.5, 0.5, 0.5), HAIR_BLACK,
+				CFrame.new(0, -0.3 - (i - 1) * 0.55, -0.9), Enum.PartType.Ball)
+		end
+		weldTo(rig, head, "HairFlower", Vector3.new(0.45, 0.45, 0.45), FLOWER_PINK,
+			CFrame.new(-0.9, 0.5, 0.4), Enum.PartType.Ball)
 	end
 
-	-- Nametag
-	local head = model:FindFirstChild("Head") :: BasePart
-	if head then AB.billboard(head, "Lucia", Vector2.new(200, 36), 2.5) end
-
-	AB.pivot(model, torso)
-	AB.weldAll(model)
-	return model
+	AB.r15NameTag(rig, "Lucia")
+	return rig
 end
