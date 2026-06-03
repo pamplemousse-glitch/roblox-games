@@ -50,12 +50,12 @@ return function(parent: Instance, originCF: CFrame): Model
 	cat.Anchored   = true
 	cat.CanCollide = true
 	cat.Size       = CAT_SIZE
-	-- Meshy GLB's native +Y is not world-up; the cat spawns lying on its back
-	-- without a corrective rotation. Tilt -90° around X to bring +Z (mesh height)
-	-- to world +Y. If the cat now lies face-down instead of upright, flip to +90.
-	cat.CFrame     = originCF
-		* CFrame.new(0, 2 + CAT_SIZE.Y / 2, 0)
-		* CFrame.Angles(math.rad(-90), 0, 0)
+	-- Meshy GLB's native axis IS +Y up — confirmed empirically by spawning four
+	-- rotation candidates side-by-side and capturing screenshots. The previous
+	-- -90° X "correction" was the bug that's had the cat on its back across
+	-- four sessions of debugging. No rotation needed; the cat sits upright and
+	-- its bottom (Y = 15 - CAT_SIZE.Y/2 = 2) rests on Pedestal2's top (Y = 2).
+	cat.CFrame     = originCF * CFrame.new(0, 2 + CAT_SIZE.Y / 2, 0)
 	cat.Parent     = model
 
 	model.PrimaryPart = cat
