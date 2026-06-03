@@ -1,75 +1,78 @@
--- Skinny Joe — gangly farmhand in red plaid shirt, denim overalls, ball cap.
--- Tall but very narrow, oversized boots, big front-toothed grin.
+-- SkinnyJoe — R15 retrofit (polish A)
+-- Gangly farmhand: red plaid shirt, denim overalls, straw-yellow ball cap,
+-- buck-tooth grin. Preserves the overalls + cap + grin identity.
 
 local AB = require(game:GetService("ReplicatedStorage").Common.AssetBuilder)
 
+local NAME     = "SkinnyJoe"
 local SKIN     = Color3.fromRGB(240, 200, 165)
 local PLAID    = Color3.fromRGB(160, 40, 40)
 local PLAID_HL = Color3.fromRGB(70, 25, 25)
 local DENIM    = Color3.fromRGB(70, 90, 130)
-local DENIM_DK = Color3.fromRGB(40, 55, 90)
 local CAP      = Color3.fromRGB(232, 200, 112)
 local BOOT     = Color3.fromRGB(55, 35, 22)
 local HAIR     = Color3.fromRGB(180, 130, 70)
+local BTN      = Color3.fromRGB(220, 180, 60)
+local TOOTH    = Color3.fromRGB(240, 230, 200)
+local GRIN     = Color3.fromRGB(160, 60, 60)
+
+local function weldTo(parent: Model, base: BasePart, name: string, size: Vector3, color: Color3, offset: CFrame, shape: Enum.PartType?): Part
+	local p = Instance.new("Part")
+	p.Name = name; p.Size = size; p.Color = color
+	p.Material = Enum.Material.SmoothPlastic
+	p.Anchored = true; p.CanCollide = false
+	p.CFrame   = base.CFrame * offset
+	if shape then p.Shape = shape end
+	p.Parent   = parent
+	local w = Instance.new("WeldConstraint"); w.Part0 = base; w.Part1 = p; w.Parent = p
+	return p
+end
 
 return function(parent: Instance, originCF: CFrame): Model
-	local model = AB.model("SkinnyJoe", parent)
+	local rig = AB.r15Rig(parent, originCF * CFrame.new(0, -3, 0), NAME, {
+		skin  = SKIN,
+		shirt = PLAID,
+		pants = DENIM,
+	})
 
-	-- Skinny legs in overalls
-	AB.block(Vector3.new(0.9, 4.8, 0.9), DENIM, AB.offset(originCF, -0.7, 2.4, 0), model, "LegL")
-	AB.block(Vector3.new(0.9, 4.8, 0.9), DENIM, AB.offset(originCF,  0.7, 2.4, 0), model, "LegR")
-	-- Big boots (look comically oversized)
-	AB.block(Vector3.new(1.5, 0.9, 1.8), BOOT, AB.offset(originCF, -0.7, 0.45, 0.2), model, "BootL")
-	AB.block(Vector3.new(1.5, 0.9, 1.8), BOOT, AB.offset(originCF,  0.7, 0.45, 0.2), model, "BootR")
+	local upperTorso = rig:FindFirstChild("UpperTorso") :: BasePart
+	if upperTorso then
+		-- Plaid pattern: dark cross stripes on the shirt
+		weldTo(rig, upperTorso, "PlaidH1", Vector3.new(2.05, 0.18, 1.05), PLAID_HL, CFrame.new(0,  0.3, 0))
+		weldTo(rig, upperTorso, "PlaidH2", Vector3.new(2.05, 0.18, 1.05), PLAID_HL, CFrame.new(0, -0.3, 0))
+		weldTo(rig, upperTorso, "PlaidV1", Vector3.new(0.2, 1.2, 1.05), PLAID_HL, CFrame.new(-0.5, 0, 0))
+		weldTo(rig, upperTorso, "PlaidV2", Vector3.new(0.2, 1.2, 1.05), PLAID_HL, CFrame.new( 0.5, 0, 0))
+		-- Overall bib over the chest
+		weldTo(rig, upperTorso, "OverallBib", Vector3.new(1.5, 1.05, 0.25), DENIM, CFrame.new(0, -0.1, 0.55))
+		-- Bib straps
+		weldTo(rig, upperTorso, "StrapL", Vector3.new(0.3, 1.3, 0.3), DENIM, CFrame.new(-0.6, 0.55, 0.4))
+		weldTo(rig, upperTorso, "StrapR", Vector3.new(0.3, 1.3, 0.3), DENIM, CFrame.new( 0.6, 0.55, 0.4))
+		-- Brass buttons on the bib
+		weldTo(rig, upperTorso, "BibBtnL", Vector3.new(0.22, 0.22, 0.22), BTN, CFrame.new(-0.45, -0.15, 0.65), Enum.PartType.Ball)
+		weldTo(rig, upperTorso, "BibBtnR", Vector3.new(0.22, 0.22, 0.22), BTN, CFrame.new( 0.45, -0.15, 0.65), Enum.PartType.Ball)
+	end
 
-	-- Narrow torso — plaid shirt visible behind overall bib
-	local torso = AB.block(
-		Vector3.new(2.4, 3.5, 1.5), PLAID,
-		AB.offset(originCF, 0, 6.5, 0),
-		model, "Torso"
-	)
-	-- Plaid pattern: dark cross stripes
-	AB.block(Vector3.new(2.45, 3.5, 0.05), PLAID_HL, AB.offset(originCF, 0, 7.0, 0.78), model, "PlaidH1")
-	AB.block(Vector3.new(2.45, 0.25, 1.55), PLAID_HL, AB.offset(originCF, 0, 6.0, 0), model, "PlaidV1")
-	AB.block(Vector3.new(2.45, 0.25, 1.55), PLAID_HL, AB.offset(originCF, 0, 7.2, 0), model, "PlaidV2")
+	local head = rig:FindFirstChild("Head") :: BasePart
+	if head then
+		-- Big round eyes
+		weldTo(rig, head, "EyeL", Vector3.new(0.25, 0.25, 0.25), Color3.new(0, 0, 0), CFrame.new(-0.45, 0.15, 0.5), Enum.PartType.Ball)
+		weldTo(rig, head, "EyeR", Vector3.new(0.25, 0.25, 0.25), Color3.new(0, 0, 0), CFrame.new( 0.45, 0.15, 0.5), Enum.PartType.Ball)
+		-- Buck tooth + grin
+		weldTo(rig, head, "Tooth", Vector3.new(0.3, 0.45, 0.1), TOOTH, CFrame.new(0, -0.2, 0.5))
+		weldTo(rig, head, "Grin",  Vector3.new(0.9, 0.15, 0.18), GRIN, CFrame.new(0, -0.4, 0.5))
+	end
 
-	-- Overall bib (denim square over the chest)
-	AB.block(Vector3.new(1.6, 2.2, 0.25), DENIM, AB.offset(originCF, 0, 6.5, 0.85), model, "OverallBib")
-	-- Bib straps over shoulders
-	AB.block(Vector3.new(0.3, 1.4, 0.3), DENIM, AB.offset(originCF, -0.7, 8.2, 0.7), model, "StrapL")
-	AB.block(Vector3.new(0.3, 1.4, 0.3), DENIM, AB.offset(originCF,  0.7, 8.2, 0.7), model, "StrapR")
-	-- Two brass buttons
-	AB.sphere(0.22, Color3.fromRGB(220, 180, 60), AB.offset(originCF, -0.5, 7.4, 0.99), model, "BibBtnL")
-	AB.sphere(0.22, Color3.fromRGB(220, 180, 60), AB.offset(originCF,  0.5, 7.4, 0.99), model, "BibBtnR")
+	-- Shaggy hair sticking out + straw-yellow ball cap
+	AB.r15Hat(rig, Vector3.new(2.05, 0.4, 2.05), HAIR, 0.55, "Hair")
+	AB.r15Hat(rig, Vector3.new(2.4, 0.9, 2.4), CAP, 1.05, "CapCrown", Enum.PartType.Cylinder)
+	AB.r15Hat(rig, Vector3.new(2.8, 0.3, 1.6), CAP, 0.7, "CapBrim")
 
-	-- Long thin arms
-	AB.block(Vector3.new(0.8, 4.0, 0.8), PLAID, AB.offset(originCF, -1.7, 6.3, 0), model, "ArmL")
-	AB.block(Vector3.new(0.8, 4.0, 0.8), PLAID, AB.offset(originCF,  1.7, 6.3, 0), model, "ArmR")
-	AB.sphere(0.9, SKIN, AB.offset(originCF, -1.7, 4.2, 0), model, "HandL")
-	AB.sphere(0.9, SKIN, AB.offset(originCF,  1.7, 4.2, 0), model, "HandR")
+	-- Comically oversized boots
+	local lFoot = rig:FindFirstChild("LeftFoot") :: BasePart
+	local rFoot = rig:FindFirstChild("RightFoot") :: BasePart
+	if lFoot then weldTo(rig, lFoot, "BootL", Vector3.new(1.5, 0.85, 1.8), BOOT, CFrame.new(0, -0.05, 0.15)) end
+	if rFoot then weldTo(rig, rFoot, "BootR", Vector3.new(1.5, 0.85, 1.8), BOOT, CFrame.new(0, -0.05, 0.15)) end
 
-	-- Long thin neck (suggested with a small skin block)
-	AB.block(Vector3.new(0.8, 0.7, 0.8), SKIN, AB.offset(originCF, 0, 8.6, 0), model, "Neck")
-
-	-- Head — slightly oblong (use sphere; long via positioning)
-	AB.sphere(2.0, SKIN, AB.offset(originCF, 0, 9.7, 0), model, "Head")
-	-- Eyes
-	AB.sphere(0.25, Color3.new(0, 0, 0), AB.offset(originCF, -0.5, 9.85, 0.9), model, "EyeL")
-	AB.sphere(0.25, Color3.new(0, 0, 0), AB.offset(originCF,  0.5, 9.85, 0.9), model, "EyeR")
-	-- Buck tooth grin
-	AB.block(Vector3.new(0.3, 0.5, 0.1), Color3.fromRGB(240, 230, 200), AB.offset(originCF, 0, 9.2, 0.95), model, "Tooth")
-	AB.block(Vector3.new(1.0, 0.15, 0.2), Color3.fromRGB(160, 60, 60), AB.offset(originCF, 0, 8.95, 0.9), model, "Grin")
-
-	-- Shaggy hair sticking out from under the cap
-	AB.block(Vector3.new(2.1, 0.4, 2.1), HAIR, AB.offset(originCF, 0, 10.7, 0), model, "Hair")
-
-	-- Straw-yellow ball cap (brim + crown)
-	AB.cylinder(2.6, 0.9, CAP, AB.offset(originCF, 0, 11.2, 0), model, "CapCrown")
-	AB.block(Vector3.new(2.8, 0.3, 1.6), CAP, AB.offset(originCF, 0, 10.85, 1.2), model, "CapBrim")
-
-	AB.billboard(model:FindFirstChild("Head") or torso, "Skinny Joe", Vector2.new(220, 40), 3.0)
-
-	AB.pivot(model, torso)
-	AB.weldAll(model)
-	return model
+	AB.r15NameTag(rig, "Skinny Joe")
+	return rig
 end

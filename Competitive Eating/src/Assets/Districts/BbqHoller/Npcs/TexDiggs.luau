@@ -1,8 +1,11 @@
--- Tex Diggs — lean cowboy in a black hat, denim vest, and worn boots.
--- Tall, narrow build, oversized cowboy hat, brass belt buckle, kerchief.
+-- TexDiggs — R15 retrofit (polish A)
+-- Lean cowboy: cream shirt + denim jeans, dark vest, brass belt buckle,
+-- red kerchief, black cowboy hat, boot spurs. Preserves the lean cowboy
+-- silhouette + buckle + spurs.
 
 local AB = require(game:GetService("ReplicatedStorage").Common.AssetBuilder)
 
+local NAME     = "TexDiggs"
 local SKIN     = Color3.fromRGB(215, 170, 130)
 local SHIRT    = Color3.fromRGB(230, 220, 195)
 local VEST     = Color3.fromRGB(60, 60, 80)
@@ -11,63 +14,70 @@ local BOOT     = Color3.fromRGB(60, 35, 20)
 local HAT      = Color3.fromRGB(35, 25, 22)
 local BUCKLE   = Color3.fromRGB(220, 180, 60)
 local KERCHIEF = Color3.fromRGB(160, 40, 40)
+local STUBBLE  = Color3.fromRGB(60, 50, 45)
+
+local function weldTo(parent: Model, base: BasePart, name: string, size: Vector3, color: Color3, offset: CFrame, shape: Enum.PartType?): Part
+	local p = Instance.new("Part")
+	p.Name = name; p.Size = size; p.Color = color
+	p.Material = Enum.Material.SmoothPlastic
+	p.Anchored = true; p.CanCollide = false
+	p.CFrame   = base.CFrame * offset
+	if shape then p.Shape = shape end
+	p.Parent   = parent
+	local w = Instance.new("WeldConstraint"); w.Part0 = base; w.Part1 = p; w.Parent = p
+	return p
+end
 
 return function(parent: Instance, originCF: CFrame): Model
-	local model = AB.model("TexDiggs", parent)
+	local rig = AB.r15Rig(parent, originCF * CFrame.new(0, -3, 0), NAME, {
+		skin  = SKIN,
+		shirt = SHIRT,
+		pants = DENIM,
+	})
 
-	-- Legs (denim)
-	AB.block(Vector3.new(1.2, 4.5, 1.2), DENIM, AB.offset(originCF, -0.75, 2.25, 0), model, "LegL")
-	AB.block(Vector3.new(1.2, 4.5, 1.2), DENIM, AB.offset(originCF,  0.75, 2.25, 0), model, "LegR")
-	-- Boots
-	AB.block(Vector3.new(1.4, 1.0, 1.6), BOOT, AB.offset(originCF, -0.75, 0.5, 0.1), model, "BootL")
-	AB.block(Vector3.new(1.4, 1.0, 1.6), BOOT, AB.offset(originCF,  0.75, 0.5, 0.1), model, "BootR")
-	-- Boot spurs
-	AB.sphere(0.35, BUCKLE, AB.offset(originCF, -0.75, 0.5, -0.8), model, "SpurL")
-	AB.sphere(0.35, BUCKLE, AB.offset(originCF,  0.75, 0.5, -0.8), model, "SpurR")
+	local upperTorso = rig:FindFirstChild("UpperTorso") :: BasePart
+	if upperTorso then
+		-- Vest panels (open in the middle, dark fabric on left/right + back)
+		weldTo(rig, upperTorso, "VestL",    Vector3.new(0.7, 1.25, 0.3), VEST, CFrame.new(-0.65, 0, 0.5))
+		weldTo(rig, upperTorso, "VestR",    Vector3.new(0.7, 1.25, 0.3), VEST, CFrame.new( 0.65, 0, 0.5))
+		weldTo(rig, upperTorso, "VestBack", Vector3.new(2.0, 1.25, 0.2), VEST, CFrame.new(0, 0, -0.55))
+	end
 
-	-- Belt + buckle
-	AB.block(Vector3.new(2.6, 0.5, 1.4), HAT, AB.offset(originCF, 0, 4.8, 0), model, "Belt")
-	AB.block(Vector3.new(0.8, 0.6, 0.1), BUCKLE, AB.offset(originCF, 0, 4.8, 0.75), model, "BeltBuckle")
+	local hrp = rig:FindFirstChild("HumanoidRootPart") :: BasePart
+	if hrp then
+		-- Red kerchief at the neck
+		weldTo(rig, hrp, "Kerchief",    Vector3.new(2.0, 0.5, 1.3), KERCHIEF, CFrame.new(0, 1.45, 0))
+		-- Belt + brass buckle below the torso
+		weldTo(rig, hrp, "Belt",        Vector3.new(2.2, 0.4, 1.1), HAT, CFrame.new(0, -1.15, 0))
+		weldTo(rig, hrp, "BeltBuckle",  Vector3.new(0.75, 0.55, 0.18), BUCKLE, CFrame.new(0, -1.15, 0.55))
+	end
 
-	-- Torso (cream shirt, then dark vest over it)
-	local torso = AB.block(
-		Vector3.new(3, 3.5, 1.8), SHIRT,
-		AB.offset(originCF, 0, 6.5, 0),
-		model, "Torso"
-	)
-	-- Vest panels (open in the middle, dark fabric on left/right)
-	AB.block(Vector3.new(0.9, 3.5, 0.3), VEST, AB.offset(originCF, -1.0, 6.5, 0.95), model, "VestL")
-	AB.block(Vector3.new(0.9, 3.5, 0.3), VEST, AB.offset(originCF,  1.0, 6.5, 0.95), model, "VestR")
-	AB.block(Vector3.new(3.0, 3.5, 0.2), VEST, AB.offset(originCF, 0, 6.5, -0.95), model, "VestBack")
+	local head = rig:FindFirstChild("Head") :: BasePart
+	if head then
+		weldTo(rig, head, "EyeL", Vector3.new(0.22, 0.22, 0.22), Color3.new(0, 0, 0), CFrame.new(-0.4, 0.15, 0.5), Enum.PartType.Ball)
+		weldTo(rig, head, "EyeR", Vector3.new(0.22, 0.22, 0.22), Color3.new(0, 0, 0), CFrame.new( 0.4, 0.15, 0.5), Enum.PartType.Ball)
+		-- Stubble on the chin
+		weldTo(rig, head, "Stubble", Vector3.new(1.3, 0.22, 0.25), STUBBLE, CFrame.new(0, -0.35, 0.5))
+	end
 
-	-- Red kerchief at the neck
-	AB.block(Vector3.new(2.2, 0.6, 2.0), KERCHIEF, AB.offset(originCF, 0, 8.4, 0), model, "Kerchief")
+	-- Black cowboy hat: wide brim + tall crown + red hat band
+	AB.r15Hat(rig, Vector3.new(4.6, 0.25, 4.6), HAT,      0.85, "HatBrim",  Enum.PartType.Cylinder)
+	AB.r15Hat(rig, Vector3.new(2.8, 1.6, 2.8), HAT,       1.85, "HatCrown", Enum.PartType.Cylinder)
+	AB.r15Hat(rig, Vector3.new(2.85, 0.35, 2.85), KERCHIEF, 1.2, "HatBand", Enum.PartType.Cylinder)
+	AB.r15Hat(rig, Vector3.new(2.4, 0.2, 0.6), HAT, 0.85, "BrimDip")
 
-	-- Arms (cream shirt sleeves)
-	AB.block(Vector3.new(1.0, 3.6, 1.0), SHIRT, AB.offset(originCF, -2.0, 6.5, 0), model, "ArmL")
-	AB.block(Vector3.new(1.0, 3.6, 1.0), SHIRT, AB.offset(originCF,  2.0, 6.5, 0), model, "ArmR")
-	AB.sphere(1.0, SKIN, AB.offset(originCF, -2.0, 4.6, 0), model, "HandL")
-	AB.sphere(1.0, SKIN, AB.offset(originCF,  2.0, 4.6, 0), model, "HandR")
+	-- Boots + brass spurs at the heels
+	local lFoot = rig:FindFirstChild("LeftFoot") :: BasePart
+	local rFoot = rig:FindFirstChild("RightFoot") :: BasePart
+	if lFoot then
+		weldTo(rig, lFoot, "BootL", Vector3.new(1.3, 0.9, 1.55), BOOT, CFrame.new(0, -0.1, 0.1))
+		weldTo(rig, lFoot, "SpurL", Vector3.new(0.35, 0.35, 0.35), BUCKLE, CFrame.new(0, -0.1, -0.7), Enum.PartType.Ball)
+	end
+	if rFoot then
+		weldTo(rig, rFoot, "BootR", Vector3.new(1.3, 0.9, 1.55), BOOT, CFrame.new(0, -0.1, 0.1))
+		weldTo(rig, rFoot, "SpurR", Vector3.new(0.35, 0.35, 0.35), BUCKLE, CFrame.new(0, -0.1, -0.7), Enum.PartType.Ball)
+	end
 
-	-- Head (a touch narrower than the others)
-	AB.sphere(2.0, SKIN, AB.offset(originCF, 0, 9.4, 0), model, "Head")
-	-- Eyes
-	AB.sphere(0.22, Color3.new(0, 0, 0), AB.offset(originCF, -0.45, 9.55, 0.9), model, "EyeL")
-	AB.sphere(0.22, Color3.new(0, 0, 0), AB.offset(originCF,  0.45, 9.55, 0.9), model, "EyeR")
-	-- Stubble (faint band on chin)
-	AB.block(Vector3.new(1.4, 0.25, 0.3), Color3.fromRGB(60, 50, 45), AB.offset(originCF, 0, 8.85, 1.0), model, "Stubble")
-
-	-- Cowboy hat: a wide brim + a tall crown, slightly tilted
-	AB.cylinder(5.5, 0.25, HAT, AB.offset(originCF, 0, 10.5, 0), model, "HatBrim")
-	AB.cylinder(3.0, 1.8,  HAT, AB.offset(originCF, 0, 11.6, 0), model, "HatCrown")
-	-- Brim front dip
-	AB.block(Vector3.new(2.5, 0.2, 0.6), HAT, AB.offset(originCF, 0, 10.45, 2.4), model, "BrimDip")
-	-- Hat band
-	AB.cylinder(3.05, 0.4, KERCHIEF, AB.offset(originCF, 0, 10.85, 0), model, "HatBand")
-
-	AB.billboard(model:FindFirstChild("Head") or torso, "Tex Diggs", Vector2.new(220, 40), 3.2)
-
-	AB.pivot(model, torso)
-	AB.weldAll(model)
-	return model
+	AB.r15NameTag(rig, "Tex Diggs")
+	return rig
 end
