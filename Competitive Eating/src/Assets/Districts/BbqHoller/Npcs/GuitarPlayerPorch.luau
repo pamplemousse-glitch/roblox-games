@@ -1,8 +1,11 @@
--- Guitar Player on Porch — seated musician in jeans, denim vest, scruffy
--- beard, holding an acoustic guitar across the lap. Tipped cowboy hat.
+-- GuitarPlayerPorch — R15 retrofit (polish A)
+-- Seated musician on a stool: jeans, denim vest over white shirt, scruffy
+-- beard, cowboy hat. Holds an acoustic guitar across the lap. The seated
+-- pose is approximated by sitting the rig on a stool prop welded to the HRP.
 
 local AB = require(game:GetService("ReplicatedStorage").Common.AssetBuilder)
 
+local NAME      = "GuitarPlayerPorch"
 local SKIN      = Color3.fromRGB(225, 180, 140)
 local DENIM     = Color3.fromRGB(60, 80, 130)
 local DENIM_D   = Color3.fromRGB(40, 55, 95)
@@ -18,92 +21,99 @@ local GUITAR_D  = Color3.fromRGB(110, 65, 30)
 local STRING    = Color3.fromRGB(220, 220, 225)
 local STOOL     = Color3.fromRGB(120, 85, 50)
 
+local function weldTo(parent: Model, base: BasePart, name: string, size: Vector3, color: Color3, offset: CFrame, shape: Enum.PartType?): Part
+	local p = Instance.new("Part")
+	p.Name = name; p.Size = size; p.Color = color
+	p.Material = Enum.Material.SmoothPlastic
+	p.Anchored = true; p.CanCollide = false
+	p.CFrame   = base.CFrame * offset
+	if shape then p.Shape = shape end
+	p.Parent   = parent
+	local w = Instance.new("WeldConstraint"); w.Part0 = base; w.Part1 = p; w.Parent = p
+	return p
+end
+
 return function(parent: Instance, originCF: CFrame): Model
-	local model = AB.model("GuitarPlayerPorch", parent)
+	-- White shirt + jean torso. Seated pose: we still spawn a standing R15
+	-- rig (the joint chain handles posing as data); the stool is welded under
+	-- the LowerTorso to give the visual impression of sitting.
+	local rig = AB.r15Rig(parent, originCF * CFrame.new(0, -3, 0), NAME, {
+		skin  = SKIN,
+		shirt = SHIRT_W,
+		pants = PANTS,
+	})
 
-	-- Stool / barrel he's sitting on
-	local stool = AB.cylinder(3, 2.4, STOOL, AB.offset(originCF, 0, 1.2, 0), model, "Stool")
-	-- Stool bands
-	AB.cylinder(3.1, 0.2, HAT_DARK, AB.offset(originCF, 0, 0.5, 0), model, "StoolBand1")
-	AB.cylinder(3.1, 0.2, HAT_DARK, AB.offset(originCF, 0, 2.0, 0), model, "StoolBand2")
-
-	-- Legs (seated — pointing forward)
-	local legL = AB.block(Vector3.new(1.2, 3, 1.2), PANTS, AB.offset(originCF, -0.7, 2.5, 1.5), model, "LegL")
-	legL.CFrame = legL.CFrame * CFrame.Angles(math.rad(85), 0, 0)
-	local legR = AB.block(Vector3.new(1.2, 3, 1.2), PANTS, AB.offset(originCF,  0.7, 2.5, 1.5), model, "LegR")
-	legR.CFrame = legR.CFrame * CFrame.Angles(math.rad(85), 0, 0)
-	-- Boots resting on ground (front of stool)
-	AB.block(Vector3.new(1.4, 0.7, 1.7), BOOT, AB.offset(originCF, -0.7, 0.35, 3.0), model, "BootL")
-	AB.block(Vector3.new(1.4, 0.7, 1.7), BOOT, AB.offset(originCF,  0.7, 0.35, 3.0), model, "BootR")
-
-	-- Torso (white shirt under denim vest)
-	local torso = AB.block(Vector3.new(3.2, 3.6, 1.7), SHIRT_W, AB.offset(originCF, 0, 4.6, 0), model, "Torso")
-	-- Denim vest panels
-	AB.block(Vector3.new(0.7, 3.6, 1.7), DENIM, AB.offset(originCF, -1.4, 4.6, 0), model, "VestL")
-	AB.block(Vector3.new(0.7, 3.6, 1.7), DENIM, AB.offset(originCF,  1.4, 4.6, 0), model, "VestR")
-	AB.block(Vector3.new(3.2, 3.6, 0.2), DENIM, AB.offset(originCF, 0, 4.6, -0.8), model, "VestBack")
-	-- Vest stitching
-	AB.block(Vector3.new(0.1, 3.6, 0.1), DENIM_D, AB.offset(originCF, -1.05, 4.6, 0.85), model, "StitchL")
-	AB.block(Vector3.new(0.1, 3.6, 0.1), DENIM_D, AB.offset(originCF,  1.05, 4.6, 0.85), model, "StitchR")
-
-	-- Arms (positioned to play guitar — both forward and down)
-	local armL = AB.block(Vector3.new(1.1, 3.2, 1.1), SHIRT_W, AB.offset(originCF, -2.1, 4.5, 0.6), model, "ArmL")
-	armL.CFrame = armL.CFrame * CFrame.Angles(math.rad(-30), math.rad(20), 0)
-	local armR = AB.block(Vector3.new(1.1, 3.2, 1.1), SHIRT_W, AB.offset(originCF,  2.1, 4.5, 0.6), model, "ArmR")
-	armR.CFrame = armR.CFrame * CFrame.Angles(math.rad(-30), math.rad(-20), 0)
-	AB.sphere(0.8, SKIN, AB.offset(originCF, -2.5, 3.5, 2.0), model, "HandL")
-	AB.sphere(0.8, SKIN, AB.offset(originCF,  2.5, 3.5, 2.0), model, "HandR")
-
-	-- Acoustic guitar (across lap, slightly tilted)
-	-- Body (large hourglass — simplified to a stretched sphere)
-	local guitarCF = AB.offset(originCF, 0.2, 4.0, 2.4) * CFrame.Angles(0, 0, math.rad(20))
-	AB.sphere(3.4, GUITAR, guitarCF, model, "GuitarBody")
-	-- Sound hole
-	AB.cylinder(0.9, 0.1, GUITAR_D, guitarCF * CFrame.new(0, 0, 1.6), model, "SoundHole")
-	-- Bridge
-	AB.block(Vector3.new(1, 0.2, 0.3), GUITAR_D, guitarCF * CFrame.new(-1.2, 0, 1.6), model, "Bridge")
-	-- Guitar neck (long stick)
-	local neck = AB.block(Vector3.new(0.6, 7, 0.4), GUITAR_D, guitarCF * CFrame.new(2.5, 0, 1.4), model, "Neck")
-	neck.CFrame = neck.CFrame * CFrame.Angles(0, 0, math.rad(90))
-	-- Frets (5 lines on neck)
-	for i = 1, 5 do
-		AB.block(Vector3.new(0.55, 0.1, 0.42), STRING, guitarCF * CFrame.new(2 + i * 1.1, 0, 1.4), model, "Fret_" .. i)
-	end
-	-- Headstock
-	AB.block(Vector3.new(1.4, 0.4, 0.6), GUITAR_D, guitarCF * CFrame.new(8.5, 0.2, 1.4), model, "Headstock")
-	-- Tuning pegs (3 each side)
-	for i = 1, 3 do
-		AB.sphere(0.2, STRING, guitarCF * CFrame.new(8.3 + (i - 1) * 0.4, 0.5, 1.4), model, "PegT_" .. i)
-		AB.sphere(0.2, STRING, guitarCF * CFrame.new(8.3 + (i - 1) * 0.4, -0.5, 1.4), model, "PegB_" .. i)
-	end
-	-- Strings (6 thin lines from bridge to headstock)
-	for i = 1, 6 do
-		local offY = -0.3 + (i - 1) * 0.12
-		AB.block(Vector3.new(8.5, 0.04, 0.04), STRING, guitarCF * CFrame.new(2.5, offY, 1.42), model, "String_" .. i)
+	local upperTorso = rig:FindFirstChild("UpperTorso") :: BasePart
+	if upperTorso then
+		-- Denim vest panels over the white shirt
+		weldTo(rig, upperTorso, "VestL",    Vector3.new(0.55, 1.25, 0.25), DENIM,   CFrame.new(-0.75, 0, 0.5))
+		weldTo(rig, upperTorso, "VestR",    Vector3.new(0.55, 1.25, 0.25), DENIM,   CFrame.new( 0.75, 0, 0.5))
+		weldTo(rig, upperTorso, "VestBack", Vector3.new(2.0, 1.25, 0.15),  DENIM,   CFrame.new(0, 0, -0.55))
+		weldTo(rig, upperTorso, "StitchL",  Vector3.new(0.08, 1.25, 0.1),  DENIM_D, CFrame.new(-0.5, 0, 0.6))
+		weldTo(rig, upperTorso, "StitchR",  Vector3.new(0.08, 1.25, 0.1),  DENIM_D, CFrame.new( 0.5, 0, 0.6))
 	end
 
-	-- Head
-	AB.sphere(2.1, SKIN, AB.offset(originCF, 0, 7.4, 0), model, "Head")
-	-- Hair (longer, scraggly)
-	AB.sphere(1.6, HAIR, AB.offset(originCF, 0, 7.8, -0.5), model, "HairBack")
-	AB.block(Vector3.new(2.2, 0.3, 2.2), HAIR, AB.offset(originCF, 0, 8.1, 0), model, "HairTop")
-	-- Scruffy beard
-	AB.block(Vector3.new(1.8, 1, 1.5), BEARD, AB.offset(originCF, 0, 6.5, 0.4), model, "Beard")
+	local lowerTorso = rig:FindFirstChild("LowerTorso") :: BasePart
+	if lowerTorso then
+		-- Stool / barrel underneath (welded so it travels with the rig)
+		weldTo(rig, lowerTorso, "Stool",      Vector3.new(2.6, 2.0, 2.6), STOOL,    CFrame.new(0, -1.5, 0), Enum.PartType.Cylinder)
+		weldTo(rig, lowerTorso, "StoolBand1", Vector3.new(2.7, 0.2, 2.7), HAT_DARK, CFrame.new(0, -2.4, 0), Enum.PartType.Cylinder)
+		weldTo(rig, lowerTorso, "StoolBand2", Vector3.new(2.7, 0.2, 2.7), HAT_DARK, CFrame.new(0, -0.7, 0), Enum.PartType.Cylinder)
+	end
 
-	-- Cowboy hat (tipped slightly)
-	local hatBrim = AB.cylinder(5.4, 0.3, HAT_BROWN, AB.offset(originCF, 0, 8.4, 0), model, "HatBrim")
-	hatBrim.CFrame = hatBrim.CFrame * CFrame.Angles(math.rad(-8), 0, 0)
-	local hatCrown = AB.cylinder(2.6, 1.4, HAT_BROWN, AB.offset(originCF, 0, 9.3, 0.2), model, "HatCrown")
-	hatCrown.CFrame = hatCrown.CFrame * CFrame.Angles(math.rad(-8), 0, 0)
-	AB.cylinder(2.65, 0.3, HAT_DARK, AB.offset(originCF, 0, 8.8, 0.2), model, "HatBand")
+	local head = rig:FindFirstChild("Head") :: BasePart
+	if head then
+		-- Thin lines for concentrating eyes
+		weldTo(rig, head, "EyeL", Vector3.new(0.35, 0.1, 0.1), Color3.new(0, 0, 0), CFrame.new(-0.4, 0.15, 0.5))
+		weldTo(rig, head, "EyeR", Vector3.new(0.35, 0.1, 0.1), Color3.new(0, 0, 0), CFrame.new( 0.4, 0.15, 0.5))
+		-- Scruffy beard
+		weldTo(rig, head, "Beard", Vector3.new(1.6, 0.9, 1.3), BEARD, CFrame.new(0, -0.55, 0.15))
+	end
 
-	-- Eyes (one closed in concentration — both as thin lines)
-	AB.block(Vector3.new(0.35, 0.1, 0.1), Color3.new(0, 0, 0), AB.offset(originCF, -0.5, 7.7, 0.95), model, "EyeL")
-	AB.block(Vector3.new(0.35, 0.1, 0.1), Color3.new(0, 0, 0), AB.offset(originCF,  0.5, 7.7, 0.95), model, "EyeR")
+	-- Hair + cowboy hat (slightly tipped is implied — we use a flat brim here
+	-- because r15Hat welds straight to the head; the tilt was cosmetic only)
+	AB.r15Hat(rig, Vector3.new(2.1, 0.3, 2.1), HAIR, 0.55, "Hair")
+	AB.r15Hat(rig, Vector3.new(4.8, 0.3, 4.8), HAT_BROWN, 0.95, "HatBrim", Enum.PartType.Cylinder)
+	AB.r15Hat(rig, Vector3.new(2.6, 1.4, 2.6), HAT_BROWN, 1.85, "HatCrown", Enum.PartType.Cylinder)
+	AB.r15Hat(rig, Vector3.new(2.65, 0.28, 2.65), HAT_DARK, 1.25, "HatBand", Enum.PartType.Cylinder)
 
-	AB.billboard(model:FindFirstChild("Head") or torso, "Musician", Vector2.new(180, 36), 3.2)
+	-- Boots on the feet
+	local lFoot = rig:FindFirstChild("LeftFoot") :: BasePart
+	local rFoot = rig:FindFirstChild("RightFoot") :: BasePart
+	if lFoot then weldTo(rig, lFoot, "BootL", Vector3.new(1.3, 0.6, 1.6), BOOT, CFrame.new(0, -0.1, 0.1)) end
+	if rFoot then weldTo(rig, rFoot, "BootR", Vector3.new(1.3, 0.6, 1.6), BOOT, CFrame.new(0, -0.1, 0.1)) end
 
-	AB.pivot(model, torso)
-	AB.weldAll(model)
-	return model
+	-- Acoustic guitar slung from the right hand, body across the lap. The
+	-- whole guitar is welded to the right hand so it pose-rides with the
+	-- strumming arm.
+	local rHand = rig:FindFirstChild("RightHand") :: BasePart
+	if rHand then
+		local guitarCF = CFrame.new(-0.2, -1.6, 0.6) * CFrame.Angles(0, 0, math.rad(20))
+		weldTo(rig, rHand, "GuitarBody", Vector3.new(3.4, 3.4, 3.4), GUITAR, guitarCF, Enum.PartType.Ball)
+		weldTo(rig, rHand, "SoundHole",  Vector3.new(0.9, 0.1, 0.9), GUITAR_D, guitarCF * CFrame.new(0, 0, 1.6), Enum.PartType.Cylinder)
+		weldTo(rig, rHand, "Bridge",     Vector3.new(1.0, 0.2, 0.3), GUITAR_D, guitarCF * CFrame.new(-1.2, 0, 1.6))
+		-- Neck (long block oriented along X)
+		weldTo(rig, rHand, "Neck", Vector3.new(0.6, 0.6, 7.0), GUITAR_D,
+			guitarCF * CFrame.new(2.5, 0, 1.4) * CFrame.Angles(0, math.rad(90), 0))
+		for i = 1, 5 do
+			weldTo(rig, rHand, "Fret_" .. i, Vector3.new(0.55, 0.1, 0.42), STRING,
+				guitarCF * CFrame.new(2.0 + i * 1.1, 0, 1.4))
+		end
+		weldTo(rig, rHand, "Headstock", Vector3.new(1.4, 0.4, 0.6), GUITAR_D,
+			guitarCF * CFrame.new(8.5, 0.2, 1.4))
+		for i = 1, 3 do
+			weldTo(rig, rHand, "PegT_" .. i, Vector3.new(0.2, 0.2, 0.2), STRING,
+				guitarCF * CFrame.new(8.3 + (i - 1) * 0.4, 0.5, 1.4), Enum.PartType.Ball)
+			weldTo(rig, rHand, "PegB_" .. i, Vector3.new(0.2, 0.2, 0.2), STRING,
+				guitarCF * CFrame.new(8.3 + (i - 1) * 0.4, -0.5, 1.4), Enum.PartType.Ball)
+		end
+		for i = 1, 6 do
+			local offY = -0.3 + (i - 1) * 0.12
+			weldTo(rig, rHand, "String_" .. i, Vector3.new(8.5, 0.04, 0.04), STRING,
+				guitarCF * CFrame.new(2.5, offY, 1.42))
+		end
+	end
+
+	AB.r15NameTag(rig, "Musician")
+	return rig
 end

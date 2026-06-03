@@ -1,8 +1,10 @@
--- Farmgirl with Iced Tea — sun dress, wide-brim straw hat, holding a clear
--- glass of iced tea with a lemon slice on top.
+-- FarmgirlIcedTea — R15 retrofit (polish A)
+-- Tan sun dress, wide-brim straw hat with red band, pigtail hair, holding a
+-- glass of iced tea with a lemon slice on top. Preserves dress + hat + glass.
 
 local AB = require(game:GetService("ReplicatedStorage").Common.AssetBuilder)
 
+local NAME    = "FarmgirlIcedTea"
 local SKIN    = Color3.fromRGB(238, 200, 175)
 local DRESS   = Color3.fromRGB(220, 175, 140)
 local DRESS_S = Color3.fromRGB(180, 130, 100)
@@ -14,70 +16,78 @@ local GLASS   = Color3.fromRGB(220, 240, 250)
 local TEA     = Color3.fromRGB(140, 95, 50)
 local LEMON   = Color3.fromRGB(245, 220, 90)
 
+local function weldTo(parent: Model, base: BasePart, name: string, size: Vector3, color: Color3, offset: CFrame, shape: Enum.PartType?): Part
+	local p = Instance.new("Part")
+	p.Name = name; p.Size = size; p.Color = color
+	p.Material = Enum.Material.SmoothPlastic
+	p.Anchored = true; p.CanCollide = false
+	p.CFrame   = base.CFrame * offset
+	if shape then p.Shape = shape end
+	p.Parent   = parent
+	local w = Instance.new("WeldConstraint"); w.Part0 = base; w.Part1 = p; w.Parent = p
+	return p
+end
+
 return function(parent: Instance, originCF: CFrame): Model
-	local model = AB.model("FarmgirlIcedTea", parent)
+	local rig = AB.r15Rig(parent, originCF * CFrame.new(0, -3, 0), NAME, {
+		skin  = SKIN,
+		shirt = DRESS,
+		pants = DRESS,    -- single-piece sun dress reads as dress on legs too
+	})
 
-	-- Legs (skinny)
-	AB.block(Vector3.new(1.0, 3.6, 1.0), SKIN, AB.offset(originCF, -0.6, 1.8, 0), model, "LegL")
-	AB.block(Vector3.new(1.0, 3.6, 1.0), SKIN, AB.offset(originCF,  0.6, 1.8, 0), model, "LegR")
-	AB.block(Vector3.new(1.2, 0.3, 1.4), SANDAL, AB.offset(originCF, -0.6, 0.15, 0.1), model, "SandalL")
-	AB.block(Vector3.new(1.2, 0.3, 1.4), SANDAL, AB.offset(originCF,  0.6, 0.15, 0.1), model, "SandalR")
-
-	-- Dress (A-line skirt over torso)
-	local torso = AB.block(Vector3.new(3, 4, 1.6), DRESS, AB.offset(originCF, 0, 5.5, 0), model, "Torso")
-	-- Skirt flare (wedge-like, wider at bottom)
-	AB.block(Vector3.new(4, 1, 2.4), DRESS, AB.offset(originCF, 0, 3.6, 0), model, "SkirtBot")
-	AB.block(Vector3.new(3.5, 0.8, 2), DRESS, AB.offset(originCF, 0, 4.3, 0), model, "SkirtMid")
-	-- Dress trim pattern (small dark dots)
-	for i, x in {-1.0, 0, 1.0} do
-		AB.sphere(0.25, DRESS_S, AB.offset(originCF, x, 4.5, 0.85), model, "DressDot_" .. i)
+	local lowerTorso = rig:FindFirstChild("LowerTorso") :: BasePart
+	if lowerTorso then
+		-- Skirt flare (wider near the bottom)
+		weldTo(rig, lowerTorso, "SkirtMid", Vector3.new(3.5, 0.8, 2.0), DRESS, CFrame.new(0, -1.1, 0))
+		weldTo(rig, lowerTorso, "SkirtBot", Vector3.new(4.0, 0.9, 2.4), DRESS, CFrame.new(0, -1.8, 0))
+		-- Dress dots
+		weldTo(rig, lowerTorso, "DressDot_1", Vector3.new(0.25, 0.25, 0.25), DRESS_S, CFrame.new(-0.9, -1.2, 0.95), Enum.PartType.Ball)
+		weldTo(rig, lowerTorso, "DressDot_2", Vector3.new(0.25, 0.25, 0.25), DRESS_S, CFrame.new( 0,    -1.4, 0.95), Enum.PartType.Ball)
+		weldTo(rig, lowerTorso, "DressDot_3", Vector3.new(0.25, 0.25, 0.25), DRESS_S, CFrame.new( 0.9, -1.2, 0.95), Enum.PartType.Ball)
 	end
 
-	-- Arms
-	AB.block(Vector3.new(0.9, 3.8, 0.9), SKIN, AB.offset(originCF, -2.0, 5.5, 0), model, "ArmL")
-	-- Right arm bent forward (holding glass)
-	local armR = AB.block(Vector3.new(0.9, 3.8, 0.9), SKIN, AB.offset(originCF, 2.0, 5.5, 0.4), model, "ArmR")
-	armR.CFrame = armR.CFrame * CFrame.Angles(math.rad(-30), 0, 0)
-	-- Hands
-	AB.sphere(0.7, SKIN, AB.offset(originCF, -2.0, 3.6, 0), model, "HandL")
-	AB.sphere(0.7, SKIN, AB.offset(originCF, 2.0, 4.5, 2.0), model, "HandR")
+	local head = rig:FindFirstChild("Head") :: BasePart
+	if head then
+		-- Closed-happy crescent eyes
+		weldTo(rig, head, "EyeL", Vector3.new(0.4, 0.1, 0.1), Color3.new(0, 0, 0), CFrame.new(-0.4, 0.15, 0.5))
+		weldTo(rig, head, "EyeR", Vector3.new(0.4, 0.1, 0.1), Color3.new(0, 0, 0), CFrame.new( 0.4, 0.15, 0.5))
+		-- Smile
+		weldTo(rig, head, "Smile", Vector3.new(0.8, 0.18, 0.18), Color3.new(0, 0, 0), CFrame.new(0, -0.3, 0.5))
+		-- Cheek blush
+		weldTo(rig, head, "CheekL", Vector3.new(0.3, 0.3, 0.3), HAT_BD, CFrame.new(-0.7, -0.1, 0.45), Enum.PartType.Ball)
+		weldTo(rig, head, "CheekR", Vector3.new(0.3, 0.3, 0.3), HAT_BD, CFrame.new( 0.7, -0.1, 0.45), Enum.PartType.Ball)
+		-- Pigtails on either side of the head
+		weldTo(rig, head, "HairPigL", Vector3.new(1.1, 1.1, 1.1), HAIR, CFrame.new(-0.95, -0.2, -0.2), Enum.PartType.Ball)
+		weldTo(rig, head, "HairPigR", Vector3.new(1.1, 1.1, 1.1), HAIR, CFrame.new( 0.95, -0.2, -0.2), Enum.PartType.Ball)
+	end
 
-	-- Iced tea glass (in right hand)
-	local glassCF = AB.offset(originCF, 2.0, 5.0, 2.4)
-	local cup = AB.cylinder(1.3, 1.8, GLASS, glassCF, model, "Glass")
-	cup.Transparency = 0.4
-	cup.Reflectance  = 0.2
-	-- Tea inside
-	AB.cylinder(1.15, 1.4, TEA, glassCF * CFrame.new(0, -0.1, 0), model, "Tea")
-	-- Lemon slice on rim
-	local lemon = AB.cylinder(0.7, 0.15, LEMON, glassCF * CFrame.new(0, 1, 0.3) * CFrame.Angles(0, math.rad(15), 0), model, "Lemon")
+	-- Hair fringe + wide-brim straw sun hat with red band
+	AB.r15Hat(rig, Vector3.new(2.05, 0.3, 2.05), HAIR, 0.55, "Hair")
+	AB.r15Hat(rig, Vector3.new(4.5, 0.3, 4.5), STRAW,  0.95, "HatBrim", Enum.PartType.Cylinder)
+	AB.r15Hat(rig, Vector3.new(2.4, 1.1, 2.4), STRAW,  1.55, "HatCrown", Enum.PartType.Cylinder)
+	AB.r15Hat(rig, Vector3.new(2.45, 0.28, 2.45), HAT_BD, 1.2, "HatBand", Enum.PartType.Cylinder)
 
-	-- Head
-	AB.sphere(2.0, SKIN, AB.offset(originCF, 0, 8.6, 0), model, "Head")
-	-- Pigtails hair
-	AB.sphere(1.3, HAIR, AB.offset(originCF, -1.6, 7.4, -0.4), model, "HairPigL")
-	AB.sphere(1.3, HAIR, AB.offset(originCF,  1.6, 7.4, -0.4), model, "HairPigR")
-	-- Fringe
-	AB.block(Vector3.new(2.0, 0.3, 2.0), HAIR, AB.offset(originCF, 0, 9.3, 0), model, "Hair")
+	-- Sandals welded to feet
+	local lFoot = rig:FindFirstChild("LeftFoot") :: BasePart
+	local rFoot = rig:FindFirstChild("RightFoot") :: BasePart
+	if lFoot then weldTo(rig, lFoot, "SandalL", Vector3.new(1.15, 0.25, 1.35), SANDAL, CFrame.new(0, -0.18, 0.1)) end
+	if rFoot then weldTo(rig, rFoot, "SandalR", Vector3.new(1.15, 0.25, 1.35), SANDAL, CFrame.new(0, -0.18, 0.1)) end
 
-	-- Wide-brim straw sun hat
-	AB.cylinder(5.4, 0.3, STRAW, AB.offset(originCF, 0, 9.8, 0), model, "HatBrim")
-	AB.cylinder(2.4, 1.2, STRAW, AB.offset(originCF, 0, 10.6, 0), model, "HatCrown")
-	-- Red hatband
-	AB.cylinder(2.45, 0.3, HAT_BD, AB.offset(originCF, 0, 10.1, 0), model, "HatBand")
+	-- Glass of iced tea in right hand. R15 RightHand origin = old R6 Right Arm
+	-- baseline + 1.2 studs Y; offsets are written relative to the new hand
+	-- center so no extra shift is needed here.
+	local rHand = rig:FindFirstChild("RightHand") :: BasePart
+	if rHand then
+		local cup = weldTo(rig, rHand, "Glass", Vector3.new(1.3, 1.8, 1.3), GLASS,
+			CFrame.new(0.2, -0.2, 0.6), Enum.PartType.Cylinder)
+		cup.Transparency = 0.4
+		cup.Reflectance  = 0.2
+		weldTo(rig, rHand, "Tea", Vector3.new(1.15, 1.4, 1.15), TEA,
+			CFrame.new(0.2, -0.3, 0.6), Enum.PartType.Cylinder)
+		weldTo(rig, rHand, "Lemon", Vector3.new(0.7, 0.15, 0.7), LEMON,
+			CFrame.new(0.2, 0.75, 0.6), Enum.PartType.Cylinder)
+	end
 
-	-- Eyes (closed-happy crescent — just thin black blocks)
-	AB.block(Vector3.new(0.4, 0.1, 0.1), Color3.new(0, 0, 0), AB.offset(originCF, -0.5, 8.85, 0.95), model, "EyeL")
-	AB.block(Vector3.new(0.4, 0.1, 0.1), Color3.new(0, 0, 0), AB.offset(originCF,  0.5, 8.85, 0.95), model, "EyeR")
-	-- Smile
-	AB.block(Vector3.new(1.0, 0.2, 0.2), Color3.new(0, 0, 0), AB.offset(originCF, 0, 8.2, 0.95), model, "Smile")
-	-- Cheek blush
-	AB.sphere(0.3, HAT_BD, AB.offset(originCF, -1.0, 8.4, 0.85), model, "CheekL")
-	AB.sphere(0.3, HAT_BD, AB.offset(originCF,  1.0, 8.4, 0.85), model, "CheekR")
-
-	AB.billboard(model:FindFirstChild("Head") or torso, "Farmgirl", Vector2.new(160, 32), 2.6)
-
-	AB.pivot(model, torso)
-	AB.weldAll(model)
-	return model
+	AB.r15NameTag(rig, "Farmgirl")
+	return rig
 end

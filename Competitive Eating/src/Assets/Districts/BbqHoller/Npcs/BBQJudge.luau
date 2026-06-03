@@ -1,8 +1,9 @@
--- BBQ Judge — official judge in navy blazer + bowtie, glasses, holding a
--- clipboard with a pen. Looks the part of a competition official.
+-- BBQJudge — R15 retrofit (polish A)
+-- Official judge in navy blazer + bowtie, glasses, clipboard + pen.
 
 local AB = require(game:GetService("ReplicatedStorage").Common.AssetBuilder)
 
+local NAME     = "BBQJudge"
 local SKIN     = Color3.fromRGB(225, 190, 160)
 local BLAZER   = Color3.fromRGB(40, 55, 95)
 local BLAZER_D = Color3.fromRGB(28, 38, 65)
@@ -18,69 +19,83 @@ local GLASS    = Color3.fromRGB(200, 220, 230)
 local IRON     = Color3.fromRGB(35, 30, 28)
 local RIBBON_G = Color3.fromRGB(220, 180, 60)
 
+local function weldTo(parent: Model, base: BasePart, name: string, size: Vector3, color: Color3, offset: CFrame, shape: Enum.PartType?): Part
+	local p = Instance.new("Part")
+	p.Name = name; p.Size = size; p.Color = color
+	p.Material = Enum.Material.SmoothPlastic
+	p.Anchored = true; p.CanCollide = false
+	p.CFrame   = base.CFrame * offset
+	if shape then p.Shape = shape end
+	p.Parent   = parent
+	local w = Instance.new("WeldConstraint"); w.Part0 = base; w.Part1 = p; w.Parent = p
+	return p
+end
+
 return function(parent: Instance, originCF: CFrame): Model
-	local model = AB.model("BBQJudge", parent)
+	local rig = AB.r15Rig(parent, originCF * CFrame.new(0, -3, 0), NAME, {
+		skin  = SKIN,
+		shirt = BLAZER,   -- blazer over shirt — torso reads as blazer
+		pants = PANTS,
+	})
 
-	-- Legs
-	AB.block(Vector3.new(1.2, 3.6, 1.2), PANTS, AB.offset(originCF, -0.7, 1.8, 0), model, "LegL")
-	AB.block(Vector3.new(1.2, 3.6, 1.2), PANTS, AB.offset(originCF,  0.7, 1.8, 0), model, "LegR")
-	AB.block(Vector3.new(1.3, 0.5, 1.6), SHOE, AB.offset(originCF, -0.7, 0.25, 0.1), model, "ShoeL")
-	AB.block(Vector3.new(1.3, 0.5, 1.6), SHOE, AB.offset(originCF,  0.7, 0.25, 0.1), model, "ShoeR")
-
-	-- Shirt (visible under open blazer)
-	AB.block(Vector3.new(2.4, 4, 1.6), SHIRT, AB.offset(originCF, 0, 5.5, 0), model, "Shirt")
-	-- Blazer (front panels on either side of shirt, full back)
-	local torso = AB.block(Vector3.new(3.4, 4, 1.8), BLAZER, AB.offset(originCF, 0, 5.5, -0.05), model, "BlazerBack")
-	AB.block(Vector3.new(1.0, 4, 0.4), BLAZER_D, AB.offset(originCF, -1.3, 5.5, 0.8), model, "LapelL")
-	AB.block(Vector3.new(1.0, 4, 0.4), BLAZER_D, AB.offset(originCF,  1.3, 5.5, 0.8), model, "LapelR")
-	-- Gold ribbon on lapel
-	AB.block(Vector3.new(0.4, 0.6, 0.2), RIBBON_G, AB.offset(originCF, 1.4, 6.4, 1.0), model, "Ribbon")
-	-- Bowtie
-	AB.block(Vector3.new(1.3, 0.5, 0.2), BOWTIE, AB.offset(originCF, 0, 7.6, 0.95), model, "BowtieC")
-	AB.wedge(Vector3.new(0.2, 0.6, 0.6), BOWTIE, AB.offset(originCF, -0.6, 7.6, 1.0) * CFrame.Angles(0, math.rad(90), 0), model, "BowtieL")
-	AB.wedge(Vector3.new(0.2, 0.6, 0.6), BOWTIE, AB.offset(originCF,  0.6, 7.6, 1.0) * CFrame.Angles(0, math.rad(-90), 0), model, "BowtieR")
-
-	-- Arms (left holding clipboard, right with pen)
-	AB.block(Vector3.new(1.1, 3.8, 1.1), BLAZER, AB.offset(originCF, -2.3, 5.5, 0), model, "ArmL")
-	local armR = AB.block(Vector3.new(1.1, 3.8, 1.1), BLAZER, AB.offset(originCF, 2.3, 5.5, 0.4), model, "ArmR")
-	armR.CFrame = armR.CFrame * CFrame.Angles(math.rad(-20), 0, 0)
-	AB.sphere(0.85, SKIN, AB.offset(originCF, -2.3, 3.5, 0.5), model, "HandL")
-	AB.sphere(0.85, SKIN, AB.offset(originCF,  2.3, 4.2, 1.5), model, "HandR")
-
-	-- Clipboard (in left hand at front)
-	local board = AB.block(Vector3.new(2, 3, 0.3), CLIP_W, AB.offset(originCF, -1.8, 4.6, 1.6), model, "Clipboard")
-	AB.block(Vector3.new(2.1, 0.4, 0.4), CLIP_M, AB.offset(originCF, -1.8, 6.0, 1.65), model, "ClipboardTop")
-	-- Paper lines
-	for i, y in {3.5, 4.0, 4.6, 5.1, 5.6} do
-		AB.block(Vector3.new(1.5, 0.05, 0.05), Color3.new(0, 0, 0), AB.offset(originCF, -1.8, y, 1.78), model, "PaperLine_" .. i)
+	local hrp = rig:FindFirstChild("HumanoidRootPart") :: BasePart
+	if hrp then
+		-- White shirt collar peeking above the blazer
+		weldTo(rig, hrp, "ShirtCollar", Vector3.new(1.4, 0.4, 0.4), SHIRT, CFrame.new(0, 1.2, 0.4))
+		-- Lapels (dark navy edges down the front of the blazer)
+		weldTo(rig, hrp, "LapelL", Vector3.new(0.5, 1.6, 0.2), BLAZER_D, CFrame.new(-0.65, 0.4, 0.55))
+		weldTo(rig, hrp, "LapelR", Vector3.new(0.5, 1.6, 0.2), BLAZER_D, CFrame.new( 0.65, 0.4, 0.55))
+		-- Gold ribbon on lapel
+		weldTo(rig, hrp, "Ribbon", Vector3.new(0.3, 0.45, 0.15), RIBBON_G, CFrame.new(0.65, 0.9, 0.65))
+		-- Bowtie center + wings
+		weldTo(rig, hrp, "BowtieC", Vector3.new(0.7, 0.3, 0.15), BOWTIE, CFrame.new(0, 1.45, 0.55))
+		weldTo(rig, hrp, "BowtieL", Vector3.new(0.25, 0.35, 0.35), BOWTIE, CFrame.new(-0.35, 1.45, 0.55), Enum.PartType.Ball)
+		weldTo(rig, hrp, "BowtieR", Vector3.new(0.25, 0.35, 0.35), BOWTIE, CFrame.new( 0.35, 1.45, 0.55), Enum.PartType.Ball)
 	end
 
-	-- Pen (in right hand)
-	local pen = AB.block(Vector3.new(0.2, 1.2, 0.2), PEN, AB.offset(originCF, 2.0, 4.4, 1.9), model, "Pen")
-	pen.CFrame = pen.CFrame * CFrame.Angles(math.rad(-45), 0, 0)
+	local head = rig:FindFirstChild("Head") :: BasePart
+	if head then
+		-- Glasses (iron frames + tinted lenses)
+		weldTo(rig, head, "GlassFrameL", Vector3.new(0.55, 0.45, 0.05), IRON, CFrame.new(-0.4, 0.05, 0.5))
+		weldTo(rig, head, "GlassFrameR", Vector3.new(0.55, 0.45, 0.05), IRON, CFrame.new( 0.4, 0.05, 0.5))
+		weldTo(rig, head, "GlassBridge", Vector3.new(0.3, 0.05, 0.05), IRON, CFrame.new(0, 0.05, 0.5))
+		local lensL = weldTo(rig, head, "LensL", Vector3.new(0.45, 0.36, 0.04), GLASS, CFrame.new(-0.4, 0.05, 0.55))
+		local lensR = weldTo(rig, head, "LensR", Vector3.new(0.45, 0.36, 0.04), GLASS, CFrame.new( 0.4, 0.05, 0.55))
+		lensL.Transparency = 0.5
+		lensR.Transparency = 0.5
+		-- Mouth (slight pursed look)
+		weldTo(rig, head, "Mouth", Vector3.new(0.7, 0.15, 0.18), Color3.new(0, 0, 0), CFrame.new(0, -0.35, 0.55))
+	end
 
-	-- Head
-	AB.sphere(2.1, SKIN, AB.offset(originCF, 0, 8.7, 0), model, "Head")
-	-- Hair
-	AB.block(Vector3.new(2.2, 0.3, 2.2), HAIR, AB.offset(originCF, 0, 9.4, 0), model, "Hair")
-	-- Side-comb part
-	AB.block(Vector3.new(0.2, 0.4, 2.0), Color3.fromRGB(50, 38, 28), AB.offset(originCF, -0.7, 9.45, 0), model, "Part")
+	-- Side-comb hair + main cap
+	AB.r15Hat(rig, Vector3.new(2.05, 0.32, 2.05), HAIR, 0.55, "Hair")
+	AB.r15Hat(rig, Vector3.new(0.2, 0.35, 1.8), Color3.fromRGB(50, 38, 28), 0.62, "HairPart")
 
-	-- Glasses (frame ring + lens shimmer)
-	AB.block(Vector3.new(0.6, 0.5, 0.05), IRON, AB.offset(originCF, -0.55, 8.95, 1.0), model, "GlassFrameL")
-	AB.block(Vector3.new(0.6, 0.5, 0.05), IRON, AB.offset(originCF,  0.55, 8.95, 1.0), model, "GlassFrameR")
-	AB.block(Vector3.new(0.3, 0.05, 0.05), IRON, AB.offset(originCF, 0, 8.95, 1.0), model, "GlassBridge")
-	local lensL = AB.block(Vector3.new(0.5, 0.4, 0.04), GLASS, AB.offset(originCF, -0.55, 8.95, 1.04), model, "LensL")
-	local lensR = AB.block(Vector3.new(0.5, 0.4, 0.04), GLASS, AB.offset(originCF,  0.55, 8.95, 1.04), model, "LensR")
-	lensL.Transparency = 0.5
-	lensR.Transparency = 0.5
+	-- Shoes welded to feet
+	local lFoot = rig:FindFirstChild("LeftFoot") :: BasePart
+	local rFoot = rig:FindFirstChild("RightFoot") :: BasePart
+	if lFoot then weldTo(rig, lFoot, "ShoeL", Vector3.new(1.2, 0.5, 1.55), SHOE, CFrame.new(0, -0.1, 0.1)) end
+	if rFoot then weldTo(rig, rFoot, "ShoeR", Vector3.new(1.2, 0.5, 1.55), SHOE, CFrame.new(0, -0.1, 0.1)) end
 
-	-- Mouth (slight pursed look)
-	AB.block(Vector3.new(0.9, 0.18, 0.2), Color3.new(0, 0, 0), AB.offset(originCF, 0, 8.25, 1.0), model, "Mouth")
+	-- Clipboard in left hand. R15 LeftHand origin is at local Y=-1.2 relative to
+	-- the old R6 Left Arm reference, so accessory Y shifts by +1.2 to keep the
+	-- world position equivalent to the previous build.
+	local lHand = rig:FindFirstChild("LeftHand") :: BasePart
+	if lHand then
+		weldTo(rig, lHand, "Clipboard",    Vector3.new(1.8, 2.6, 0.25), CLIP_W, CFrame.new(0.2, -0.2, 0.7))
+		weldTo(rig, lHand, "ClipboardTop", Vector3.new(1.9, 0.35, 0.35), CLIP_M, CFrame.new(0.2,  1.1, 0.72))
+		for i, y in {-1.0, -0.5, 0.0, 0.4, 0.8} do
+			weldTo(rig, lHand, "PaperLine_" .. i, Vector3.new(1.4, 0.05, 0.05), Color3.new(0, 0, 0), CFrame.new(0.2, y, 0.83))
+		end
+	end
 
-	AB.billboard(model:FindFirstChild("Head") or torso, "BBQ Judge", Vector2.new(180, 36), 2.4)
+	-- Pen in right hand
+	local rHand = rig:FindFirstChild("RightHand") :: BasePart
+	if rHand then
+		weldTo(rig, rHand, "Pen", Vector3.new(0.2, 1.1, 0.2), PEN,
+			CFrame.new(0, -0.1, 0.5) * CFrame.Angles(math.rad(-45), 0, 0))
+	end
 
-	AB.pivot(model, torso)
-	AB.weldAll(model)
-	return model
+	AB.r15NameTag(rig, "BBQ Judge")
+	return rig
 end
