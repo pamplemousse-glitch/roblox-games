@@ -1,5 +1,6 @@
--- Carmela — Mamma Carmela herself. Older Italian woman in a floral dress
--- and apron, hair in a bun, holding a wooden spoon and a pot of sauce.
+-- Carmela — R15 retrofit (polish A)
+-- Mamma Carmela herself. Older Italian woman, floral red dress + white apron,
+-- hair bun, wooden spoon in right hand, pot of sauce in left.
 
 local AB = require(game:GetService("ReplicatedStorage").Common.AssetBuilder)
 
@@ -14,85 +15,75 @@ local SAUCE_R = Color3.fromRGB(180, 40, 35)
 local WD      = Color3.fromRGB(110, 75, 45)
 local CHEEK_R = Color3.fromRGB(240, 160, 150)
 
+local function weldTo(parent: Model, base: BasePart, name: string, size: Vector3, color: Color3, offset: CFrame, shape: Enum.PartType?): Part
+	local p = Instance.new("Part")
+	p.Name = name; p.Size = size; p.Color = color
+	p.Material = Enum.Material.SmoothPlastic
+	p.Anchored = true; p.CanCollide = false
+	p.CFrame   = base.CFrame * offset
+	if shape then p.Shape = shape end
+	p.Parent   = parent
+	local w = Instance.new("WeldConstraint"); w.Part0 = base; w.Part1 = p; w.Parent = p
+	return p
+end
+
 return function(parent: Instance, originCF: CFrame): Model
-	local model = AB.model(NAME, parent)
+	local rig = AB.r15Rig(parent, originCF * CFrame.new(0, -3, 0), NAME, {
+		skin  = SKIN,
+		shirt = DRESS,
+		pants = DRESS,  -- skirt also dress color
+	})
 
-	-- Torso (floral dress)
-	local torso = AB.part({size=Vector3.new(2.8, 3, 1.4), color=DRESS,
-		cf=originCF, canCollide=false, name="Torso"}, model)
-	-- Flower pattern (yellow dots on dress)
-	for i, off in {Vector3.new(-0.7, 0.5, 0), Vector3.new(0.7, 0.7, 0), Vector3.new(-0.5, -0.5, 0), Vector3.new(0.6, -0.4, 0)} do
-		AB.sphere(0.18, FLOWERS, AB.offset(originCF, off.X, off.Y, 0.75), model, "Flower_" .. i)
+	local hrp = rig:FindFirstChild("HumanoidRootPart") :: BasePart
+	if hrp then
+		-- White apron + straps + pocket
+		weldTo(rig, hrp, "Apron",       Vector3.new(1.85, 2.1, 0.12), APRON, CFrame.new(0, -0.1, 0.6))
+		weldTo(rig, hrp, "ApronStrapL", Vector3.new(0.3, 1.0, 0.1), APRON, CFrame.new(-0.7, 1.15, 0.6))
+		weldTo(rig, hrp, "ApronStrapR", Vector3.new(0.3, 1.0, 0.1), APRON, CFrame.new( 0.7, 1.15, 0.6))
+		weldTo(rig, hrp, "ApronPocket", Vector3.new(0.55, 0.7, 0.1), Color3.fromRGB(220, 215, 200), CFrame.new(0.35, -0.4, 0.66))
+		-- Yellow flower dots on dress (4 around apron edges)
+		weldTo(rig, hrp, "Flower_1", Vector3.new(0.18, 0.18, 0.18), FLOWERS, CFrame.new(-0.85, 0.6, 0.55), Enum.PartType.Ball)
+		weldTo(rig, hrp, "Flower_2", Vector3.new(0.18, 0.18, 0.18), FLOWERS, CFrame.new( 0.85, 0.7, 0.55), Enum.PartType.Ball)
+		weldTo(rig, hrp, "Flower_3", Vector3.new(0.18, 0.18, 0.18), FLOWERS, CFrame.new(-0.85, -0.5, 0.55), Enum.PartType.Ball)
+		weldTo(rig, hrp, "Flower_4", Vector3.new(0.18, 0.18, 0.18), FLOWERS, CFrame.new( 0.85, -0.4, 0.55), Enum.PartType.Ball)
 	end
-	-- Apron (white, with frilly edge)
-	AB.part({size=Vector3.new(2.4, 2.5, 0.15), color=APRON,
-		cf=AB.offset(originCF, 0, -0.2, 0.78), canCollide=false, name="Apron"}, model)
-	-- Apron strap
-	AB.part({size=Vector3.new(0.3, 1.8, 0.1), color=APRON,
-		cf=AB.offset(originCF, -0.8, 1.4, 0.78), canCollide=false, name="StrapL"}, model)
-	AB.part({size=Vector3.new(0.3, 1.8, 0.1), color=APRON,
-		cf=AB.offset(originCF, 0.8, 1.4, 0.78), canCollide=false, name="StrapR"}, model)
-	-- Apron pocket
-	AB.part({size=Vector3.new(0.6, 0.8, 0.1), color=Color3.fromRGB(220, 215, 200),
-		cf=AB.offset(originCF, 0.4, -0.4, 0.85), canCollide=false, name="Pocket"}, model)
-	-- Dress hem (lower puff)
-	AB.part({size=Vector3.new(3.2, 0.6, 1.6), color=DRESS,
-		cf=AB.offset(originCF, 0, -1.7, 0), canCollide=false, name="Hem"}, model)
+	local head = rig:FindFirstChild("Head") :: BasePart
+	if head then
+		-- Rosy cheeks
+		weldTo(rig, head, "CheekL", Vector3.new(0.3, 0.3, 0.3), CHEEK_R, CFrame.new(-0.55, -0.1, 0.45), Enum.PartType.Ball)
+		weldTo(rig, head, "CheekR", Vector3.new(0.3, 0.3, 0.3), CHEEK_R, CFrame.new( 0.55, -0.1, 0.45), Enum.PartType.Ball)
+		-- Closed smiling eyes + smile
+		weldTo(rig, head, "EyeL",   Vector3.new(0.3, 0.05, 0.1), Color3.fromRGB(60, 40, 35), CFrame.new(-0.4, 0.2, 0.5))
+		weldTo(rig, head, "EyeR",   Vector3.new(0.3, 0.05, 0.1), Color3.fromRGB(60, 40, 35), CFrame.new( 0.4, 0.2, 0.5))
+		weldTo(rig, head, "Smile",  Vector3.new(0.6, 0.08, 0.1), Color3.fromRGB(140, 70, 70), CFrame.new(0, -0.4, 0.5))
+	end
+	-- Hair bun + grey side hair via r15Hat
+	AB.r15Hat(rig, Vector3.new(1.9, 0.4, 1.5), HAIR,  0.45, "HairSides")
+	AB.r15Hat(rig, Vector3.new(0.9, 0.9, 0.9), HAIR,  1.0, "Bun", Enum.PartType.Ball)
 
-	-- Head
-	local head = AB.part({size=Vector3.new(1.9, 1.9, 1.9), color=SKIN,
-		cf=AB.offset(originCF, 0, 2.5, 0), shape=Enum.PartType.Ball, canCollide=false, name="Head"}, model)
-	-- Hair bun (round on top)
-	AB.sphere(1, HAIR, AB.offset(originCF, 0, 3.6, -0.3), model, "Bun")
-	-- Hair on sides (small grey blocks)
-	AB.part({size=Vector3.new(2, 0.5, 1.5), color=HAIR,
-		cf=AB.offset(originCF, 0, 3, -0.4), canCollide=false, name="HairBack"}, model)
-	-- Cheeks (rosy)
-	AB.sphere(0.3, CHEEK_R, AB.offset(originCF, -0.6, 2.4, 0.85), model, "CheekL")
-	AB.sphere(0.3, CHEEK_R, AB.offset(originCF, 0.6, 2.4, 0.85), model, "CheekR")
-	-- Eyes (closed, smiling — small dark arcs)
-	AB.block(Vector3.new(0.3, 0.05, 0.1), Color3.fromRGB(60, 40, 35),
-		AB.offset(originCF, -0.4, 2.7, 0.93), model, "EyeL")
-	AB.block(Vector3.new(0.3, 0.05, 0.1), Color3.fromRGB(60, 40, 35),
-		AB.offset(originCF, 0.4, 2.7, 0.93), model, "EyeR")
-	-- Smile
-	AB.block(Vector3.new(0.6, 0.08, 0.1), Color3.fromRGB(140, 70, 70),
-		AB.offset(originCF, 0, 2.1, 0.93), model, "Smile")
-
-	-- Arms forward
-	AB.part({size=Vector3.new(0.95, 2.4, 0.95), color=DRESS,
-		cf=AB.offset(originCF, -1.8, 0, 0.3) * CFrame.Angles(math.rad(-30), 0, 0), canCollide=false, name="ArmL"}, model)
-	AB.part({size=Vector3.new(0.95, 2.4, 0.95), color=DRESS,
-		cf=AB.offset(originCF, 1.8, 0, 0.3) * CFrame.Angles(math.rad(-30), 0, 0), canCollide=false, name="ArmR"}, model)
-	-- Hands
-	AB.sphere(0.5, SKIN, AB.offset(originCF, -1.8, -1, 1.4), model, "HandL")
-	AB.sphere(0.5, SKIN, AB.offset(originCF, 1.8, -1, 1.4), model, "HandR")
-
-	-- Big pot of sauce (carried in left hand)
-	AB.cylinder(1.6, 1.6, POT_BLK,
-		AB.offset(originCF, -1.8, -0.5, 2.5), model, "Pot")
-	AB.cylinder(1.65, 0.2, Color3.fromRGB(60, 60, 65),
-		AB.offset(originCF, -1.8, 0.3, 2.5) * CFrame.Angles(0, 0, math.rad(90)), model, "PotRim")
-	-- Sauce inside
-	AB.cylinder(1.45, 0.3, SAUCE_R,
-		AB.offset(originCF, -1.8, 0.25, 2.5) * CFrame.Angles(0, 0, math.rad(90)), model, "Sauce")
-	-- Steam from sauce
-	local s1 = AB.sphere(0.7, Color3.fromRGB(240, 240, 240), AB.offset(originCF, -1.8, 1, 2.5), model, "Steam1"); s1.Transparency = 0.55
-	local s2 = AB.sphere(0.9, Color3.fromRGB(240, 240, 240), AB.offset(originCF, -1.8, 2, 2.6), model, "Steam2"); s2.Transparency = 0.75
-	-- Pot handle (left side)
-	AB.cylinder(0.2, 0.7, POT_BLK,
-		AB.offset(originCF, -3.2, -0.3, 2.5) * CFrame.Angles(0, 0, math.rad(90)), model, "PotHandle")
-
+	-- Pot of sauce held in left hand (with steam) — R15 LeftHand local Y=-1.2
+	local lHand = rig:FindFirstChild("LeftHand") :: BasePart
+	if lHand then
+		weldTo(rig, lHand, "Pot",        Vector3.new(1.6, 1.4, 1.6), POT_BLK, CFrame.new(0, -0.2, 0.8))
+		weldTo(rig, lHand, "PotRim",     Vector3.new(1.7, 0.2, 1.7), Color3.fromRGB(60, 60, 65), CFrame.new(0, 0.5, 0.8))
+		weldTo(rig, lHand, "Sauce",      Vector3.new(1.5, 0.25, 1.5), SAUCE_R, CFrame.new(0, 0.45, 0.8))
+		weldTo(rig, lHand, "PotHandle",  Vector3.new(0.2, 0.6, 0.2), POT_BLK, CFrame.new(-1.0, -0.2, 0.8))
+		local s1 = weldTo(rig, lHand, "Steam1", Vector3.new(0.65, 0.65, 0.65), Color3.fromRGB(240, 240, 240),
+			CFrame.new(0, 1.3, 0.8), Enum.PartType.Ball); s1.Transparency = 0.55
+		local s2 = weldTo(rig, lHand, "Steam2", Vector3.new(0.85, 0.85, 0.85), Color3.fromRGB(240, 240, 240),
+			CFrame.new(0.15, 2.1, 0.85), Enum.PartType.Ball); s2.Transparency = 0.75
+	end
 	-- Wooden spoon in right hand
-	AB.cylinder(0.2, 3, WD,
-		AB.offset(originCF, 1.8, -0.2, 2.5) * CFrame.Angles(math.rad(-20), 0, 0), model, "Spoon")
-	AB.cylinder(0.6, 0.4, WD,
-		AB.offset(originCF, 1.8, 0.6, 3.5) * CFrame.Angles(math.rad(-20), 0, math.rad(90)), model, "SpoonHead")
-	-- Sauce on spoon
-	AB.sphere(0.25, SAUCE_R, AB.offset(originCF, 1.8, 0.7, 3.5), model, "SauceDrip")
+	local rHand = rig:FindFirstChild("RightHand") :: BasePart
+	if rHand then
+		weldTo(rig, rHand, "Spoon",     Vector3.new(0.2, 3, 0.2), WD,
+			CFrame.new(0, 1.0, 0.8) * CFrame.Angles(math.rad(-30), 0, 0))
+		weldTo(rig, rHand, "SpoonHead", Vector3.new(0.6, 0.4, 0.6), WD,
+			CFrame.new(0, 2.3, 1.6) * CFrame.Angles(math.rad(-30), 0, 0))
+		weldTo(rig, rHand, "SauceDrip", Vector3.new(0.25, 0.25, 0.25), SAUCE_R,
+			CFrame.new(0, 2.4, 1.6) * CFrame.Angles(math.rad(-30), 0, 0), Enum.PartType.Ball)
+	end
 
-	AB.billboard(head, NAME, Vector2.new(220, 40), 3)
-	AB.pivot(model, torso)
-	AB.weldAll(model)
-	return model
+	AB.r15NameTag(rig, NAME)
+	return rig
 end

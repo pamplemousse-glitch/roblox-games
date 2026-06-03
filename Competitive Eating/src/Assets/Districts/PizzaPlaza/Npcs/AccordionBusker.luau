@@ -1,5 +1,6 @@
--- Accordion Busker — street musician with a big accordion strapped to his
--- chest, beret, scruffy beard.
+-- AccordionBusker — R15 retrofit (polish A)
+-- Lorenzo: street musician with a big red accordion strapped to chest,
+-- burgundy beret, scruffy beard, brown vest, floating music notes.
 
 local AB = require(game:GetService("ReplicatedStorage").Common.AssetBuilder)
 
@@ -16,103 +17,92 @@ local BRASS   = Color3.fromRGB(200, 160, 80)
 local IVORY   = Color3.fromRGB(245, 240, 220)
 local BELLOW  = Color3.fromRGB(80, 60, 50)
 
+local function weldTo(parent: Model, base: BasePart, name: string, size: Vector3, color: Color3, offset: CFrame, shape: Enum.PartType?): Part
+	local p = Instance.new("Part")
+	p.Name = name; p.Size = size; p.Color = color
+	p.Material = Enum.Material.SmoothPlastic
+	p.Anchored = true; p.CanCollide = false
+	p.CFrame   = base.CFrame * offset
+	if shape then p.Shape = shape end
+	p.Parent   = parent
+	local w = Instance.new("WeldConstraint"); w.Part0 = base; w.Part1 = p; w.Parent = p
+	return p
+end
+
 return function(parent: Instance, originCF: CFrame): Model
-	local model = AB.model(NAME, parent)
+	local rig = AB.r15Rig(parent, originCF * CFrame.new(0, -3, 0), NAME, {
+		skin  = SKIN,
+		shirt = SHIRT,
+		pants = PANTS,
+	})
 
-	-- Torso (white shirt)
-	local torso = AB.part({size=Vector3.new(2.6, 3, 1.3), color=SHIRT,
-		cf=originCF, canCollide=false, name="Torso"}, model)
-	-- Brown vest over shirt
-	AB.part({size=Vector3.new(2.7, 2.4, 0.15), color=VEST,
-		cf=AB.offset(originCF, 0, -0.2, 0.7), canCollide=false, name="VestFront"}, model)
-	AB.part({size=Vector3.new(2.7, 2.4, 0.15), color=VEST,
-		cf=AB.offset(originCF, 0, -0.2, -0.7), canCollide=false, name="VestBack"}, model)
-	-- Vest buttons
-	for i, y in {0.7, 0.1, -0.5, -1.1} do
-		AB.sphere(0.1, BRASS, AB.offset(originCF, 0, y, 0.78), model, "Button_" .. i)
+	local hrp = rig:FindFirstChild("HumanoidRootPart") :: BasePart
+	if hrp then
+		-- Brown vest panels + brass buttons
+		weldTo(rig, hrp, "VestFront", Vector3.new(2.1, 1.95, 0.12), VEST, CFrame.new(0, -0.05, 0.55))
+		weldTo(rig, hrp, "VestBack",  Vector3.new(2.1, 1.95, 0.12), VEST, CFrame.new(0, -0.05, -0.55))
+		for i, y in {0.55, 0.05, -0.45, -0.85} do
+			weldTo(rig, hrp, "Button_" .. i, Vector3.new(0.12, 0.12, 0.12), BRASS, CFrame.new(0, y, 0.62), Enum.PartType.Ball)
+		end
+		-- ACCORDION strapped to chest
+		weldTo(rig, hrp, "AccL",     Vector3.new(1.3, 2.2, 1.2), ACC_RED, CFrame.new(-1.7, -0.2, 1.4))
+		weldTo(rig, hrp, "AccR",     Vector3.new(1.3, 2.2, 1.2), ACC_RED, CFrame.new( 1.7, -0.2, 1.4))
+		weldTo(rig, hrp, "AccLEdge", Vector3.new(0.2, 2.2, 1.2), ACC_BLK, CFrame.new(-1.0, -0.2, 1.4))
+		weldTo(rig, hrp, "AccREdge", Vector3.new(0.2, 2.2, 1.2), ACC_BLK, CFrame.new( 1.0, -0.2, 1.4))
+		-- Bellows (folded stripes)
+		for i, x in {-0.85, -0.45, -0.05, 0.35, 0.75} do
+			weldTo(rig, hrp, "Bellow_" .. i, Vector3.new(0.35, 1.9, 1.0), BELLOW, CFrame.new(x, -0.2, 1.4))
+		end
+		-- Brass corner studs
+		for k, sx in {-1, 1} do
+			for j, sy in {-1, 1} do
+				weldTo(rig, hrp, "BellowCorner_" .. k .. j, Vector3.new(0.2, 0.2, 0.2), BRASS,
+					CFrame.new(sx * 1.2, -0.2 + sy * 0.95, 1.95), Enum.PartType.Ball)
+			end
+		end
+		-- Mini button board (left side) + white keys (right side)
+		for r = 1, 3 do
+			for c = 1, 3 do
+				weldTo(rig, hrp, "Btn_" .. r .. c, Vector3.new(0.1, 0.1, 0.1), IVORY,
+					CFrame.new(-1.95 + (c - 1) * 0.18, 0.4 - (r - 1) * 0.4, 2.0), Enum.PartType.Ball)
+			end
+		end
+		for k = 1, 5 do
+			weldTo(rig, hrp, "Key_" .. k, Vector3.new(0.16, 0.4, 0.6), IVORY,
+				CFrame.new(1.3 + (k - 1) * 0.18, -0.7, 2.0))
+		end
+		-- Brand badge (decorative)
+		weldTo(rig, hrp, "Badge", Vector3.new(0.9, 0.5, 0.05), BRASS, CFrame.new(0, 0.4, 2.0))
+		-- Shoulder straps
+		weldTo(rig, hrp, "StrapL", Vector3.new(0.2, 3.5, 0.2), ACC_BLK,
+			CFrame.new(-0.9, 1.2, 0.9) * CFrame.Angles(0, 0, math.rad(15)))
+		weldTo(rig, hrp, "StrapR", Vector3.new(0.2, 3.5, 0.2), ACC_BLK,
+			CFrame.new( 0.9, 1.2, 0.9) * CFrame.Angles(0, 0, math.rad(-15)))
 	end
-	-- Pants
-	AB.part({size=Vector3.new(2.6, 0.4, 1.3), color=PANTS,
-		cf=AB.offset(originCF, 0, -1.6, 0), canCollide=false, name="Belt"}, model)
-	AB.part({size=Vector3.new(2.6, 0.4, 1.3), color=PANTS,
-		cf=AB.offset(originCF, 0, -1.9, 0), canCollide=false, name="Pants"}, model)
-
-	-- Head
-	local head = AB.part({size=Vector3.new(1.9, 1.9, 1.9), color=SKIN,
-		cf=AB.offset(originCF, 0, 2.5, 0), shape=Enum.PartType.Ball, canCollide=false, name="Head"}, model)
-	-- Beret (red)
-	AB.sphere(1.4, BERET, AB.offset(originCF, 0, 3.3, -0.15), model, "Beret")
-	-- Beret tail (small spike)
-	AB.cylinder(0.15, 0.4, BERET, AB.offset(originCF, 0, 3.8, -0.15), model, "BeretTail")
-	-- Scruffy beard
-	AB.sphere(1, HAIR, AB.offset(originCF, 0, 1.8, 0.3), model, "Beard")
-	-- Mustache
-	AB.block(Vector3.new(1.3, 0.25, 0.4), HAIR, AB.offset(originCF, 0, 2.2, 0.85), model, "Mustache")
-	-- Eyes (closed, into the music)
-	AB.block(Vector3.new(0.35, 0.06, 0.1), Color3.fromRGB(60, 40, 35),
-		AB.offset(originCF, -0.4, 2.7, 0.92), model, "EyeL")
-	AB.block(Vector3.new(0.35, 0.06, 0.1), Color3.fromRGB(60, 40, 35),
-		AB.offset(originCF, 0.4, 2.7, 0.92), model, "EyeR")
-
-	-- Arms wrapping around accordion
-	AB.part({size=Vector3.new(0.9, 2.2, 0.9), color=SHIRT,
-		cf=AB.offset(originCF, -2.4, -0.5, 0.8) * CFrame.Angles(math.rad(-30), 0, math.rad(15)), canCollide=false, name="ArmL"}, model)
-	AB.part({size=Vector3.new(0.9, 2.2, 0.9), color=SHIRT,
-		cf=AB.offset(originCF, 2.4, -0.5, 0.8) * CFrame.Angles(math.rad(-30), 0, math.rad(-15)), canCollide=false, name="ArmR"}, model)
-	-- Hands
-	AB.sphere(0.45, SKIN, AB.offset(originCF, -2.4, -1.4, 2), model, "HandL")
-	AB.sphere(0.45, SKIN, AB.offset(originCF, 2.4, -1.4, 2), model, "HandR")
-
-	-- ACCORDION — big iconic prop on chest
-	-- Left side (button board, red)
-	AB.block(Vector3.new(1.5, 2.6, 1.4), ACC_RED, AB.offset(originCF, -2, -0.4, 1.6), model, "AccL")
-	-- Right side (keyboard, red)
-	AB.block(Vector3.new(1.5, 2.6, 1.4), ACC_RED, AB.offset(originCF, 2, -0.4, 1.6), model, "AccR")
-	-- Bellows (folded/striped center)
-	for i, x in {-1.3, -0.8, -0.3, 0.2, 0.7, 1.2} do
-		AB.block(Vector3.new(0.4, 2.2, 1.2), BELLOW, AB.offset(originCF, x, -0.4, 1.6), model, "Bellow_" .. i)
+	local head = rig:FindFirstChild("Head") :: BasePart
+	if head then
+		-- Scruffy beard + thick mustache
+		weldTo(rig, head, "Beard",    Vector3.new(0.9, 0.9, 0.9), HAIR, CFrame.new(0, -0.6, 0.3), Enum.PartType.Ball)
+		weldTo(rig, head, "Mustache", Vector3.new(1.3, 0.25, 0.4), HAIR, CFrame.new(0, -0.25, 0.5))
+		-- Eyes closed (into the music)
+		weldTo(rig, head, "EyeL", Vector3.new(0.35, 0.06, 0.1), Color3.fromRGB(60, 40, 35), CFrame.new(-0.4, 0.2, 0.5))
+		weldTo(rig, head, "EyeR", Vector3.new(0.35, 0.06, 0.1), Color3.fromRGB(60, 40, 35), CFrame.new( 0.4, 0.2, 0.5))
 	end
-	-- Bellows hardware corners
-	for k, sx in {-1, 1} do
-		for j, sy in {-1, 1} do
-			AB.sphere(0.18, BRASS,
-				AB.offset(originCF, sx * 1.4, -0.4 + sy * 1.1, 2.1), model, "BellowCorner_" .. k .. j)
+	-- Burgundy beret + tail
+	AB.r15Hat(rig, Vector3.new(1.4, 1.0, 1.4), BERET, 0.75, "Beret", Enum.PartType.Ball)
+	AB.r15Hat(rig, Vector3.new(0.18, 0.4, 0.18), BERET, 1.4, "BeretTail")
+
+	-- Music notes floating above (neon glyphs welded to head so they ride with rig)
+	if head then
+		for i, off in {Vector3.new(-2, 2, 0), Vector3.new(2, 3, 0.4), Vector3.new(0, 4, 0.7)} do
+			local note = weldTo(rig, head, "Note_" .. i, Vector3.new(0.28, 0.28, 0.28),
+				Color3.fromRGB(255, 230, 100), CFrame.new(off.X, off.Y, off.Z), Enum.PartType.Ball)
+			AB.neon(note)
+			weldTo(rig, head, "NoteStem_" .. i, Vector3.new(0.06, 0.6, 0.06), Color3.fromRGB(255, 230, 100),
+				CFrame.new(off.X, off.Y + 0.35, off.Z))
 		end
 	end
-	-- Black accents on each side
-	AB.block(Vector3.new(0.2, 2.6, 1.4), ACC_BLK, AB.offset(originCF, -1.3, -0.4, 1.6), model, "AccLEdge")
-	AB.block(Vector3.new(0.2, 2.6, 1.4), ACC_BLK, AB.offset(originCF, 1.3, -0.4, 1.6), model, "AccREdge")
-	-- Button board (small buttons on left side)
-	for r = 1, 4 do
-		for c = 1, 4 do
-			AB.sphere(0.1, IVORY,
-				AB.offset(originCF, -2 - 0.3 + c * 0.15, -0.4 + 0.8 - (r - 1) * 0.4, 2.3), model, "Btn_" .. r .. c)
-		end
-	end
-	-- Keyboard (white keys on right)
-	for k = 1, 6 do
-		AB.block(Vector3.new(0.15, 0.4, 0.8), IVORY,
-			AB.offset(originCF, 1.8 + (k - 1) * 0.18, -0.4 - 0.5, 2.3), model, "Key_" .. k)
-	end
-	-- Strap over shoulder
-	AB.block(Vector3.new(0.2, 4, 0.2), ACC_BLK,
-		AB.offset(originCF, -1, 1.5, 1) * CFrame.Angles(0, 0, math.rad(15)), model, "StrapL")
-	AB.block(Vector3.new(0.2, 4, 0.2), ACC_BLK,
-		AB.offset(originCF, 1, 1.5, 1) * CFrame.Angles(0, 0, math.rad(-15)), model, "StrapR")
-	-- Brand badge (decorative)
-	AB.block(Vector3.new(1, 0.5, 0.05), BRASS, AB.offset(originCF, 0, 0.5, 2.3), model, "Badge")
 
-	-- Music notes floating around (small neon glyphs)
-	for i, off in {Vector3.new(-3, 4, 0), Vector3.new(3, 5, 0.5), Vector3.new(0, 6, 1)} do
-		local note = AB.sphere(0.25, Color3.fromRGB(255, 230, 100),
-			AB.offset(originCF, off.X, off.Y, off.Z), model, "Note_" .. i)
-		AB.neon(note)
-		AB.cylinder(0.05, 0.6, Color3.fromRGB(255, 230, 100),
-			AB.offset(originCF, off.X, off.Y + 0.35, off.Z), model, "NoteStem_" .. i)
-	end
-
-	AB.billboard(head, NAME, Vector2.new(200, 36), 3)
-	AB.pivot(model, torso)
-	AB.weldAll(model)
-	return model
+	AB.r15NameTag(rig, NAME)
+	return rig
 end
