@@ -45,12 +45,14 @@ local C = {
 -- World layout. Original ship at world position ≈ (-80, 0, 0) per
 -- FranksStringLights. We rebuild around the model origin and PivotTo at the
 -- end, so coordinates here are LOCAL to ship.
--- 2× footprint: 50-stud-long hull (was ~25), and axle sits ~56 studs up.
+-- 2× footprint horizontal, but axle stays at ~28 stud so the boat hangs
+-- close to the ground instead of suspended at Y=56+. Visible to player
+-- without binoculars.
 local HULL_LENGTH   = 50    -- X (long axis)
 local HULL_WIDTH    = 12    -- Z
 local HULL_HEIGHT   = 6     -- Y
 local SEGMENTS      = 9     -- segmented blocks → faint curve
-local AXLE_Y        = 56    -- pivotY target at 2× scale
+local AXLE_Y        = 28    -- mechanical axle world-Y MUST match RideController pivotY
 local DECK_Y        = 6     -- top of hull
 
 local shipCF = CFrame.new(originalPivot.Position)

@@ -43,13 +43,16 @@ local BUTTER_HIGHLIGHT= Color3.fromRGB(255, 235, 140)
 local SYRUP_AMBER     = Color3.fromRGB(160, 85, 25)
 local SYRUP_GLOSS     = Color3.fromRGB(210, 130, 50)
 
--- ── 3. Geometry constants (2x original footprint) ────────────────────────────
-local PLATFORM_DIAM   = 80        -- top pancake (largest of stack)
-local STACK_LAYERS    = 5         -- 5 pancakes — biggest on top, smallest at base
-local LAYER_HEIGHT    = 3.2
-local LAYER_SHRINK    = 4         -- each lower pancake shrinks by this many studs
+-- ── 3. Geometry constants (2× original footprint) ────────────────────────────
+-- Original TiltAWhirl was ~28-stud diameter. 2× = 56. The previous 80-stud +
+-- 5-layer stack was both too wide AND too tall (reads as a wedding cake tower
+-- next to the spawn). Reduced to a single thick pancake at ~56 stud diameter.
+local PLATFORM_DIAM   = 56        -- single pancake platform
+local STACK_LAYERS    = 1         -- one thick pancake, not a stacked tower
+local LAYER_HEIGHT    = 4
+local LAYER_SHRINK    = 0
 local CAR_COUNT       = 6         -- butter-pat cars
-local CAR_RADIUS      = 22        -- distance from center to each butter pat
+local CAR_RADIUS      = 18        -- distance from center to each butter pat
 
 -- Work in local space; we PivotTo() to originalPivot at the end so we stay
 -- exactly where the original ride was placed.

@@ -70,19 +70,22 @@ local FROSTING_COLORS = {
 local SPRINKLE_COLORS = { C.sprinkleA, C.sprinkleB, C.sprinkleC, C.sprinkleD, C.sprinkleE }
 
 -- ── Dimensions ───────────────────────────────────────────────────────────────
-local DONUT_DIAMETER     = 50                              -- per spec (2× original cup)
-local DONUT_OUTER_R      = DONUT_DIAMETER / 2              -- 25
-local DONUT_TUBE_R       = 9                               -- donut tube thickness radius
-local DONUT_INNER_R      = DONUT_OUTER_R - DONUT_TUBE_R*2  -- 7 — hole radius
-local DONUT_HEIGHT       = DONUT_TUBE_R * 2                -- 18 — donut total height
+-- Original TeacupRide was ~30 stud diameter. 2× = ~60 stud. The previous
+-- DONUT_DIAMETER=50 + PLATTER_RADIUS=95 produced a 190-stud ride ≈ 6× the
+-- original. Corrected here.
+local DONUT_DIAMETER     = 14                              -- 2× of original ~7-stud cup
+local DONUT_OUTER_R      = DONUT_DIAMETER / 2              -- 7
+local DONUT_TUBE_R       = 2.5                             -- donut tube thickness radius
+local DONUT_INNER_R      = DONUT_OUTER_R - DONUT_TUBE_R*2  -- 2 — hole radius
+local DONUT_HEIGHT       = DONUT_TUBE_R * 2                -- 5 — donut total height
 
 local DONUT_SEGMENTS     = 16   -- ring resolution per donut
 local NUM_DONUTS         = 8
 
-local PLATTER_RADIUS     = 95                              -- holds 8 50-stud donuts at r=60
-local DONUT_RING_RADIUS  = 60                              -- center distance of each donut
-local PLATTER_THICKNESS  = 4
-local PLATTER_TRIM_W     = 2
+local PLATTER_RADIUS     = 30                              -- 2× of original ~15-stud platter
+local DONUT_RING_RADIUS  = 20                              -- center distance of each donut
+local PLATTER_THICKNESS  = 1.5
+local PLATTER_TRIM_W     = 1
 
 -- ── Build the platter (glaze display tray) ───────────────────────────────────
 -- Y=0 in local space = top surface of platter. Donuts sit at Y = ~0.

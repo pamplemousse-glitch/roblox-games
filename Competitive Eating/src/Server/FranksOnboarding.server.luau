@@ -96,10 +96,12 @@ local function makeEatPrompt(name: string, anchorPos: Vector3)
 	lbl.Parent                   = bb
 end
 
--- 3 known-position contest tables (BEST GUESS — orchestrator verify).
-makeEatPrompt("Table_Center", Vector3.new(  0, 10, 0))
-makeEatPrompt("Table_East",   Vector3.new( 40, 10, 0))
-makeEatPrompt("Table_West",   Vector3.new(-40, 10, 0))
+-- Real contest table position derived from workspace audit:
+-- ContestStage_T1 is at (72, 14, -221). Other tables (T2, T3) follow the
+-- same +X spacing pattern from prior layouts.
+makeEatPrompt("Table_T1", Vector3.new( 72, 18, -221))
+makeEatPrompt("Table_T2", Vector3.new(104, 18, -221))
+makeEatPrompt("Table_T3", Vector3.new( 40, 18, -221))
 
 -- ── 3. Tutorial sign at spawn ────────────────────────────────────────────────
 local signModel = AB.model("WelcomeSign", root)
