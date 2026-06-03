@@ -85,6 +85,30 @@ function AssetSpawner.init()
 
 			if spawnOk then
 				spawned += 1
+				-- ── Z-fight / shake suppression (Tokyo first; promote to others when verified) ──
+				-- Every module currently spawns 50-300 anchored parts that overlap each other
+				-- intentionally (wall sticks into foundation, shoji panel embedded in frame,
+				-- etc.). Coplanar faces fight for the depth buffer every frame — looks like
+				-- the building is "shaking." Two-step fix at spawn time:
+				--   1) Only PrimaryPart keeps CanCollide=true. Every other part is decorative
+				--      and shouldn't block players or the physics solver.
+				--   2) Each non-primary part shrinks by 0.02 stud in each axis. Breaks coplanar
+				--      faces with no visible appearance change.
+				-- Gated on Tokyo until we verify the user perceives the shake stopping.
+				if typeof(spawnResult) == "Instance" and spawnResult:IsA("Model")
+				   and entry.module:sub(1, #"Assets.Districts.TokyoTown.") == "Assets.Districts.TokyoTown." then
+					local primary = spawnResult.PrimaryPart
+					for _, d in ipairs(spawnResult:GetDescendants()) do
+						if not d:IsA("BasePart") then continue end
+						if d == primary then continue end
+						d.CanCollide = false
+						d.Size = Vector3.new(
+							math.max(0.05, d.Size.X - 0.02),
+							math.max(0.05, d.Size.Y - 0.02),
+							math.max(0.05, d.Size.Z - 0.02)
+						)
+					end
+				end
 				-- Per-district polish pass: PBR materials + lighting bumps. Each
 				-- Polish module runs ::apply(model) on assets whose manifest path
 				-- matches its prefix. AssetSpawner clears + respawns Districts on
