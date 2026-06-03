@@ -70,17 +70,30 @@ local NUM_CHAIRS      = 16
 -- it sat in the .rbxl.
 local O = CFrame.new(0, 0, 0)
 
--- ── 1. Center mast (the umbrella stem) ──────────────────────────────────────
--- PrimaryPart MUST be a stable named part the rest of the model welds to.
--- Previous build used "CenterMast" — preserve that name so any tooling /
--- handoffs continue to find it.
+-- ── 1. Center mast + invisible anchor ───────────────────────────────────────
+-- The mast must use Roblox's X-aligned Cylinder shape rotated 90° around Z
+-- to stand upright. But setting that rotated cylinder as PrimaryPart breaks
+-- PivotTo at the end: PivotTo would un-rotate the model to make PrimaryPart's
+-- CFrame match originalPivot (identity rotation), laying the whole canopy
+-- on its side. The fix is a separate identity-rotation anchor part that
+-- carries the model's pivot.
+local anchor = AB.part({
+	size         = Vector3.new(0.1, 0.1, 0.1),
+	color        = C.stem,
+	cf           = O,
+	canCollide   = false,
+	transparency = 1,
+	name         = "PivotAnchor",
+}, m)
+anchor:AddTag("Structural")
+m.PrimaryPart = anchor
+
 local mast = AB.cylinder(
 	MAST_DIAMETER, MAST_HEIGHT, C.stem,
 	O * CFrame.new(0, MAST_HEIGHT / 2, 0),
 	m, "CenterMast"
 )
 mast:AddTag("Structural")    -- anchors partCentroid even with decorative chairs
-m.PrimaryPart = mast
 
 -- Stem gold bands every ~10 studs for paper-umbrella detail.
 for i, y in { 8, 18, 28 } do
