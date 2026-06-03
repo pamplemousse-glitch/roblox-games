@@ -228,7 +228,9 @@ end
 
 -- ── 4. Weld + reposition ────────────────────────────────────────────────────
 AB.weldAll(m)
-m:PivotTo(originalPivot)
+-- Lower the umbrella ~12 stud so chairs hang reachable from ground instead
+-- of suspended in the sky like a parasol on a pedestal.
+m:PivotTo(originalPivot * CFrame.new(0, -12, 0))
 
 print(string.format("[RideRebuildSwingCarousel] Cocktail Umbrella Swing built (%d descendants, PrimaryPart=%s)",
 	#m:GetDescendants(), m.PrimaryPart and m.PrimaryPart.Name or "nil"))

@@ -11,7 +11,14 @@ local RideController = {}
 local SPIN_RIDES = {
 	{ name = "Carousel",       rps = 0.35, gallopAmplitude = 0.75, gallopFreq = 0.6 },
 	{ name = "TeacupRide",     rps = 0.55 },
-	{ name = "SwingCarousel",  rps = 0.30, rampSecs = 20, swingOutAmplitude = 4.5 }, -- ramps from 0; chairs swing out
+	-- SwingCarousel cycle: 15s rest → 15s spin-up → 20s peak → 15s spin-down → loop.
+	-- Chairs swing out radially (Roblox-faked centrifugal) AND lift Y
+	-- (chains "shorten" visually as rotation speeds — rope-physics analog).
+	{ name = "SwingCarousel",  rps = 0.55,
+	  cyclePause = 15, cycleAccel = 15, cyclePeak = 20, cycleDecel = 15,
+	  swingOutAmplitude = 8,           -- radial outward at peak
+	  swingDropAmplitude = 9,          -- Y rise at peak (was a drop at rest)
+	},
 	{ name = "TiltAWhirl",     rps = 0.75 },
 }
 
@@ -46,12 +53,14 @@ local SCRAMBLER_SUB_RPS  = -0.84  -- sub-hub counter-rotation (3× main, opposit
 -- ── Types ─────────────────────────────────────────────────────────────────────
 
 type HorseGallop   = { parts: { BasePart }, seat: Seat?, phase: number, prevOffset: number }
-type ChairSwing    = { parts: { BasePart }, chains: { BasePart }, seat: Seat?, prevOffset: number }
+type ChairSwing    = { parts: { BasePart }, chains: { BasePart }, seat: Seat?, prevOffset: number, prevY: number }
 type SpinState     = { model: Model, angle: number, rps: number, currentRps: number,
                        rampRate: number, baseCF: CFrame,
                        gallopAmplitude: number?, gallopFreq: number?,
                        horses: { HorseGallop }?, totalTime: number?,
-                       swingOutAmplitude: number?, chairs: { ChairSwing }? }
+                       swingOutAmplitude: number?, swingDropAmplitude: number?, chairs: { ChairSwing }?,
+                       cyclePause: number?, cycleAccel: number?, cyclePeak: number?, cycleDecel: number?,
+                       cycleT: number? }
 type PendulumState = { model: Model, amp: number, freq: number, t: number, baseCF: CFrame, axis: string }
 type CoasterState  = {
 	cartModel  : Model,
@@ -527,13 +536,22 @@ function RideController.init(remotesFolder: Folder)
 			addBoardingPrompt(m, center, seats)
 		end
 		local rampSecs: number = (cfg :: any).rampSecs or 0
+		local cyclePause = (cfg :: any).cyclePause :: number?
+		local cycleAccel = (cfg :: any).cycleAccel :: number?
+		local cyclePeak  = (cfg :: any).cyclePeak :: number?
+		local cycleDecel = (cfg :: any).cycleDecel :: number?
 		local spinState: SpinState = {
 			model      = m,
 			angle      = 0,
 			rps        = cfg.rps,
-			currentRps = rampSecs > 0 and 0 or cfg.rps,
+			currentRps = (cyclePause or rampSecs > 0) and 0 or cfg.rps,
 			rampRate   = rampSecs > 0 and (cfg.rps / rampSecs) or 0,
 			baseCF     = CFrame.new(center),
+			cyclePause = cyclePause,
+			cycleAccel = cycleAccel,
+			cyclePeak  = cyclePeak,
+			cycleDecel = cycleDecel,
+			cycleT     = cyclePause and 0 or nil,
 		}
 
 		-- Optional gallop: horses Y-oscillate while ride spins.
@@ -629,12 +647,14 @@ function RideController.init(remotesFolder: Folder)
 							chains     = chains,
 							seat       = seat,
 							prevOffset = 0,
+							prevY      = 0,
 						})
 					end
 				end
 			end
-			spinState.chairs            = chairs
-			spinState.swingOutAmplitude = swingAmp
+			spinState.chairs             = chairs
+			spinState.swingOutAmplitude  = swingAmp
+			spinState.swingDropAmplitude = (cfg :: any).swingDropAmplitude :: number?
 		end
 
 		table.insert(spinList, spinState)
@@ -820,19 +840,43 @@ function RideController.init(remotesFolder: Folder)
 	RunService.Heartbeat:Connect(function(dt)
 
 		for _, s in spinList do
-			if s.rampRate > 0 and s.currentRps < s.rps then
+			-- Cycle phases: rest → spin-up → peak → spin-down → loop.
+			-- Overrides the simple ramp-once behavior for rides that opt in
+			-- via cyclePause/Accel/Peak/Decel SPIN_RIDES fields.
+			if s.cyclePause then
+				local pauseT = s.cyclePause :: number
+				local accelT = s.cycleAccel :: number
+				local peakT  = s.cyclePeak :: number
+				local decelT = s.cycleDecel :: number
+				local total  = pauseT + accelT + peakT + decelT
+				s.cycleT = ((s.cycleT :: number) + dt) % total
+				local t = s.cycleT :: number
+				if t < pauseT then
+					s.currentRps = 0
+				elseif t < pauseT + accelT then
+					s.currentRps = s.rps * ((t - pauseT) / accelT)
+				elseif t < pauseT + accelT + peakT then
+					s.currentRps = s.rps
+				else
+					s.currentRps = s.rps * (1 - ((t - pauseT - accelT - peakT) / decelT))
+				end
+			elseif s.rampRate > 0 and s.currentRps < s.rps then
 				s.currentRps = math.min(s.currentRps + s.rampRate * dt, s.rps)
 			end
 			s.angle += s.currentRps * dt
 			s.model:PivotTo(s.baseCF * CFrame.Angles(0, s.angle, 0))
 
-			-- Chair swing-out: radial outward translation proportional to currentRps.
-			-- Reads each chair's current world XZ to derive radial direction, so the
-			-- offset rotates correctly with the spin.
+			-- Chair swing-out: radial outward translation + Y rise proportional to
+			-- (currentRps/rps)². Centrifugal-style — at rest the chairs hang at full
+			-- rope drop; at peak rpm the chairs raise to rim level (chains horizontal).
 			local chairs = s.chairs
 			if chairs then
-				local amp = s.swingOutAmplitude :: number
-				local desiredMag = (s.rps > 0 and s.currentRps / s.rps or 0) * amp
+				local amp     = s.swingOutAmplitude :: number
+				local dropAmp = (s.swingDropAmplitude :: number?) or 0
+				local rpsRatio = s.rps > 0 and (s.currentRps / s.rps) or 0
+				local r2 = rpsRatio * rpsRatio                  -- centrifugal ∝ ω²
+				local desiredMag = r2 * amp                       -- radial outward
+				local desiredY   = -dropAmp * (1 - r2)            -- Y drop (negative = below rest)
 				local centerX = s.baseCF.Position.X
 				local centerZ = s.baseCF.Position.Z
 				for _, c in chairs do
@@ -843,8 +887,9 @@ function RideController.init(remotesFolder: Folder)
 					if mag > 0.1 then
 						local radX = relX / mag
 						local radZ = relZ / mag
-						local delta = desiredMag - c.prevOffset
-						local offset = Vector3.new(radX * delta, 0, radZ * delta)
+						local dMag = desiredMag - c.prevOffset
+						local dY   = desiredY  - c.prevY
+						local offset = Vector3.new(radX * dMag, dY, radZ * dMag)
 						for _, p in c.parts do
 							p.CFrame = p.CFrame + offset
 						end
@@ -852,12 +897,14 @@ function RideController.init(remotesFolder: Folder)
 						if seat then
 							seat.CFrame = seat.CFrame + offset
 						end
-						-- Chains move half so they tilt visually (rim anchor stays put-ish)
-						local halfOffset = Vector3.new(radX * delta * 0.5, 0, radZ * delta * 0.5)
+						-- Chains move half radial + half Y so they tilt outward AND
+						-- shorten visually (rim anchor stays put-ish).
+						local halfOffset = Vector3.new(radX * dMag * 0.5, dY * 0.5, radZ * dMag * 0.5)
 						for _, ch in c.chains do
 							ch.CFrame = ch.CFrame + halfOffset
 						end
 						c.prevOffset = desiredMag
+						c.prevY      = desiredY
 					end
 				end
 			end
