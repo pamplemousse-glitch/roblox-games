@@ -1,5 +1,6 @@
--- Fashion Woman — chic Italian woman in big sunglasses, designer handbag,
--- elegant dress, heels.
+-- FashionWoman — R15 retrofit (polish A)
+-- Bianca: chic Italian in red dress, big shades, pearl necklace,
+-- designer handbag (gold + black).
 
 local AB = require(game:GetService("ReplicatedStorage").Common.AssetBuilder)
 
@@ -12,88 +13,75 @@ local SHOE_R  = Color3.fromRGB(150, 20, 30)
 local BAG_GLD = Color3.fromRGB(200, 160, 80)
 local BAG_BLK = Color3.fromRGB(35, 30, 30)
 local LIPS    = Color3.fromRGB(180, 30, 40)
-local SKIN_DK = Color3.fromRGB(220, 195, 165)
+
+local function weldTo(parent: Model, base: BasePart, name: string, size: Vector3, color: Color3, offset: CFrame, shape: Enum.PartType?): Part
+	local p = Instance.new("Part")
+	p.Name = name; p.Size = size; p.Color = color
+	p.Material = Enum.Material.SmoothPlastic
+	p.Anchored = true; p.CanCollide = false
+	p.CFrame   = base.CFrame * offset
+	if shape then p.Shape = shape end
+	p.Parent   = parent
+	local w = Instance.new("WeldConstraint"); w.Part0 = base; w.Part1 = p; w.Parent = p
+	return p
+end
 
 return function(parent: Instance, originCF: CFrame): Model
-	local model = AB.model(NAME, parent)
+	local rig = AB.r15Rig(parent, originCF * CFrame.new(0, -3, 0), NAME, {
+		skin     = SKIN,
+		shirt    = DRESS_R,
+		pants    = DRESS_R,
+		leftLeg  = SKIN,  -- bare legs / heels feel
+		rightLeg = SKIN,
+	})
 
-	-- Torso (red dress)
-	local torso = AB.part({size=Vector3.new(2.4, 3, 1.2), color=DRESS_R,
-		cf=originCF, canCollide=false, name="Torso"}, model)
-	-- Dress tone highlight
-	AB.part({size=Vector3.new(2.45, 1.2, 1.25), color=DRESS_T,
-		cf=AB.offset(originCF, 0, 0.7, 0), canCollide=false, name="Bodice"}, model)
-	-- Belt
-	AB.cylinder(1.3, 0.3, BAG_BLK,
-		AB.offset(originCF, 0, -0.4, 0) * CFrame.Angles(0, 0, math.rad(90)), model, "Belt")
-	-- Gold belt buckle
-	AB.block(Vector3.new(0.6, 0.5, 0.1), BAG_GLD, AB.offset(originCF, 0, -0.4, 0.65), model, "BeltBuckle")
-	-- Dress hem (flared)
-	AB.part({size=Vector3.new(2.8, 0.8, 1.5), color=DRESS_R,
-		cf=AB.offset(originCF, 0, -1.8, 0), canCollide=false, name="Hem"}, model)
-	-- Long bare legs
-	AB.cylinder(0.4, 2, SKIN_DK, AB.offset(originCF, -0.5, -3.2, 0), model, "LegL")
-	AB.cylinder(0.4, 2, SKIN_DK, AB.offset(originCF, 0.5, -3.2, 0), model, "LegR")
-	-- Red high heels
-	AB.part({size=Vector3.new(0.7, 0.3, 1.2), color=SHOE_R,
-		cf=AB.offset(originCF, -0.5, -4.3, 0.3), canCollide=false, name="ShoeL"}, model)
-	AB.part({size=Vector3.new(0.7, 0.3, 1.2), color=SHOE_R,
-		cf=AB.offset(originCF, 0.5, -4.3, 0.3), canCollide=false, name="ShoeR"}, model)
-	-- Heel spikes
-	AB.cylinder(0.1, 0.6, SHOE_R, AB.offset(originCF, -0.5, -4.7, -0.2), model, "HeelL")
-	AB.cylinder(0.1, 0.6, SHOE_R, AB.offset(originCF, 0.5, -4.7, -0.2), model, "HeelR")
+	local hrp = rig:FindFirstChild("HumanoidRootPart") :: BasePart
+	if hrp then
+		-- Bodice highlight + black belt + gold buckle + pearl necklace
+		weldTo(rig, hrp, "Bodice",     Vector3.new(2.1, 1.0, 1.05), DRESS_T, CFrame.new(0, 0.6, 0))
+		weldTo(rig, hrp, "Belt",       Vector3.new(2.1, 0.25, 1.05), BAG_BLK, CFrame.new(0, -0.3, 0))
+		weldTo(rig, hrp, "BeltBuckle", Vector3.new(0.55, 0.4, 0.1), BAG_GLD, CFrame.new(0, -0.3, 0.55))
+		for i = -1, 1 do
+			weldTo(rig, hrp, "Pearl_" .. (i + 2), Vector3.new(0.13, 0.13, 0.13),
+				Color3.fromRGB(245, 240, 230), CFrame.new(i * 0.3, 1.0, 0.55), Enum.PartType.Ball)
+		end
+	end
+	local head = rig:FindFirstChild("Head") :: BasePart
+	if head then
+		-- Designer sunglasses (big, black + gold accents) + lips + pearl earrings
+		weldTo(rig, head, "Shades",       Vector3.new(1.7, 0.45, 0.2), BAG_BLK, CFrame.new(0, 0.1, 0.5))
+		weldTo(rig, head, "ShadeAccentL", Vector3.new(0.12, 0.12, 0.3), BAG_GLD, CFrame.new(-0.65, 0.1, 0.55))
+		weldTo(rig, head, "ShadeAccentR", Vector3.new(0.12, 0.12, 0.3), BAG_GLD, CFrame.new( 0.65, 0.1, 0.55))
+		weldTo(rig, head, "Lips",         Vector3.new(0.5, 0.13, 0.1), LIPS, CFrame.new(0, -0.4, 0.5))
+		weldTo(rig, head, "EarringL",     Vector3.new(0.18, 0.18, 0.18), Color3.fromRGB(245, 240, 230), CFrame.new(-0.85, -0.1, 0.05), Enum.PartType.Ball)
+		weldTo(rig, head, "EarringR",     Vector3.new(0.18, 0.18, 0.18), Color3.fromRGB(245, 240, 230), CFrame.new( 0.85, -0.1, 0.05), Enum.PartType.Ball)
+	end
+	-- Long flowing hair (back curtain + top + side strands via hats)
+	AB.r15Hat(rig, Vector3.new(1.9, 2.5, 0.6), HAIR, 0.0, "HairLong")
+	AB.r15Hat(rig, Vector3.new(2.2, 1.0, 2.0), HAIR, 0.6, "HairTop", Enum.PartType.Ball)
 
-	-- Head
-	local head = AB.part({size=Vector3.new(1.7, 1.7, 1.7), color=SKIN,
-		cf=AB.offset(originCF, 0, 2.4, 0), shape=Enum.PartType.Ball, canCollide=false, name="Head"}, model)
-	-- Long flowing hair
-	AB.part({size=Vector3.new(1.8, 2.5, 0.6), color=HAIR,
-		cf=AB.offset(originCF, 0, 2, -0.7), canCollide=false, name="HairLong"}, model)
-	-- Hair top
-	AB.sphere(1.1, HAIR, AB.offset(originCF, 0, 3, 0), model, "HairTop")
-	-- Side hair strands
-	AB.cylinder(0.4, 1.4, HAIR, AB.offset(originCF, -0.9, 2, 0.3), model, "HairSideL")
-	AB.cylinder(0.4, 1.4, HAIR, AB.offset(originCF, 0.9, 2, 0.3), model, "HairSideR")
-	-- Big designer sunglasses
-	AB.block(Vector3.new(1.8, 0.5, 0.2), BAG_BLK, AB.offset(originCF, 0, 2.5, 0.85), model, "Shades")
-	-- Sunglass gold accents
-	AB.cylinder(0.1, 0.3, BAG_GLD,
-		AB.offset(originCF, -0.7, 2.5, 0.95) * CFrame.Angles(math.rad(90), 0, 0), model, "ShadeAccentL")
-	AB.cylinder(0.1, 0.3, BAG_GLD,
-		AB.offset(originCF, 0.7, 2.5, 0.95) * CFrame.Angles(math.rad(90), 0, 0), model, "ShadeAccentR")
-	-- Red lips
-	AB.block(Vector3.new(0.55, 0.15, 0.1), LIPS, AB.offset(originCF, 0, 1.95, 0.85), model, "Lips")
-	-- Pearl earrings
-	AB.sphere(0.18, Color3.fromRGB(245, 240, 230), AB.offset(originCF, -0.85, 2.4, 0.3), model, "EarringL")
-	AB.sphere(0.18, Color3.fromRGB(245, 240, 230), AB.offset(originCF, 0.85, 2.4, 0.3), model, "EarringR")
-	-- Pearl necklace
-	for i = -1, 1 do
-		AB.sphere(0.12, Color3.fromRGB(245, 240, 230),
-			AB.offset(originCF, i * 0.3, 1.3, 0.7), model, "Pearl_" .. (i + 2))
+	-- Red high-heel shoes (welded to feet so they ride along)
+	local lFoot = rig:FindFirstChild("LeftFoot") :: BasePart
+	if lFoot then
+		weldTo(rig, lFoot, "HeelL", Vector3.new(0.95, 0.4, 1.15), SHOE_R, CFrame.new(0, -0.05, 0.1))
+		weldTo(rig, lFoot, "HeelSpikeL", Vector3.new(0.12, 0.6, 0.12), SHOE_R, CFrame.new(0, -0.45, -0.4))
+	end
+	local rFoot = rig:FindFirstChild("RightFoot") :: BasePart
+	if rFoot then
+		weldTo(rig, rFoot, "HeelR", Vector3.new(0.95, 0.4, 1.15), SHOE_R, CFrame.new(0, -0.05, 0.1))
+		weldTo(rig, rFoot, "HeelSpikeR", Vector3.new(0.12, 0.6, 0.12), SHOE_R, CFrame.new(0, -0.45, -0.4))
 	end
 
-	-- Arms (one with bag, one to head touching glasses)
-	AB.part({size=Vector3.new(0.7, 2.3, 0.7), color=SKIN,
-		cf=AB.offset(originCF, -1.5, -0.2, 0), canCollide=false, name="ArmL"}, model)
-	AB.part({size=Vector3.new(0.7, 2.3, 0.7), color=SKIN,
-		cf=AB.offset(originCF, 1.5, 0.8, 0.3) * CFrame.Angles(math.rad(-100), 0, 0), canCollide=false, name="ArmR"}, model)
-	-- Hands
-	AB.sphere(0.4, SKIN, AB.offset(originCF, -1.5, -1.5, 0), model, "HandL")
-	AB.sphere(0.4, SKIN, AB.offset(originCF, 1.5, 2.5, 0.6), model, "HandR")
+	-- Designer handbag hanging from left hand (gold + black)
+	local lHand = rig:FindFirstChild("LeftHand") :: BasePart
+	if lHand then
+		weldTo(rig, lHand, "BagHandle",     Vector3.new(0.08, 0.08, 1.8), BAG_GLD, CFrame.new(0, -0.6, 0))
+		weldTo(rig, lHand, "Bag",           Vector3.new(1.3, 1.5, 0.7), BAG_BLK, CFrame.new(0, -1.6, 0))
+		weldTo(rig, lHand, "BagBuckle",     Vector3.new(0.55, 0.4, 0.1), BAG_GLD, CFrame.new(0, -1.6, 0.4))
+		weldTo(rig, lHand, "BagTassel",     Vector3.new(0.08, 0.7, 0.08), BAG_GLD, CFrame.new(-0.4, -2.4, 0))
+		weldTo(rig, lHand, "BagTasselBall", Vector3.new(0.18, 0.18, 0.18), BAG_GLD, CFrame.new(-0.4, -2.8, 0), Enum.PartType.Ball)
+	end
 
-	-- Designer handbag (gold + black, hanging from left arm)
-	AB.block(Vector3.new(1.4, 1.6, 0.8), BAG_BLK, AB.offset(originCF, -1.5, -2.6, 0), model, "Bag")
-	-- Bag gold chain handle
-	AB.cylinder(0.08, 2, BAG_GLD,
-		AB.offset(originCF, -1.5, -1.8, 0) * CFrame.Angles(math.rad(20), 0, 0), model, "BagHandle")
-	-- Brand logo (gold buckle)
-	AB.block(Vector3.new(0.6, 0.4, 0.1), BAG_GLD, AB.offset(originCF, -1.5, -2.6, 0.45), model, "BagBuckle")
-	-- Tassel
-	AB.cylinder(0.06, 0.8, BAG_GLD, AB.offset(originCF, -1.9, -3.2, 0), model, "BagTassel")
-	AB.sphere(0.15, BAG_GLD, AB.offset(originCF, -1.9, -3.6, 0), model, "BagTasselBall")
-
-	AB.billboard(head, NAME, Vector2.new(200, 36), 3)
-	AB.pivot(model, torso)
-	AB.weldAll(model)
-	return model
+	AB.r15NameTag(rig, NAME)
+	return rig
 end
