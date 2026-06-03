@@ -82,6 +82,12 @@ ContestService.init(remotesFolder)
 MiniGameService.init(remotesFolder)
 NpcVendorService.init(remotesFolder)
 -- CosmeticsService.init(remotesFolder)  -- file missing
+-- Defer ride init by 2s so the 12 RideRebuild*.server.luau scripts (which
+-- task.wait(1) before clearing and rebuilding workspace.<RideName>) complete
+-- before RideController binds BoardZone parts to seats. Without this delay,
+-- BoardZones get welded to the OLD seats which then get destroyed during
+-- rebuild — boarding silently breaks.
+task.wait(2)
 RideController.init(remotesFolder)
 FriendVaultService.init(remotesFolder)
 CookbookService.init(remotesFolder)
