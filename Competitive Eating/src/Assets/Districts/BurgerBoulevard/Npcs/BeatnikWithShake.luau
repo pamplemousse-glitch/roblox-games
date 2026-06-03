@@ -1,79 +1,73 @@
--- BeatnikWithShake — black turtleneck, beret, holding a shake; serious expression.
+-- BeatnikWithShake — R15 retrofit (polish A). Black turtleneck, beret, holds milkshake.
 
 local AB = require(game:GetService("ReplicatedStorage").Common.AssetBuilder)
 
+local NAME    = "BeatnikWithShake"
 local SKIN    = Color3.fromRGB(220, 175, 130)
 local BLACK   = Color3.fromRGB(25, 25, 30)
-local PANTS   = Color3.fromRGB(25, 25, 30)
-local SHOE    = Color3.fromRGB(40, 40, 45)
-local CHROME  = Color3.fromRGB(176, 176, 176)
 local PINK_M  = Color3.fromRGB(255, 200, 215)
 local WHITE   = Color3.fromRGB(245, 245, 240)
 local RED     = Color3.fromRGB(220, 50, 50)
 local DARK    = Color3.fromRGB(30, 30, 35)
 local BERET_B = Color3.fromRGB(45, 35, 50)
+local WOOD    = Color3.fromRGB(120, 70, 40)
+
+local function weldTo(parent: Model, base: BasePart, name: string, size: Vector3, color: Color3, offset: CFrame, shape: Enum.PartType?): Part
+	local p = Instance.new("Part")
+	p.Name = name; p.Size = size; p.Color = color
+	p.Material = Enum.Material.SmoothPlastic
+	p.Anchored = true; p.CanCollide = false
+	p.CFrame = base.CFrame * offset
+	if shape then p.Shape = shape end
+	p.Parent = parent
+	local w = Instance.new("WeldConstraint"); w.Part0 = base; w.Part1 = p; w.Parent = p
+	return p
+end
 
 return function(parent: Instance, originCF: CFrame): Model
-	local model = AB.model("BeatnikWithShake", parent)
-
-	-- Shoes
-	AB.block(Vector3.new(0.8, 0.4, 1.1), SHOE, AB.offset(originCF, -0.4, 0.2, 0.2), model, "ShoeL")
-	AB.block(Vector3.new(0.8, 0.4, 1.1), SHOE, AB.offset(originCF,  0.4, 0.2, 0.2), model, "ShoeR")
-	-- Legs (black slacks)
-	AB.block(Vector3.new(0.7, 2.4, 0.7), PANTS, AB.offset(originCF, -0.4, 1.6, 0), model, "LegL")
-	AB.block(Vector3.new(0.7, 2.4, 0.7), PANTS, AB.offset(originCF,  0.4, 1.6, 0), model, "LegR")
-	-- Belt
-	AB.block(Vector3.new(1.8, 0.3, 1), DARK, AB.offset(originCF, 0, 3, 0), model, "Belt")
-
-	-- Torso (black turtleneck)
-	local torso = AB.block(Vector3.new(2, 2.5, 1), BLACK, AB.offset(originCF, 0, 4.4, 0), model, "Torso")
-	-- Turtleneck collar (raised black)
-	AB.cylinder(0.9, 0.7, BLACK, AB.offset(originCF, 0, 5.9, 0), model, "TurtleneckCollar")
-
-	-- Arms (one holding shake)
-	AB.block(Vector3.new(0.55, 2, 0.55), BLACK, AB.offset(originCF, -1.25, 4.2, 0), model, "ArmL")
-	AB.block(Vector3.new(0.55, 1.8, 0.55), BLACK, AB.offset(originCF, 1.1, 4.5, 0.4) * CFrame.Angles(0, 0, math.rad(-30)), model, "ArmR")
-	AB.sphere(0.5, SKIN, AB.offset(originCF, -1.25, 3.2, 0), model, "HandL")
-	AB.sphere(0.5, SKIN, AB.offset(originCF, 1.7, 5.4, 0.7), model, "HandR")
-
+	local rig = AB.r15Rig(parent, originCF * CFrame.new(0, -3, 0), NAME, {
+		skin  = SKIN,
+		shirt = BLACK,
+		pants = BLACK,  -- black slacks
+	})
+	local hrp = rig:FindFirstChild("HumanoidRootPart") :: BasePart
+	if hrp then
+		-- Turtleneck collar (raised black)
+		weldTo(rig, hrp, "TurtleneckCollar", Vector3.new(0.9, 0.7, 0.9), BLACK, CFrame.new(0, 1.4, 0), Enum.PartType.Cylinder)
+		-- Belt
+		weldTo(rig, hrp, "Belt", Vector3.new(1.8, 0.3, 1.0), DARK, CFrame.new(0, -1.1, 0))
+		-- Bongos under left arm
+		weldTo(rig, hrp, "BongoL", Vector3.new(0.7, 0.8, 0.7), WOOD, CFrame.new(-1.6, -1.0, 0), Enum.PartType.Cylinder)
+		weldTo(rig, hrp, "BongoR", Vector3.new(0.6, 0.8, 0.6), WOOD, CFrame.new(-2.1, -1.0, 0), Enum.PartType.Cylinder)
+	end
+	local head = rig:FindFirstChild("Head") :: BasePart
+	if head then
+		-- Beret tilted
+		weldTo(rig, head, "Beret",      Vector3.new(2.0, 0.4, 2.0), BERET_B, CFrame.new(0, 0.6, 0) * CFrame.Angles(math.rad(-12), 0, math.rad(8)), Enum.PartType.Cylinder)
+		weldTo(rig, head, "BeretStem",  Vector3.new(0.25, 0.25, 0.25), BERET_B, CFrame.new(0, 1.0, 0), Enum.PartType.Ball)
+		-- Goatee + mustache
+		weldTo(rig, head, "Goatee",     Vector3.new(0.4, 0.4, 0.2), DARK, CFrame.new(0, -0.4, 0.55))
+		weldTo(rig, head, "Mustache",   Vector3.new(0.8, 0.08, 0.1), DARK, CFrame.new(0, -0.1, 0.55))
+		-- Beatnik shades (black bar)
+		weldTo(rig, head, "Shades",     Vector3.new(1.5, 0.3, 0.1), DARK, CFrame.new(0, 0.1, 0.55))
+		-- Sideburns
+		weldTo(rig, head, "SideburnL",  Vector3.new(0.15, 0.5, 0.3), DARK, CFrame.new(-0.55, -0.1, 0.15))
+		weldTo(rig, head, "SideburnR",  Vector3.new(0.15, 0.5, 0.3), DARK, CFrame.new( 0.55, -0.1, 0.15))
+	end
 	-- Milkshake in right hand
-	-- Glass
-	local glass = AB.cylinder(0.9, 1.8, Color3.fromRGB(220, 240, 255), AB.offset(originCF, 1.7, 5.9, 0.7), model, "ShakeGlass")
-	glass.Material = Enum.Material.Glass; glass.Transparency = 0.45
-	-- Pink shake inside
-	AB.cylinder(0.7, 1.5, PINK_M, AB.offset(originCF, 1.7, 5.85, 0.7), model, "ShakeContent")
-	-- Whipped cream
-	AB.sphere(0.8, WHITE, AB.offset(originCF, 1.7, 7, 0.7), model, "Whip")
-	-- Cherry
-	AB.sphere(0.2, RED, AB.offset(originCF, 1.7, 7.5, 0.7), model, "Cherry")
-	-- Straw
-	AB.cylinder(0.1, 2, RED, AB.offset(originCF, 1.85, 7.2, 0.7), model, "Straw")
-
-	-- Head
-	AB.sphere(1.35, SKIN, AB.offset(originCF, 0, 7, 0), model, "Head")
-	-- Beret (purple-black, tilted)
-	AB.cylinder(2, 0.4, BERET_B, AB.offset(originCF, 0, 7.9, 0) * CFrame.Angles(math.rad(-12), 0, math.rad(8)), model, "Beret")
-	-- Beret stem (the little nub)
-	AB.sphere(0.25, BERET_B, AB.offset(originCF, 0, 8.3, 0), model, "BeretStem")
-
-	-- Goatee
-	AB.block(Vector3.new(0.4, 0.4, 0.2), DARK, AB.offset(originCF, 0, 6.4, 0.7), model, "Goatee")
-	-- Mustache (thin)
-	AB.block(Vector3.new(0.8, 0.08, 0.1), DARK, AB.offset(originCF, 0, 6.7, 0.7), model, "Mustache")
-
-	-- Beatnik shades (black bar across eyes)
-	AB.block(Vector3.new(1.5, 0.3, 0.1), DARK, AB.offset(originCF, 0, 7.1, 0.7), model, "Shades")
-	-- Sideburns
-	AB.block(Vector3.new(0.15, 0.5, 0.3), DARK, AB.offset(originCF, -0.85, 6.7, 0.25), model, "SideburnL")
-	AB.block(Vector3.new(0.15, 0.5, 0.3), DARK, AB.offset(originCF,  0.85, 6.7, 0.25), model, "SideburnR")
-
-	-- Bongos under arm (small wood cylinder pair)
-	AB.cylinder(0.7, 0.8, Color3.fromRGB(120, 70, 40), AB.offset(originCF, -1.6, 3, 0), model, "BongoL")
-	AB.cylinder(0.6, 0.8, Color3.fromRGB(120, 70, 40), AB.offset(originCF, -2.1, 3, 0), model, "BongoR")
-
-	AB.billboard(torso, "Beatnik", Vector2.new(180, 36), 4)
-
-	AB.pivot(model, torso)
-	AB.weldAll(model)
-	return model
+	local rHand = rig:FindFirstChild("RightHand") :: BasePart
+	if rHand then
+		local glass = weldTo(rig, rHand, "ShakeGlass", Vector3.new(1.8, 0.9, 0.9), Color3.fromRGB(220, 240, 255),
+			CFrame.new(0, -0.6, 0) * CFrame.Angles(0, 0, math.rad(90)))
+		glass.Shape = Enum.PartType.Cylinder
+		glass.Material = Enum.Material.Glass; glass.Transparency = 0.45
+		local content = weldTo(rig, rHand, "ShakeContent", Vector3.new(1.5, 0.7, 0.7), PINK_M,
+			CFrame.new(0, -0.6, 0) * CFrame.Angles(0, 0, math.rad(90)))
+		content.Shape = Enum.PartType.Cylinder
+		weldTo(rig, rHand, "Whip",     Vector3.new(0.8, 0.8, 0.8), WHITE, CFrame.new(0, 0.5, 0), Enum.PartType.Ball)
+		weldTo(rig, rHand, "Cherry",   Vector3.new(0.2, 0.2, 0.2), RED,   CFrame.new(0, 1.0, 0), Enum.PartType.Ball)
+		weldTo(rig, rHand, "Straw",    Vector3.new(0.1, 2.0, 0.1), RED,   CFrame.new(0.15, 0.7, 0))
+	end
+	AB.r15NameTag(rig, "Beatnik")
+	return rig
 end

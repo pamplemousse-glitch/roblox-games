@@ -1,78 +1,75 @@
--- Smash Riley — burger-flipper chef NPC. White apron, red bandana, spatula,
--- chef cap, sauce-stained apron, smile.
+-- SmashRiley — R15 retrofit (polish A). White apron, red bandana, spatula, chef cap, ketchup stain.
 
 local AB = require(game:GetService("ReplicatedStorage").Common.AssetBuilder)
 
-local SKIN     = Color3.fromRGB(225, 185, 145)
-local APRON    = Color3.fromRGB(255, 245, 232)
-local BANDANA  = Color3.fromRGB(255, 48, 48)
-local PANTS    = Color3.fromRGB(60, 60, 70)
-local CHROME   = Color3.fromRGB(176, 176, 176)
-local KETCHUP  = Color3.fromRGB(180, 30, 30)
-local CHEF_W   = Color3.fromRGB(248, 248, 248)
-local DARK     = Color3.fromRGB(30, 30, 35)
-local SHOE     = Color3.fromRGB(40, 40, 45)
+local NAME    = "SmashRiley"
+local SKIN    = Color3.fromRGB(225, 185, 145)
+local APRON   = Color3.fromRGB(255, 245, 232)
+local BANDANA = Color3.fromRGB(255, 48, 48)
+local PANTS   = Color3.fromRGB(60, 60, 70)
+local CHROME  = Color3.fromRGB(176, 176, 176)
+local KETCHUP = Color3.fromRGB(180, 30, 30)
+local CHEF_W  = Color3.fromRGB(248, 248, 248)
+local DARK    = Color3.fromRGB(30, 30, 35)
+
+local function weldTo(parent: Model, base: BasePart, name: string, size: Vector3, color: Color3, offset: CFrame, shape: Enum.PartType?): Part
+	local p = Instance.new("Part")
+	p.Name = name; p.Size = size; p.Color = color
+	p.Material = Enum.Material.SmoothPlastic
+	p.Anchored = true; p.CanCollide = false
+	p.CFrame = base.CFrame * offset
+	if shape then p.Shape = shape end
+	p.Parent = parent
+	local w = Instance.new("WeldConstraint"); w.Part0 = base; w.Part1 = p; w.Parent = p
+	return p
+end
 
 return function(parent: Instance, originCF: CFrame): Model
-	local model = AB.model("SmashRiley", parent)
-
-	-- Shoes
-	AB.block(Vector3.new(0.9, 0.4, 1.2), SHOE, AB.offset(originCF, -0.4, 0.2, 0.2), model, "ShoeL")
-	AB.block(Vector3.new(0.9, 0.4, 1.2), SHOE, AB.offset(originCF,  0.4, 0.2, 0.2), model, "ShoeR")
-	-- Legs (pants)
-	AB.block(Vector3.new(0.7, 2.4, 0.7), PANTS, AB.offset(originCF, -0.4, 1.6, 0), model, "LegL")
-	AB.block(Vector3.new(0.7, 2.4, 0.7), PANTS, AB.offset(originCF,  0.4, 1.6, 0), model, "LegR")
-	-- Belt
-	AB.block(Vector3.new(1.8, 0.4, 1.05), DARK, AB.offset(originCF, 0, 3, 0), model, "Belt")
-	AB.block(Vector3.new(0.4, 0.5, 1.1), CHROME, AB.offset(originCF, 0, 3, 0.5), model, "Buckle")
-
-	-- Torso (apron front)
-	local torso = AB.block(Vector3.new(2, 2.5, 1), APRON, AB.offset(originCF, 0, 4.4, 0), model, "Torso")
-	-- Ketchup stain on apron (small splat)
-	AB.sphere(0.5, KETCHUP, AB.offset(originCF, 0.5, 4.5, 0.55), model, "KetchupStain")
-	-- Red apron neck-strap
-	AB.block(Vector3.new(0.3, 0.8, 0.15), BANDANA, AB.offset(originCF, -0.7, 5.6, 0.5), model, "StrapL")
-	AB.block(Vector3.new(0.3, 0.8, 0.15), BANDANA, AB.offset(originCF,  0.7, 5.6, 0.5), model, "StrapR")
-	-- Apron pocket
-	AB.block(Vector3.new(0.6, 0.7, 0.1), APRON:Lerp(DARK, 0.1), AB.offset(originCF, -0.5, 3.9, 0.55), model, "AprPocket")
-	-- Pen in pocket
-	AB.cylinder(0.1, 0.7, BANDANA, AB.offset(originCF, -0.5, 4.2, 0.6), model, "PocketPen")
-
-	-- Arms
-	AB.block(Vector3.new(0.6, 2, 0.6), APRON, AB.offset(originCF, -1.3, 4.2, 0), model, "ArmL")
-	AB.block(Vector3.new(0.6, 2, 0.6), APRON, AB.offset(originCF,  1.3, 4.2, 0), model, "ArmR")
-	-- Hands
-	AB.sphere(0.55, SKIN, AB.offset(originCF, -1.3, 3.1, 0), model, "HandL")
-	AB.sphere(0.55, SKIN, AB.offset(originCF,  1.3, 3.1, 0), model, "HandR")
-	-- Spatula in right hand
-	AB.cylinder(0.15, 1.6, Color3.fromRGB(140, 90, 50), AB.offset(originCF, 1.3, 2.2, 0) * CFrame.Angles(0, 0, math.rad(-90)), model, "SpatulaHandle")
-	local spat = AB.block(Vector3.new(0.9, 0.08, 1.2), CHROME, AB.offset(originCF, 1.3, 1.3, 0), model, "SpatulaBlade")
-	spat.Material = Enum.Material.Metal; spat.Reflectance = 0.5
-
-	-- Head
-	AB.sphere(1.4, SKIN, AB.offset(originCF, 0, 6.5, 0), model, "Head")
-	-- Red bandana wrap around forehead
-	AB.block(Vector3.new(1.5, 0.5, 1.5), BANDANA, AB.offset(originCF, 0, 7, 0), model, "Bandana")
-	AB.sphere(0.4, BANDANA, AB.offset(originCF, 0, 7.1, -0.9), model, "BandanaKnot")
-	-- Chef cap (tall white poof on top of bandana)
-	AB.cylinder(1.2, 0.8, CHEF_W, AB.offset(originCF, 0, 7.5, 0), model, "CapBand")
-	AB.sphere(1.5, CHEF_W, AB.offset(originCF, 0, 8.4, 0), model, "CapPoof1")
-	AB.sphere(1.2, CHEF_W, AB.offset(originCF, 0.4, 8.7, 0.2), model, "CapPoof2")
-
-	-- Eyes
-	AB.sphere(0.13, DARK, AB.offset(originCF, -0.3, 6.6, 0.65), model, "EyeL")
-	AB.sphere(0.13, DARK, AB.offset(originCF,  0.3, 6.6, 0.65), model, "EyeR")
-	-- Smile (small dark curve)
-	AB.block(Vector3.new(0.6, 0.08, 0.1), DARK, AB.offset(originCF, 0, 6.15, 0.7), model, "Smile")
-	-- Stubble (a few small dark dots on jaw)
-	AB.sphere(0.06, DARK, AB.offset(originCF, -0.3, 6, 0.6), model, "Stubble1")
-	AB.sphere(0.06, DARK, AB.offset(originCF, 0.2, 5.95, 0.62), model, "Stubble2")
-	AB.sphere(0.06, DARK, AB.offset(originCF, 0.4, 6.0, 0.55), model, "Stubble3")
-
-	-- Name tag
-	AB.billboard(torso, "Smash Riley", Vector2.new(220, 36), 4)
-
-	AB.pivot(model, torso)
-	AB.weldAll(model)
-	return model
+	local rig = AB.r15Rig(parent, originCF * CFrame.new(0, -3, 0), NAME, {
+		skin  = SKIN,
+		shirt = APRON,
+		pants = PANTS,
+	})
+	-- Torso accessories ride on HumanoidRootPart.
+	local hrp = rig:FindFirstChild("HumanoidRootPart") :: BasePart
+	if hrp then
+		-- White apron front, red ketchup stain, neck straps
+		weldTo(rig, hrp, "Apron",      Vector3.new(1.8, 1.95, 0.1), APRON, CFrame.new(0, 0, 0.6))
+		weldTo(rig, hrp, "KetchupStain", Vector3.new(0.5, 0.5, 0.5), KETCHUP, CFrame.new(0.5, 0.1, 0.65), Enum.PartType.Ball)
+		weldTo(rig, hrp, "StrapL",     Vector3.new(0.3, 0.8, 0.15), BANDANA, CFrame.new(-0.7, 1.2, 0.55))
+		weldTo(rig, hrp, "StrapR",     Vector3.new(0.3, 0.8, 0.15), BANDANA, CFrame.new( 0.7, 1.2, 0.55))
+		-- Belt + chrome buckle
+		weldTo(rig, hrp, "Belt",       Vector3.new(2.05, 0.4, 1.05), DARK,   CFrame.new(0, -1.1, 0))
+		local buckle = weldTo(rig, hrp, "Buckle", Vector3.new(0.4, 0.5, 0.1), CHROME, CFrame.new(0, -1.1, 0.55))
+		buckle.Material = Enum.Material.Metal; buckle.Reflectance = 0.4
+		-- Apron pocket + pen
+		weldTo(rig, hrp, "AprPocket",  Vector3.new(0.6, 0.7, 0.05), APRON:Lerp(DARK, 0.1), CFrame.new(-0.5, -0.3, 0.66))
+		weldTo(rig, hrp, "PocketPen",  Vector3.new(0.1, 0.7, 0.1), BANDANA, CFrame.new(-0.5, 0, 0.7))
+	end
+	local head = rig:FindFirstChild("Head") :: BasePart
+	if head then
+		-- Eyes + smile + red bandana wrap
+		weldTo(rig, head, "EyeL",     Vector3.new(0.13, 0.13, 0.13), DARK, CFrame.new(-0.3, 0.1, 0.5), Enum.PartType.Ball)
+		weldTo(rig, head, "EyeR",     Vector3.new(0.13, 0.13, 0.13), DARK, CFrame.new( 0.3, 0.1, 0.5), Enum.PartType.Ball)
+		weldTo(rig, head, "Smile",    Vector3.new(0.6, 0.08, 0.1), DARK, CFrame.new(0, -0.3, 0.55))
+		weldTo(rig, head, "Bandana",  Vector3.new(1.5, 0.5, 1.5), BANDANA, CFrame.new(0, 0.5, 0))
+		weldTo(rig, head, "BandanaKnot", Vector3.new(0.4, 0.4, 0.4), BANDANA, CFrame.new(0, 0.6, -0.9), Enum.PartType.Ball)
+		-- Stubble dots
+		weldTo(rig, head, "Stubble1", Vector3.new(0.06, 0.06, 0.06), DARK, CFrame.new(-0.3, -0.45, 0.45), Enum.PartType.Ball)
+		weldTo(rig, head, "Stubble2", Vector3.new(0.06, 0.06, 0.06), DARK, CFrame.new( 0.2, -0.5, 0.47), Enum.PartType.Ball)
+	end
+	-- Chef cap stack on top of head
+	AB.r15Hat(rig, Vector3.new(1.2, 0.8, 1.2), CHEF_W, 1.0, "CapBand", Enum.PartType.Cylinder)
+	AB.r15Hat(rig, Vector3.new(1.5, 1.5, 1.5), CHEF_W, 1.9, "CapPoof1", Enum.PartType.Ball)
+	AB.r15Hat(rig, Vector3.new(1.2, 1.2, 1.2), CHEF_W, 2.4, "CapPoof2", Enum.PartType.Ball)
+	-- Spatula in right hand (R15 RightHand is at local Y=-1.2 so all Y offsets +1.2 vs R6).
+	local rHand = rig:FindFirstChild("RightHand") :: BasePart
+	if rHand then
+		weldTo(rig, rHand, "SpatulaHandle", Vector3.new(1.6, 0.15, 0.15), Color3.fromRGB(140, 90, 50),
+			CFrame.new(0, -0.6, 0) * CFrame.Angles(0, 0, math.rad(-90)))
+		local spat = weldTo(rig, rHand, "SpatulaBlade", Vector3.new(0.9, 0.08, 1.2), CHROME, CFrame.new(0, -1.5, 0))
+		spat.Material = Enum.Material.Metal; spat.Reflectance = 0.5
+	end
+	AB.r15NameTag(rig, "Smash Riley")
+	return rig
 end
