@@ -137,18 +137,18 @@ return {
 	-- DaikonRamen → SushiDaiko → IzakayaLantern, staggered in Z and canted
 	-- so the row reads as a winding alley rather than a straight strip.
 	-- TakoyakiCart and SakeBar tucked into side alleys, bad faces away.
-	{ module = "Assets.Districts.TokyoTown.Buildings.DaikonRamen",     position = Vector3.new(800, 0, 140), yaw = 0 },
+	{ module = "Assets.Districts.TokyoTown.Buildings.DaikonRamen",     position = Vector3.new(800, 0, 140), yaw = 180 },
 	{ module = "Assets.Districts.TokyoTown.Buildings.SushiDaiko",      position = Vector3.new(860, 0, 140), yaw =   180 },
 	{ module = "Assets.Districts.TokyoTown.Buildings.IzakayaLantern",  position = Vector3.new(920, 0, 140), yaw =  180 },
-	{ module = "Assets.Districts.TokyoTown.Buildings.SakeBar",         position = Vector3.new(980, 0, 140), yaw = 0 },  -- north-east alley
-	{ module = "Assets.Districts.TokyoTown.Buildings.TakoyakiCart",    position = Vector3.new(1040, 0, 140), yaw = 0 },  -- south alley vendor
+	{ module = "Assets.Districts.TokyoTown.Buildings.SakeBar",         position = Vector3.new(980, 0, 140), yaw = 180 },  -- north-east alley
+	{ module = "Assets.Districts.TokyoTown.Buildings.TakoyakiCart",    position = Vector3.new(1040, 0, 140), yaw = 180 },  -- south alley vendor
 
 	-- ─── Backdrop row (Z=140..150, masks the back of the heroes) ───────
-	{ module = "Assets.Districts.TokyoTown.Buildings.CapsuleHotel",        position = Vector3.new(800, 0, 200), yaw = 0 },
-	{ module = "Assets.Districts.TokyoTown.Buildings.VendingMachineWall",  position = Vector3.new(860, 0, 200), yaw = 0 },
-	{ module = "Assets.Districts.TokyoTown.Buildings.NarrowAlleyShops",    position = Vector3.new(920, 0, 200), yaw = 0 },
-	{ module = "Assets.Districts.TokyoTown.Buildings.SalarymanApartments", position = Vector3.new(980, 0, 200), yaw = 0 },
-	{ module = "Assets.Districts.TokyoTown.Buildings.LanternNoodleRow",    position = Vector3.new(1040, 0, 200), yaw =  10 },
+	{ module = "Assets.Districts.TokyoTown.Buildings.CapsuleHotel",        position = Vector3.new(800, 0, 200), yaw = 180 },
+	{ module = "Assets.Districts.TokyoTown.Buildings.VendingMachineWall",  position = Vector3.new(860, 0, 200), yaw = 180 },
+	{ module = "Assets.Districts.TokyoTown.Buildings.NarrowAlleyShops",    position = Vector3.new(920, 0, 200), yaw = 180 },
+	{ module = "Assets.Districts.TokyoTown.Buildings.SalarymanApartments", position = Vector3.new(980, 0, 200), yaw = 180 },
+	{ module = "Assets.Districts.TokyoTown.Buildings.LanternNoodleRow",    position = Vector3.new(1040, 0, 200), yaw = 180 },
 
 	-- ─── Landmarks ─────────────────────────────────────────────────────
 	-- Torii is the WEST entry gate; Maneki-neko anchors the PLAZA at Z=85;
