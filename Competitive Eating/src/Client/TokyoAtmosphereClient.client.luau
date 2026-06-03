@@ -22,13 +22,16 @@ type AtmoSnapshot = {
 	Haze:    number,
 }
 
+-- Subtle warm tint, NOT a muddy brown haze. Density and Haze stay low so
+-- the sky doesn't turn opaque-brown — earlier preset (Density 0.4 + Haze 1.5
+-- + dark Decay) made the whole world read as mud.
 local TOKYO_PRESET: AtmoSnapshot = {
-	Density = 0.40,
+	Density = 0.18,
 	Offset  = 0.0,
-	Color   = Color3.fromRGB(240, 180, 130),
-	Decay   = Color3.fromRGB(120, 100,  90),
-	Glare   = 0.25,
-	Haze    = 1.5,
+	Color   = Color3.fromRGB(225, 205, 180),
+	Decay   = Color3.fromRGB(190, 175, 160),
+	Glare   = 0.15,
+	Haze    = 0.6,
 }
 
 local function ensureAtmosphere(): Atmosphere
