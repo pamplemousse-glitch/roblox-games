@@ -1,82 +1,68 @@
--- JukeboxDancer — poodle skirt, ponytail, mid-twirl pose.
+-- JukeboxDancer — R15 retrofit (polish A). Poodle skirt, sweater, auburn ponytail.
 
 local AB = require(game:GetService("ReplicatedStorage").Common.AssetBuilder)
 
+local NAME    = "JukeboxDancer"
 local SKIN    = Color3.fromRGB(245, 215, 185)
 local SKIRT   = Color3.fromRGB(255, 200, 215)
 local SWEATER = Color3.fromRGB(245, 245, 240)
-local SOCK    = Color3.fromRGB(245, 245, 240)
-local SHOE_B  = Color3.fromRGB(70, 50, 35)
 local HAIR_AU = Color3.fromRGB(160, 80, 50)
 local DARK    = Color3.fromRGB(30, 30, 35)
 local PINK    = Color3.fromRGB(255, 130, 180)
 local TEAL    = Color3.fromRGB(127, 202, 194)
 
+local function weldTo(parent: Model, base: BasePart, name: string, size: Vector3, color: Color3, offset: CFrame, shape: Enum.PartType?): Part
+	local p = Instance.new("Part")
+	p.Name = name; p.Size = size; p.Color = color
+	p.Material = Enum.Material.SmoothPlastic
+	p.Anchored = true; p.CanCollide = false
+	p.CFrame = base.CFrame * offset
+	if shape then p.Shape = shape end
+	p.Parent = parent
+	local w = Instance.new("WeldConstraint"); w.Part0 = base; w.Part1 = p; w.Parent = p
+	return p
+end
+
 return function(parent: Instance, originCF: CFrame): Model
-	local model = AB.model("JukeboxDancer", parent)
-
-	-- Saddle shoes (white + brown)
-	AB.block(Vector3.new(0.7, 0.4, 1), SWEATER, AB.offset(originCF, -0.35, 0.2, 0.15) * CFrame.Angles(0, math.rad(15), 0), model, "ShoeL")
-	AB.block(Vector3.new(0.4, 0.42, 0.5), SHOE_B, AB.offset(originCF, -0.35, 0.2, 0.15) * CFrame.Angles(0, math.rad(15), 0), model, "ShoeLSaddle")
-	AB.block(Vector3.new(0.7, 0.4, 1), SWEATER, AB.offset(originCF,  0.45, 0.2, 0.25) * CFrame.Angles(0, math.rad(-15), 0), model, "ShoeR")
-	AB.block(Vector3.new(0.4, 0.42, 0.5), SHOE_B, AB.offset(originCF, 0.45, 0.2, 0.25) * CFrame.Angles(0, math.rad(-15), 0), model, "ShoeRSaddle")
-	-- White ankle socks (visible above shoes)
-	AB.cylinder(0.7, 0.4, SOCK, AB.offset(originCF, -0.35, 0.6, 0.15), model, "SockL")
-	AB.cylinder(0.7, 0.4, SOCK, AB.offset(originCF,  0.45, 0.6, 0.25), model, "SockR")
-	-- Legs (skin)
-	AB.block(Vector3.new(0.55, 1.8, 0.55), SKIN, AB.offset(originCF, -0.35, 1.7, 0), model, "LegL")
-	AB.block(Vector3.new(0.55, 1.8, 0.55), SKIN, AB.offset(originCF,  0.45, 1.7, 0), model, "LegR")
-
-	-- Skirt (flaring out — wider at bottom)
-	AB.cylinder(3, 1.5, SKIRT, AB.offset(originCF, 0, 3.5, 0), model, "SkirtBot")
-	AB.cylinder(2, 1, SKIRT, AB.offset(originCF, 0, 4.5, 0), model, "SkirtTop")
-	-- Poodle applique (a small white poof on the skirt)
-	AB.sphere(0.6, SWEATER, AB.offset(originCF, 0.4, 3.2, 1.5), model, "PoodleBody")
-	AB.sphere(0.3, SWEATER, AB.offset(originCF, 0.8, 3.4, 1.5), model, "PoodleHead")
-	-- Poodle ears + tail
-	AB.sphere(0.15, SWEATER, AB.offset(originCF, 0.9, 3.6, 1.4), model, "PoodleEar")
-	AB.sphere(0.2, SWEATER, AB.offset(originCF, 0.0, 3.3, 1.5), model, "PoodleTail")
-	-- Leash (pink line connecting collar to skirt waist)
-	AB.block(Vector3.new(0.05, 0.5, 0.05), PINK, AB.offset(originCF, 0.5, 3.9, 1.4) * CFrame.Angles(0, 0, math.rad(45)), model, "PoodleLeash")
-
-	-- Torso (sweater)
-	local torso = AB.block(Vector3.new(1.7, 2, 0.9), SWEATER, AB.offset(originCF, 0, 5.6, 0), model, "Torso")
-	-- Letter "C" (varsity sweater)
-	local letter = AB.block(Vector3.new(0.6, 0.6, 0.1), TEAL, AB.offset(originCF, 0, 5.8, 0.5), model, "VarsityC")
-	AB.billboard(letter, "C", Vector2.new(40, 40), 0)
-	-- Neckline (pink trim)
-	AB.block(Vector3.new(1.4, 0.15, 0.95), PINK, AB.offset(originCF, 0, 6.5, 0), model, "NeckTrim")
-	-- Cuffs (pink trim on sleeves)
-	AB.block(Vector3.new(0.6, 0.15, 0.6), PINK, AB.offset(originCF, -1.15, 4.7, 0), model, "CuffL")
-	AB.block(Vector3.new(0.6, 0.15, 0.6), PINK, AB.offset(originCF,  1.15, 4.7, 0), model, "CuffR")
-
-	-- Arms (mid-twirl: one up, one out)
-	AB.block(Vector3.new(0.55, 1.8, 0.55), SWEATER, AB.offset(originCF, -1.4, 6, 0) * CFrame.Angles(0, 0, math.rad(35)), model, "ArmL")
-	AB.block(Vector3.new(0.55, 1.8, 0.55), SWEATER, AB.offset(originCF,  1.4, 5.4, 0) * CFrame.Angles(0, 0, math.rad(-50)), model, "ArmR")
-	AB.sphere(0.5, SKIN, AB.offset(originCF, -1.9, 6.9, 0), model, "HandL")
-	AB.sphere(0.5, SKIN, AB.offset(originCF, 2.2, 4.7, 0), model, "HandR")
-
-	-- Head
-	AB.sphere(1.3, SKIN, AB.offset(originCF, 0, 7.4, 0), model, "Head")
-	-- Auburn ponytail (long sphere stack flying behind)
-	AB.sphere(0.6, HAIR_AU, AB.offset(originCF, 0, 8, -0.5), model, "PonytailHi")
-	AB.sphere(0.7, HAIR_AU, AB.offset(originCF, -0.2, 7.3, -1.4), model, "Ponytail1")
-	AB.sphere(0.6, HAIR_AU, AB.offset(originCF, -0.4, 6.6, -2), model, "Ponytail2")
-	AB.sphere(0.5, HAIR_AU, AB.offset(originCF, -0.5, 6.0, -2.6), model, "Ponytail3")
-	-- Ponytail ribbon (pink)
-	AB.block(Vector3.new(0.6, 0.3, 0.6), PINK, AB.offset(originCF, 0, 8.1, -0.5), model, "Ribbon")
-	-- Hair on top
-	AB.block(Vector3.new(1.4, 0.5, 0.3), HAIR_AU, AB.offset(originCF, 0, 8, 0.4), model, "HairFront")
-
-	-- Eyes
-	AB.sphere(0.15, DARK, AB.offset(originCF, -0.3, 7.5, 0.6), model, "EyeL")
-	AB.sphere(0.15, DARK, AB.offset(originCF,  0.3, 7.5, 0.6), model, "EyeR")
-	-- Smile
-	AB.block(Vector3.new(0.5, 0.1, 0.08), PINK, AB.offset(originCF, 0, 7.0, 0.65), model, "Smile")
-
-	AB.billboard(torso, "JukeboxDancer", Vector2.new(220, 36), 4)
-
-	AB.pivot(model, torso)
-	AB.weldAll(model)
-	return model
+	local rig = AB.r15Rig(parent, originCF * CFrame.new(0, -3, 0), NAME, {
+		skin  = SKIN,
+		shirt = SWEATER,
+		pants = SKIN,  -- bare legs (skirt covers most)
+	})
+	local hrp = rig:FindFirstChild("HumanoidRootPart") :: BasePart
+	if hrp then
+		-- Flaring pink poodle skirt
+		weldTo(rig, hrp, "SkirtBot",   Vector3.new(3.0, 1.5, 3.0), SKIRT, CFrame.new(0, -2.0, 0), Enum.PartType.Cylinder)
+		weldTo(rig, hrp, "SkirtTop",   Vector3.new(2.0, 1.0, 2.0), SKIRT, CFrame.new(0, -1.0, 0), Enum.PartType.Cylinder)
+		-- Poodle applique on skirt
+		weldTo(rig, hrp, "PoodleBody", Vector3.new(0.6, 0.6, 0.6), SWEATER, CFrame.new(0.4, -2.3, 1.5), Enum.PartType.Ball)
+		weldTo(rig, hrp, "PoodleHead", Vector3.new(0.3, 0.3, 0.3), SWEATER, CFrame.new(0.8, -2.0, 1.5), Enum.PartType.Ball)
+		weldTo(rig, hrp, "PoodleEar",  Vector3.new(0.15, 0.15, 0.15), SWEATER, CFrame.new(0.9, -1.8, 1.4), Enum.PartType.Ball)
+		weldTo(rig, hrp, "PoodleTail", Vector3.new(0.2, 0.2, 0.2), SWEATER, CFrame.new(0.0, -2.1, 1.5), Enum.PartType.Ball)
+		-- Pink leash
+		weldTo(rig, hrp, "PoodleLeash", Vector3.new(0.05, 0.5, 0.05), PINK, CFrame.new(0.5, -1.5, 1.4) * CFrame.Angles(0, 0, math.rad(45)))
+		-- Varsity "C" letter
+		local letter = weldTo(rig, hrp, "VarsityC", Vector3.new(0.6, 0.6, 0.1), TEAL, CFrame.new(0, 0.2, 0.55))
+		AB.billboard(letter, "C", Vector2.new(40, 40), 0)
+		-- Neckline pink trim
+		weldTo(rig, hrp, "NeckTrim",   Vector3.new(1.4, 0.15, 0.95), PINK, CFrame.new(0, 1.1, 0))
+	end
+	local head = rig:FindFirstChild("Head") :: BasePart
+	if head then
+		-- Long auburn ponytail trailing back
+		weldTo(rig, head, "PonytailHi", Vector3.new(0.6, 0.6, 0.6), HAIR_AU, CFrame.new(0, 0.6, -0.5), Enum.PartType.Ball)
+		weldTo(rig, head, "Ponytail1",  Vector3.new(0.7, 0.7, 0.7), HAIR_AU, CFrame.new(-0.2, -0.1, -1.4), Enum.PartType.Ball)
+		weldTo(rig, head, "Ponytail2",  Vector3.new(0.6, 0.6, 0.6), HAIR_AU, CFrame.new(-0.4, -0.8, -2.0), Enum.PartType.Ball)
+		weldTo(rig, head, "Ponytail3",  Vector3.new(0.5, 0.5, 0.5), HAIR_AU, CFrame.new(-0.5, -1.4, -2.6), Enum.PartType.Ball)
+		-- Pink ribbon
+		weldTo(rig, head, "Ribbon",     Vector3.new(0.6, 0.3, 0.6), PINK, CFrame.new(0, 0.7, -0.5))
+		-- Hair top
+		weldTo(rig, head, "HairFront",  Vector3.new(1.4, 0.5, 0.3), HAIR_AU, CFrame.new(0, 0.6, 0.4))
+		-- Eyes + smile
+		weldTo(rig, head, "EyeL",       Vector3.new(0.15, 0.15, 0.15), DARK, CFrame.new(-0.3, 0.1, 0.5), Enum.PartType.Ball)
+		weldTo(rig, head, "EyeR",       Vector3.new(0.15, 0.15, 0.15), DARK, CFrame.new( 0.3, 0.1, 0.5), Enum.PartType.Ball)
+		weldTo(rig, head, "Smile",      Vector3.new(0.5, 0.1, 0.08), PINK, CFrame.new(0, -0.4, 0.55))
+	end
+	AB.r15NameTag(rig, "JukeboxDancer")
+	return rig
 end
