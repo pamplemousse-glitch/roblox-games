@@ -19,16 +19,16 @@ return {
 	{ module = "Assets.Districts.PizzaPlaza.Foods.PizzaSlice",                position = Vector3.new(-1090, 6,   0) },
 
 	-- Buildings (10 modules along the main street at z=100) ---------------
-	{ module = "Assets.Districts.PizzaPlaza.Buildings.TonysPizzeria",         position = Vector3.new(-1050, 0, 100), yaw = 0 },
-	{ module = "Assets.Districts.PizzaPlaza.Buildings.MammaCarmelasTrattoria",position = Vector3.new(-1000, 0, 100), yaw = 0 },
-	{ module = "Assets.Districts.PizzaPlaza.Buildings.VinnysSliceShop",       position = Vector3.new(-950, 0, 100), yaw = 0 },
-	{ module = "Assets.Districts.PizzaPlaza.Buildings.RomeosGelatoStand",     position = Vector3.new(-900, 0, 100), yaw = 0 },
-	{ module = "Assets.Districts.PizzaPlaza.Buildings.SalsCalzoneCart",       position = Vector3.new(-850, 0, 100), yaw = 0 },
-	{ module = "Assets.Districts.PizzaPlaza.Buildings.TenementWalkup",        position = Vector3.new(-800, 0, 100), yaw = 0 },
-	{ module = "Assets.Districts.PizzaPlaza.Buildings.BrickAlleyWall",        position = Vector3.new(-750, 0, 100), yaw = 0 },
-	{ module = "Assets.Districts.PizzaPlaza.Buildings.LaundryLineBuildings",  position = Vector3.new(-700, 0, 100), yaw = 0 },
-	{ module = "Assets.Districts.PizzaPlaza.Buildings.BocceCourt",            position = Vector3.new(-650, 0, 100), yaw = 0 },
-	{ module = "Assets.Districts.PizzaPlaza.Buildings.RistoranteSignWall",    position = Vector3.new(-600, 0, 100), yaw = 0 },
+	{ module = "Assets.Districts.PizzaPlaza.Buildings.TonysPizzeria",         position = Vector3.new(-1100, 0, 140), yaw = 0 },
+	{ module = "Assets.Districts.PizzaPlaza.Buildings.MammaCarmelasTrattoria",position = Vector3.new(-1040, 0, 140), yaw = 0 },
+	{ module = "Assets.Districts.PizzaPlaza.Buildings.VinnysSliceShop",       position = Vector3.new(-980, 0, 140), yaw = 0 },
+	{ module = "Assets.Districts.PizzaPlaza.Buildings.RomeosGelatoStand",     position = Vector3.new(-920, 0, 140), yaw = 0 },
+	{ module = "Assets.Districts.PizzaPlaza.Buildings.SalsCalzoneCart",       position = Vector3.new(-860, 0, 140), yaw = 0 },
+	{ module = "Assets.Districts.PizzaPlaza.Buildings.TenementWalkup",        position = Vector3.new(-1100, 0, 200), yaw = 0 },
+	{ module = "Assets.Districts.PizzaPlaza.Buildings.BrickAlleyWall",        position = Vector3.new(-1040, 0, 200), yaw = 0 },
+	{ module = "Assets.Districts.PizzaPlaza.Buildings.LaundryLineBuildings",  position = Vector3.new(-980, 0, 200), yaw = 0 },
+	{ module = "Assets.Districts.PizzaPlaza.Buildings.BocceCourt",            position = Vector3.new(-920, 0, 200), yaw = 0 },
+	{ module = "Assets.Districts.PizzaPlaza.Buildings.RistoranteSignWall",    position = Vector3.new(-860, 0, 200), yaw = 0 },
 
 	-- Props (24 entries on the sidewalk at z=60-80) ------------------------
 	-- Row j=0 (z=60)
@@ -99,9 +99,9 @@ return {
 	{ module = "Assets.Districts.PizzaPlaza.Decor.CandleHolderRow",           position = Vector3.new(-500, 0, 90) },
 
 	-- Landmarks (3 monumental anchors at z=130) ----------------------------
-	{ module = "Assets.Districts.PizzaPlaza.Landmarks.BaroqueArchEntry",      position = Vector3.new(-1000, 0, 130), yaw = 0 },
-	{ module = "Assets.Districts.PizzaPlaza.Landmarks.TreviFountain",         position = Vector3.new(-900, 0, 130), yaw = 0 },
-	{ module = "Assets.Districts.PizzaPlaza.Landmarks.GiantPizzaOven",        position = Vector3.new(-800, 0, 130), yaw = 0 },
+	{ module = "Assets.Districts.PizzaPlaza.Landmarks.BaroqueArchEntry",      position = Vector3.new(-1160, 0, 100), yaw = 0 },
+	{ module = "Assets.Districts.PizzaPlaza.Landmarks.TreviFountain",         position = Vector3.new(-980, 0, 55), yaw = 0 },
+	{ module = "Assets.Districts.PizzaPlaza.Landmarks.GiantPizzaOven",        position = Vector3.new(-800, 0, 55), yaw = 0 },
 
 	-- NPCs (12 pedestrians at z=30, 6 above ground) ------------------------
 	-- Named storefront owners
@@ -137,25 +137,25 @@ return {
 	-- DaikonRamen → SushiDaiko → IzakayaLantern, staggered in Z and canted
 	-- so the row reads as a winding alley rather than a straight strip.
 	-- TakoyakiCart and SakeBar tucked into side alleys, bad faces away.
-	{ module = "Assets.Districts.TokyoTown.Buildings.DaikonRamen",     position = Vector3.new(800, 0, 100), yaw = 180 },
-	{ module = "Assets.Districts.TokyoTown.Buildings.SushiDaiko",      position = Vector3.new(845, 0, 100), yaw =   180 },
-	{ module = "Assets.Districts.TokyoTown.Buildings.IzakayaLantern",  position = Vector3.new(895, 0, 100), yaw =  180 },
-	{ module = "Assets.Districts.TokyoTown.Buildings.SakeBar",         position = Vector3.new(948, 0, 132), yaw = -30 },  -- north-east alley
-	{ module = "Assets.Districts.TokyoTown.Buildings.TakoyakiCart",    position = Vector3.new(960, 0, 100), yaw = 180 },  -- south alley vendor
+	{ module = "Assets.Districts.TokyoTown.Buildings.DaikonRamen",     position = Vector3.new(800, 0, 140), yaw = 0 },
+	{ module = "Assets.Districts.TokyoTown.Buildings.SushiDaiko",      position = Vector3.new(860, 0, 140), yaw =   180 },
+	{ module = "Assets.Districts.TokyoTown.Buildings.IzakayaLantern",  position = Vector3.new(920, 0, 140), yaw =  180 },
+	{ module = "Assets.Districts.TokyoTown.Buildings.SakeBar",         position = Vector3.new(980, 0, 140), yaw = 0 },  -- north-east alley
+	{ module = "Assets.Districts.TokyoTown.Buildings.TakoyakiCart",    position = Vector3.new(1040, 0, 140), yaw = 0 },  -- south alley vendor
 
 	-- ─── Backdrop row (Z=140..150, masks the back of the heroes) ───────
-	{ module = "Assets.Districts.TokyoTown.Buildings.CapsuleHotel",        position = Vector3.new(815, 0, 148), yaw = 0 },
-	{ module = "Assets.Districts.TokyoTown.Buildings.VendingMachineWall",  position = Vector3.new(872, 0, 145), yaw = 180 },
-	{ module = "Assets.Districts.TokyoTown.Buildings.NarrowAlleyShops",    position = Vector3.new(920, 0, 150), yaw = 0 },
-	{ module = "Assets.Districts.TokyoTown.Buildings.SalarymanApartments", position = Vector3.new(985, 0, 145), yaw = 0 },
-	{ module = "Assets.Districts.TokyoTown.Buildings.LanternNoodleRow",    position = Vector3.new(998, 0, 122), yaw =  10 },
+	{ module = "Assets.Districts.TokyoTown.Buildings.CapsuleHotel",        position = Vector3.new(800, 0, 200), yaw = 0 },
+	{ module = "Assets.Districts.TokyoTown.Buildings.VendingMachineWall",  position = Vector3.new(860, 0, 200), yaw = 0 },
+	{ module = "Assets.Districts.TokyoTown.Buildings.NarrowAlleyShops",    position = Vector3.new(920, 0, 200), yaw = 0 },
+	{ module = "Assets.Districts.TokyoTown.Buildings.SalarymanApartments", position = Vector3.new(980, 0, 200), yaw = 0 },
+	{ module = "Assets.Districts.TokyoTown.Buildings.LanternNoodleRow",    position = Vector3.new(1040, 0, 200), yaw =  10 },
 
 	-- ─── Landmarks ─────────────────────────────────────────────────────
 	-- Torii is the WEST entry gate; Maneki-neko anchors the PLAZA at Z=85;
 	-- Pagoda is the EAST landmark visible down the winding street.
-	{ module = "Assets.Districts.TokyoTown.Landmarks.ShintoTorii",     position = Vector3.new(790, 0,  82), yaw = 90 },
-	{ module = "Assets.Districts.TokyoTown.Landmarks.GiantManekiNeko", position = Vector3.new(875, 0,  85), yaw =  0 },
-	{ module = "Assets.Districts.TokyoTown.Landmarks.MiniPagodaTower", position = Vector3.new(1018, 0,  95), yaw =  0 },
+	{ module = "Assets.Districts.TokyoTown.Landmarks.ShintoTorii",     position = Vector3.new(740, 0, 100), yaw = 0 },
+	{ module = "Assets.Districts.TokyoTown.Landmarks.GiantManekiNeko", position = Vector3.new(920, 0, 55), yaw =  0 },
+	{ module = "Assets.Districts.TokyoTown.Landmarks.MiniPagodaTower", position = Vector3.new(1100, 0, 55), yaw =  0 },
 
 	-- ─── NPCs ──────────────────────────────────────────────────────────
 	-- Named locals: 4 along the winding street (Z 95..115)
@@ -236,11 +236,6 @@ return {
 	{ module = "Assets.Districts.DonutDynasty.Foods.Beignet",      position = Vector3.new(740, 6, 0) },
 	{ module = "Assets.Districts.DonutDynasty.Foods.CinnamonRoll", position = Vector3.new(750, 6, 0) },
 
-	{ module = "Assets.Districts.DonutDynasty.Buildings.DonutShop",        position = Vector3.new(700, 0, 100), yaw = 0 },
-	{ module = "Assets.Districts.DonutDynasty.Buildings.GlazeFountain",    position = Vector3.new(750, 0, 100), yaw = 0 },
-	{ module = "Assets.Districts.DonutDynasty.Buildings.CoffeeKiosk",      position = Vector3.new(800, 0, 100), yaw = 0 },
-	{ module = "Assets.Districts.DonutDynasty.Buildings.BakeryArchEntry",  position = Vector3.new(680, 0,  60), yaw = 0 },
-	{ module = "Assets.Districts.DonutDynasty.Buildings.SugarSiloTower",   position = Vector3.new(850, 0, 100), yaw = 0 },
 
 	{ module = "Assets.Districts.DonutDynasty.Npcs.Marie",    position = Vector3.new(720, 6, 30) },
 	{ module = "Assets.Districts.DonutDynasty.Npcs.Bernard",  position = Vector3.new(740, 6, 30) },
@@ -261,24 +256,24 @@ return {
 	{ module = "Assets.Districts.BurgerBoulevard.Foods.Milkshake",            position = Vector3.new(1650, 6, 0) },
 
 	-- Hero buildings (i=1..5 → x = 2800 + 50i along Z=100)
-	{ module = "Assets.Districts.BurgerBoulevard.Buildings.SmashvilleDriveIn", position = Vector3.new(1650, 0, 100), yaw = 0 },
-	{ module = "Assets.Districts.BurgerBoulevard.Buildings.BigBeefDiner",      position = Vector3.new(1700, 0, 100), yaw = 0 },
-	{ module = "Assets.Districts.BurgerBoulevard.Buildings.SliderStop",        position = Vector3.new(1750, 0, 100), yaw = 0 },
-	{ module = "Assets.Districts.BurgerBoulevard.Buildings.ChickenwichExpress", position = Vector3.new(1800, 0, 100), yaw = 0 },
-	{ module = "Assets.Districts.BurgerBoulevard.Buildings.CoolShakeMixer",    position = Vector3.new(1850, 0, 100), yaw = 0 },
+	{ module = "Assets.Districts.BurgerBoulevard.Buildings.SmashvilleDriveIn", position = Vector3.new(1650, 0, 140), yaw = 0 },
+	{ module = "Assets.Districts.BurgerBoulevard.Buildings.BigBeefDiner",      position = Vector3.new(1710, 0, 140), yaw = 0 },
+	{ module = "Assets.Districts.BurgerBoulevard.Buildings.SliderStop",        position = Vector3.new(1770, 0, 140), yaw = 0 },
+	{ module = "Assets.Districts.BurgerBoulevard.Buildings.ChickenwichExpress", position = Vector3.new(1830, 0, 140), yaw = 0 },
+	{ module = "Assets.Districts.BurgerBoulevard.Buildings.CoolShakeMixer",    position = Vector3.new(1890, 0, 140), yaw = 0 },
 
 	-- Backdrop buildings (i=6..10 → x = 2800 + 50i along Z=160, set back behind heroes)
-	{ module = "Assets.Districts.BurgerBoulevard.Buildings.DriveInMovieWall",  position = Vector3.new(1900, 0, 160), yaw = 0 },
-	{ module = "Assets.Districts.BurgerBoulevard.Buildings.VintageGasStation", position = Vector3.new(1625, 0, 160), yaw = 0 },
-	{ module = "Assets.Districts.BurgerBoulevard.Buildings.NeonMotel",         position = Vector3.new(1725, 0, 200), yaw = 0 },
-	{ module = "Assets.Districts.BurgerBoulevard.Buildings.AutoGarage",        position = Vector3.new(1850, 0, 200), yaw = 0 },
-	{ module = "Assets.Districts.BurgerBoulevard.Buildings.SuburbanHouses",    position = Vector3.new(1650, 0, 240), yaw = 0 },
+	{ module = "Assets.Districts.BurgerBoulevard.Buildings.DriveInMovieWall",  position = Vector3.new(1830, 0, 200), yaw = 0 },
+	{ module = "Assets.Districts.BurgerBoulevard.Buildings.VintageGasStation", position = Vector3.new(1650, 0, 200), yaw = 0 },
+	{ module = "Assets.Districts.BurgerBoulevard.Buildings.NeonMotel",         position = Vector3.new(1710, 0, 200), yaw = 0 },
+	{ module = "Assets.Districts.BurgerBoulevard.Buildings.AutoGarage",        position = Vector3.new(1770, 0, 200), yaw = 0 },
+	{ module = "Assets.Districts.BurgerBoulevard.Buildings.SuburbanHouses",    position = Vector3.new(1890, 0, 200), yaw = 0 },
 
 	-- Landmarks (i=1..4 → x = 2800 + 25 + (i-1)*70 along Z=130)
-	{ module = "Assets.Districts.BurgerBoulevard.Landmarks.GiantBurgerTower",  position = Vector3.new(1625, 0, 130), yaw = 0 },
-	{ module = "Assets.Districts.BurgerBoulevard.Landmarks.FiftiesNeonArch",   position = Vector3.new(1580, 0,  40), yaw = 0 },
-	{ module = "Assets.Districts.BurgerBoulevard.Landmarks.DriveInMarquee",    position = Vector3.new(1920, 0, 130), yaw = 0 },
-	{ module = "Assets.Districts.BurgerBoulevard.Landmarks.MilkshakeWaterTower", position = Vector3.new(1800, 0, 280), yaw = 0 },
+	{ module = "Assets.Districts.BurgerBoulevard.Landmarks.GiantBurgerTower",  position = Vector3.new(1770, 0, 55), yaw = 0 },
+	{ module = "Assets.Districts.BurgerBoulevard.Landmarks.FiftiesNeonArch",   position = Vector3.new(1590, 0, 100), yaw = 0 },
+	{ module = "Assets.Districts.BurgerBoulevard.Landmarks.DriveInMarquee",    position = Vector3.new(1950, 0, 55), yaw = 0 },
+	{ module = "Assets.Districts.BurgerBoulevard.Landmarks.MilkshakeWaterTower", position = Vector3.new(1830, 0, 280), yaw = 0 },
 
 	-- Props (mostly along curbs at Z=70..90, grid)
 	{ module = "Assets.Districts.BurgerBoulevard.Props.VintageCadillacRed",   position = Vector3.new(1660, 1, 70), yaw = 0 },
@@ -373,24 +368,24 @@ return {
 	{ module = "Assets.Districts.BbqHoller.Foods.MacAndCheese", position = Vector3.new(2050, 6, 0) },
 
 	-- Hero buildings (main street, Z=100)
-	{ module = "Assets.Districts.BbqHoller.Buildings.SmokehouseSmokyJoes", position = Vector3.new(2000, 0, 100), yaw = 0 },
-	{ module = "Assets.Districts.BbqHoller.Buildings.RibShack",            position = Vector3.new(2060, 0, 100), yaw = 0 },
-	{ module = "Assets.Districts.BbqHoller.Buildings.PulledPorkPit",       position = Vector3.new(2120, 0, 100), yaw = 0 },
-	{ module = "Assets.Districts.BbqHoller.Buildings.BrisketBarn",         position = Vector3.new(2180, 0, 100), yaw = 0 },
-	{ module = "Assets.Districts.BbqHoller.Buildings.PitBossBBQTruck",     position = Vector3.new(2240, 0,  95), yaw = 15 },
+	{ module = "Assets.Districts.BbqHoller.Buildings.SmokehouseSmokyJoes", position = Vector3.new(2000, 0, 140), yaw = 0 },
+	{ module = "Assets.Districts.BbqHoller.Buildings.RibShack",            position = Vector3.new(2060, 0, 140), yaw = 0 },
+	{ module = "Assets.Districts.BbqHoller.Buildings.PulledPorkPit",       position = Vector3.new(2120, 0, 140), yaw = 0 },
+	{ module = "Assets.Districts.BbqHoller.Buildings.BrisketBarn",         position = Vector3.new(2180, 0, 140), yaw = 0 },
+	{ module = "Assets.Districts.BbqHoller.Buildings.PitBossBBQTruck",     position = Vector3.new(2240, 0, 140), yaw = 0 },
 
 	-- Backdrop buildings (back row, Z=175)
-	{ module = "Assets.Districts.BbqHoller.Buildings.WeatheredFarmhouse", position = Vector3.new(1990, 0, 175), yaw = 0 },
-	{ module = "Assets.Districts.BbqHoller.Buildings.RustedShed",        position = Vector3.new(2050, 0, 175), yaw = -10 },
-	{ module = "Assets.Districts.BbqHoller.Buildings.HayBarn",           position = Vector3.new(2120, 0, 185), yaw = 0 },
-	{ module = "Assets.Districts.BbqHoller.Buildings.LogCabin",          position = Vector3.new(2200, 0, 170), yaw = 8 },
-	{ module = "Assets.Districts.BbqHoller.Buildings.WaterTower",        position = Vector3.new(2270, 0, 195), yaw = 0 },
+	{ module = "Assets.Districts.BbqHoller.Buildings.WeatheredFarmhouse", position = Vector3.new(2000, 0, 200), yaw = 0 },
+	{ module = "Assets.Districts.BbqHoller.Buildings.RustedShed",        position = Vector3.new(2060, 0, 200), yaw = 0 },
+	{ module = "Assets.Districts.BbqHoller.Buildings.HayBarn",           position = Vector3.new(2120, 0, 200), yaw = 0 },
+	{ module = "Assets.Districts.BbqHoller.Buildings.LogCabin",          position = Vector3.new(2180, 0, 200), yaw = 0 },
+	{ module = "Assets.Districts.BbqHoller.Buildings.WaterTower",        position = Vector3.new(2240, 0, 200), yaw = 0 },
 
 	-- Landmarks (anchor points around the district)
-	{ module = "Assets.Districts.BbqHoller.Landmarks.BarnLandmark",       position = Vector3.new(1950, 0, 160), yaw = 25 },
-	{ module = "Assets.Districts.BbqHoller.Landmarks.GiantPigStatue",     position = Vector3.new(2100, 0,  70), yaw = -20 },
-	{ module = "Assets.Districts.BbqHoller.Landmarks.SmokerChimneyTower", position = Vector3.new(2280, 0, 130), yaw = 0 },
-	{ module = "Assets.Districts.BbqHoller.Landmarks.HayBalePyramid",     position = Vector3.new(1970, 0, 120), yaw = 0 },
+	{ module = "Assets.Districts.BbqHoller.Landmarks.BarnLandmark",       position = Vector3.new(1940, 0, 100), yaw = 0 },
+	{ module = "Assets.Districts.BbqHoller.Landmarks.GiantPigStatue",     position = Vector3.new(2120, 0, 55), yaw = 0 },
+	{ module = "Assets.Districts.BbqHoller.Landmarks.SmokerChimneyTower", position = Vector3.new(2300, 0, 55), yaw = 0 },
+	{ module = "Assets.Districts.BbqHoller.Landmarks.HayBalePyramid",     position = Vector3.new(2120, 0, 10), yaw = 0 },
 
 	-- Props (scattered around buildings)
 	{ module = "Assets.Districts.BbqHoller.Props.SmokerBarrel", position = Vector3.new(2005, 0,  78), yaw = 10 },
@@ -445,11 +440,6 @@ return {
 	{ module = "Assets.Districts.MercadoDelSol.Foods.Tamale",     position = Vector3.new(1340, 6, 0) },
 	{ module = "Assets.Districts.MercadoDelSol.Foods.Elote",      position = Vector3.new(1350, 6, 0) },
 
-	{ module = "Assets.Districts.MercadoDelSol.Buildings.TaqueriaStall",      position = Vector3.new(1300, 0, 100), yaw = 0 },
-	{ module = "Assets.Districts.MercadoDelSol.Buildings.MercadoCanopy",      position = Vector3.new(1350, 0, 100), yaw = 0 },
-	{ module = "Assets.Districts.MercadoDelSol.Buildings.SalsaCart",          position = Vector3.new(1400, 0, 100), yaw = 0 },
-	{ module = "Assets.Districts.MercadoDelSol.Buildings.CathedralArchEntry", position = Vector3.new(1280, 0,  60), yaw = 0 },
-	{ module = "Assets.Districts.MercadoDelSol.Buildings.PinataTower",        position = Vector3.new(1450, 0, 100), yaw = 0 },
 
 	{ module = "Assets.Districts.MercadoDelSol.Npcs.DonPepe",  position = Vector3.new(1320, 6, 30) },
 	{ module = "Assets.Districts.MercadoDelSol.Npcs.Lucia",    position = Vector3.new(1340, 6, 30) },
@@ -463,24 +453,24 @@ return {
 	-- ============================================================
 
 	-- Hero buildings — main street row at Z = 100, spaced 50 studs
-	{ module = "Assets.Districts.DonutDynasty.V2.Buildings.LeGlacePastry",       position = Vector3.new(1180, 0, 100), yaw = 0 },
-	{ module = "Assets.Districts.DonutDynasty.V2.Buildings.SweetheartDonuts",    position = Vector3.new(1230, 0, 100), yaw = 0 },
-	{ module = "Assets.Districts.DonutDynasty.V2.Buildings.BeignetBayou",        position = Vector3.new(1280, 0, 100), yaw = 0 },
-	{ module = "Assets.Districts.DonutDynasty.V2.Buildings.CinnamonSpiralRollCo",position = Vector3.new(1330, 0, 100), yaw = 0 },
-	{ module = "Assets.Districts.DonutDynasty.V2.Buildings.CocoaAndCake",        position = Vector3.new(1380, 0, 100), yaw = 0 },
+	{ module = "Assets.Districts.DonutDynasty.V2.Buildings.LeGlacePastry",       position = Vector3.new(1180, 0, 140), yaw = 0 },
+	{ module = "Assets.Districts.DonutDynasty.V2.Buildings.SweetheartDonuts",    position = Vector3.new(1240, 0, 140), yaw = 0 },
+	{ module = "Assets.Districts.DonutDynasty.V2.Buildings.BeignetBayou",        position = Vector3.new(1300, 0, 140), yaw = 0 },
+	{ module = "Assets.Districts.DonutDynasty.V2.Buildings.CinnamonSpiralRollCo",position = Vector3.new(1360, 0, 140), yaw = 0 },
+	{ module = "Assets.Districts.DonutDynasty.V2.Buildings.CocoaAndCake",        position = Vector3.new(1420, 0, 140), yaw = 0 },
 
 	-- Backdrop buildings — further back, Z = 160-200
-	{ module = "Assets.Districts.DonutDynasty.V2.Buildings.PinkTownhouses",       position = Vector3.new(1200, 0, 180), yaw = 0 },
-	{ module = "Assets.Districts.DonutDynasty.V2.Buildings.SugarCrustedApartments", position = Vector3.new(1300, 0, 200), yaw = 0 },
-	{ module = "Assets.Districts.DonutDynasty.V2.Buildings.GingerbreadStorefronts", position = Vector3.new(1370, 0, 180), yaw = 0 },
-	{ module = "Assets.Districts.DonutDynasty.V2.Buildings.CandyCaneLampRow",     position = Vector3.new(1280, 0,  75), yaw = 0 },
+	{ module = "Assets.Districts.DonutDynasty.V2.Buildings.PinkTownhouses",       position = Vector3.new(1210, 0, 200), yaw = 0 },
+	{ module = "Assets.Districts.DonutDynasty.V2.Buildings.SugarCrustedApartments", position = Vector3.new(1310, 0, 200), yaw = 0 },
+	{ module = "Assets.Districts.DonutDynasty.V2.Buildings.GingerbreadStorefronts", position = Vector3.new(1410, 0, 200), yaw = 0 },
+	{ module = "Assets.Districts.DonutDynasty.V2.Buildings.CandyCaneLampRow",     position = Vector3.new(1300, 0, 235), yaw = 0 },
 
 	-- Landmarks
-	{ module = "Assets.Districts.DonutDynasty.V2.Landmarks.GiantDonutTower",      position = Vector3.new(1280, 0,  20), yaw = 0 },
-	{ module = "Assets.Districts.DonutDynasty.V2.Landmarks.CandyCaneArchway",     position = Vector3.new(1180, 0,  60), yaw = 0 },
-	{ module = "Assets.Districts.DonutDynasty.V2.Landmarks.SugarSpireCastle",     position = Vector3.new(1430, 0, 220), yaw = 0 },
+	{ module = "Assets.Districts.DonutDynasty.V2.Landmarks.GiantDonutTower",      position = Vector3.new(1240, 0, 55), yaw = 0 },
+	{ module = "Assets.Districts.DonutDynasty.V2.Landmarks.CandyCaneArchway",     position = Vector3.new(1120, 0, 100), yaw = 0 },
+	{ module = "Assets.Districts.DonutDynasty.V2.Landmarks.SugarSpireCastle",     position = Vector3.new(1300, 0, 280), yaw = 0 },
 	-- Keep v1 GlazeFountain (per spec) — reference v1 module at v2 position
-	{ module = "Assets.Districts.DonutDynasty.Buildings.GlazeFountain",            position = Vector3.new(1250, 0,  45), yaw = 0 },
+	{ module = "Assets.Districts.DonutDynasty.Buildings.GlazeFountain",            position = Vector3.new(1420, 0, 55), yaw = 0 },
 
 	-- Props: CandyCoatedBench (x4) — flanking sidewalks
 	{ module = "Assets.Districts.DonutDynasty.V2.Props.CandyCoatedBench", position = Vector3.new(1195, 2, 85),  yaw = 0 },
@@ -557,16 +547,16 @@ return {
 	-- ============================================================
 
 	-- ── V2 Buildings (4200 + 50*i, 0, 100) ──
-	{ module = "Assets.Districts.MercadoDelSol.Buildings.TaqueriaElSol",        position = Vector3.new(2450, 0, 100), yaw = 0 },
-	{ module = "Assets.Districts.MercadoDelSol.Buildings.BurritoCasa",          position = Vector3.new(2500, 0, 100), yaw = 0 },
-	{ module = "Assets.Districts.MercadoDelSol.Buildings.QuesadillaStand",      position = Vector3.new(2550, 0, 100), yaw = 0 },
-	{ module = "Assets.Districts.MercadoDelSol.Buildings.TamaleTia",            position = Vector3.new(2600, 0, 100), yaw = 0 },
-	{ module = "Assets.Districts.MercadoDelSol.Buildings.EloteTruck",           position = Vector3.new(2650, 0, 100), yaw = 0 },
-	{ module = "Assets.Districts.MercadoDelSol.Buildings.TerracottaHacienda",   position = Vector3.new(2700, 0, 100), yaw = 0 },
-	{ module = "Assets.Districts.MercadoDelSol.Buildings.CantinaStainedGlass",  position = Vector3.new(2750, 0, 100), yaw = 0 },
-	{ module = "Assets.Districts.MercadoDelSol.Buildings.PinkGreenStuccoShops", position = Vector3.new(2800, 0, 100), yaw = 0 },
-	{ module = "Assets.Districts.MercadoDelSol.Buildings.FountainCourtyard",    position = Vector3.new(2850, 0, 100), yaw = 0 },
-	{ module = "Assets.Districts.MercadoDelSol.Buildings.BellTower",            position = Vector3.new(2900, 0, 100), yaw = 0 },
+	{ module = "Assets.Districts.MercadoDelSol.Buildings.TaqueriaElSol",        position = Vector3.new(2450, 0, 140), yaw = 0 },
+	{ module = "Assets.Districts.MercadoDelSol.Buildings.BurritoCasa",          position = Vector3.new(2510, 0, 140), yaw = 0 },
+	{ module = "Assets.Districts.MercadoDelSol.Buildings.QuesadillaStand",      position = Vector3.new(2570, 0, 140), yaw = 0 },
+	{ module = "Assets.Districts.MercadoDelSol.Buildings.TamaleTia",            position = Vector3.new(2630, 0, 140), yaw = 0 },
+	{ module = "Assets.Districts.MercadoDelSol.Buildings.EloteTruck",           position = Vector3.new(2690, 0, 140), yaw = 0 },
+	{ module = "Assets.Districts.MercadoDelSol.Buildings.TerracottaHacienda",   position = Vector3.new(2450, 0, 200), yaw = 0 },
+	{ module = "Assets.Districts.MercadoDelSol.Buildings.CantinaStainedGlass",  position = Vector3.new(2510, 0, 200), yaw = 0 },
+	{ module = "Assets.Districts.MercadoDelSol.Buildings.PinkGreenStuccoShops", position = Vector3.new(2570, 0, 200), yaw = 0 },
+	{ module = "Assets.Districts.MercadoDelSol.Buildings.FountainCourtyard",    position = Vector3.new(2630, 0, 200), yaw = 0 },
+	{ module = "Assets.Districts.MercadoDelSol.Buildings.BellTower",            position = Vector3.new(2690, 0, 200), yaw = 0 },
 
 	-- ── V2 Props row 1 (4200 + 15*i, 0, 60) ──
 	{ module = "Assets.Districts.MercadoDelSol.Props.PapelPicadoBanner",  position = Vector3.new(2415, 0, 60) },
@@ -629,10 +619,10 @@ return {
 	{ module = "Assets.Districts.MercadoDelSol.Decor.PaintedTileWall",    position = Vector3.new(2500, 12, 90) },
 
 	-- ── V2 Landmarks (4200 + 100*i, 0, 130) ──
-	{ module = "Assets.Districts.MercadoDelSol.Buildings.PinataTower",         position = Vector3.new(2500, 0, 130), yaw = 0 },
-	{ module = "Assets.Districts.MercadoDelSol.Buildings.CathedralArchEntry",  position = Vector3.new(2600, 0, 130), yaw = 0 },
-	{ module = "Assets.Districts.MercadoDelSol.Landmarks.MariachiBandstand",   position = Vector3.new(2700, 0, 130), yaw = 0 },
-	{ module = "Assets.Districts.MercadoDelSol.Landmarks.GiantCactusSculpture", position = Vector3.new(2800, 0, 130), yaw = 0 },
+	{ module = "Assets.Districts.MercadoDelSol.Buildings.PinataTower",         position = Vector3.new(2750, 0, 55), yaw = 0 },
+	{ module = "Assets.Districts.MercadoDelSol.Buildings.CathedralArchEntry",  position = Vector3.new(2390, 0, 100), yaw = 0 },
+	{ module = "Assets.Districts.MercadoDelSol.Landmarks.MariachiBandstand",   position = Vector3.new(2510, 0, 55), yaw = 0 },
+	{ module = "Assets.Districts.MercadoDelSol.Landmarks.GiantCactusSculpture", position = Vector3.new(2630, 0, 55), yaw = 0 },
 
 	-- ── V2 NPCs (4200 + 20*i, 6, 30) — 11 figures: 4 named + 7 pedestrians ──
 	{ module = "Assets.Districts.MercadoDelSol.Npcs.DonPepe",            position = Vector3.new(2420, 6, 30) },
