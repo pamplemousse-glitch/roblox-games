@@ -115,6 +115,72 @@ function AssetSpawner.init()
 	else
 		warn("[AssetSpawner] manifest iteration crashed: " .. tostring(total))
 	end
+
+	-- ── Footprint audit ─────────────────────────────────────────────────────
+	-- After every asset is spawned, compute each top-level Model's XZ AABB and
+	-- warn about any pair whose AABBs intersect. Anchored colliding overlapping
+	-- parts are the root cause of the building-shake bug: Roblox's physics
+	-- solver tries to push them apart every frame. Catching them at startup
+	-- means future layout drift fails loudly instead of silently.
+	local OVERLAP_PAD = -0.5  -- negative pad: only flag genuine penetration, not edge-touching
+	local Y_TOL       = 5     -- Y bands only flagged if they're roughly co-extensive
+	local audited     = 0
+	local overlaps    = {}
+	local function modelAabb(m: Model): ({min: Vector3, max: Vector3}?)
+		local minV: Vector3? = nil
+		local maxV: Vector3? = nil
+		for _, d in ipairs(m:GetDescendants()) do
+			if not d:IsA("BasePart") then continue end
+			if not d.Anchored then continue end
+			if not d.CanCollide then continue end
+			local cf, sz = d.CFrame, d.Size
+			-- Conservative AABB: largest extent in any rotation is the half-size sum
+			local hx = math.abs(sz.X) * 0.5 + math.abs(sz.Y) * 0.5 + math.abs(sz.Z) * 0.5
+			local hy = hx
+			local hz = hx
+			local lo = cf.Position - Vector3.new(hx, hy, hz)
+			local hi = cf.Position + Vector3.new(hx, hy, hz)
+			if not minV then minV, maxV = lo, hi
+			else
+				minV = Vector3.new(math.min(minV.X, lo.X), math.min(minV.Y, lo.Y), math.min(minV.Z, lo.Z))
+				maxV = Vector3.new(math.max(maxV.X, hi.X), math.max(maxV.Y, hi.Y), math.max(maxV.Z, hi.Z))
+			end
+		end
+		if not minV then return nil end
+		return { min = minV, max = maxV }
+	end
+
+	local boxes: { [string]: any } = {}
+	for _, child in ipairs(districtsFolder:GetChildren()) do
+		if not child:IsA("Model") then continue end
+		local b = modelAabb(child)
+		if not b then continue end
+		boxes[child.Name] = b
+	end
+	for nameA, a in boxes do
+		for nameB, b in boxes do
+			if nameA >= nameB then continue end  -- each pair once
+			-- XZ AABB overlap, Y co-extent check
+			local xover = math.min(a.max.X, b.max.X) - math.max(a.min.X, b.min.X)
+			local zover = math.min(a.max.Z, b.max.Z) - math.max(a.min.Z, b.min.Z)
+			local yover = math.min(a.max.Y, b.max.Y) - math.max(a.min.Y, b.min.Y)
+			if xover > OVERLAP_PAD and zover > OVERLAP_PAD and yover > Y_TOL then
+				audited += 1
+				table.insert(overlaps, string.format("%s ↔ %s (overlap XZ=%.1fx%.1f)", nameA, nameB, xover, zover))
+			end
+		end
+	end
+	if #overlaps > 0 then
+		warn(string.format("[AssetSpawner] %d AABB overlap pair(s) detected:", #overlaps))
+		for i = 1, math.min(#overlaps, 20) do
+			warn("  • " .. overlaps[i])
+		end
+		if #overlaps > 20 then
+			warn(string.format("  … and %d more (truncated)", #overlaps - 20))
+		end
+	else
+		print("[AssetSpawner] footprint audit: 0 overlaps")
+	end
 end
 
 return AssetSpawner
