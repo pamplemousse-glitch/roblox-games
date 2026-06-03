@@ -145,7 +145,11 @@ local function buildSoftServeMountain(cf: CFrame)
 	AB.pivot(m, base)
 	AB.weldAll(m)
 end
-buildSoftServeMountain(CFrame.new(-150, 0, -180))
+-- Moved from (-150, 0, -180) — was right on top of workspace.TeacupRide
+-- which sits at (-155, 7, -165). Two competing tall ice-cream-like columns
+-- next to the donut ride read as a broken overlap. Relocated to a clear
+-- patch ~300 stud east of the spawn cluster.
+buildSoftServeMountain(CFrame.new(280, 0, -240))
 
 -- ── 5. Corn-dog watchtower ───────────────────────────────────────────────────
 local function buildCorndogTower(cf: CFrame)
