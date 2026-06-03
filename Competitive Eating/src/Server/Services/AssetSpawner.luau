@@ -12,8 +12,18 @@ local AssetSpawner = {}
 local Common         = game:GetService("ReplicatedStorage").Common
 local AssetsFolder   = game:GetService("ReplicatedStorage"):FindFirstChild("Assets")
 local manifestModule = Common:FindFirstChild("AssetManifest")
-local polishModule       = Common:FindFirstChild("TokyoPolish")
-local donutPolishModule  = Common:FindFirstChild("DonutPolish")
+
+-- Per-district polish modules. Each runs ::apply(model) on any Asset whose
+-- manifest `module` path starts with the matching prefix. Order is cosmetic —
+-- the prefixes are disjoint so at most one ever fires per asset.
+local POLISH_REGISTRY = {
+	{ name = "TokyoPolish",   module = Common:FindFirstChild("TokyoPolish"),   prefix = "Assets.Districts.TokyoTown."       },
+	{ name = "DonutPolish",   module = Common:FindFirstChild("DonutPolish"),   prefix = "Assets.Districts.DonutDynasty."    },
+	{ name = "PizzaPolish",   module = Common:FindFirstChild("PizzaPolish"),   prefix = "Assets.Districts.PizzaPlaza."      },
+	{ name = "BurgerPolish",  module = Common:FindFirstChild("BurgerPolish"),  prefix = "Assets.Districts.BurgerBoulevard." },
+	{ name = "BbqPolish",     module = Common:FindFirstChild("BbqPolish"),     prefix = "Assets.Districts.BbqHoller."       },
+	{ name = "MercadoPolish", module = Common:FindFirstChild("MercadoPolish"), prefix = "Assets.Districts.MercadoDelSol."   },
+}
 
 local function findModuleByPath(rootName: string, path: string): ModuleScript?
 	-- path like "Assets.Districts.PizzaPlaza.Buildings.PizzaParlor"
@@ -75,28 +85,21 @@ function AssetSpawner.init()
 
 			if spawnOk then
 				spawned += 1
-				-- Tokyo polish: PBR materials + lantern/sign lighting on every
-				-- Tokyo Town asset after it spawns. AssetSpawner clears + respawns
-				-- Districts each server start, so the pass runs every session.
-				if polishModule and entry.module:sub(1, 28) == "Assets.Districts.TokyoTown." then
-					if typeof(spawnResult) == "Instance" and spawnResult:IsA("Model") then
+				-- Per-district polish pass: PBR materials + lighting bumps. Each
+				-- Polish module runs ::apply(model) on assets whose manifest path
+				-- matches its prefix. AssetSpawner clears + respawns Districts on
+				-- every server start, so the pass runs every session.
+				if typeof(spawnResult) == "Instance" and spawnResult:IsA("Model") then
+					for _, p in POLISH_REGISTRY do
+						if not p.module then continue end
+						if entry.module:sub(1, #p.prefix) ~= p.prefix then continue end
 						local polishOk, polishErr = pcall(function()
-							require(polishModule).apply(spawnResult)
+							require(p.module).apply(spawnResult)
 						end)
 						if not polishOk then
-							warn("[AssetSpawner] TokyoPolish failed for " .. entry.module .. ": " .. tostring(polishErr))
+							warn("[AssetSpawner] " .. p.name .. " failed for " .. entry.module .. ": " .. tostring(polishErr))
 						end
-					end
-				end
-				-- Donut polish: same pattern, gated on the Donut Dynasty path prefix.
-				if donutPolishModule and entry.module:sub(1, 30) == "Assets.Districts.DonutDynasty." then
-					if typeof(spawnResult) == "Instance" and spawnResult:IsA("Model") then
-						local polishOk, polishErr = pcall(function()
-							require(donutPolishModule).apply(spawnResult)
-						end)
-						if not polishOk then
-							warn("[AssetSpawner] DonutPolish failed for " .. entry.module .. ": " .. tostring(polishErr))
-						end
+						break
 					end
 				end
 			else
