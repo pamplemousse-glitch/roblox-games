@@ -53,13 +53,15 @@ local C = {
 	seatTan    = Color3.fromRGB(195, 160, 110),  -- bun-coloured seat pad
 }
 
--- ── Footprint sizing (2× the original Wave-Swinger build) ───────────────────
-local MAST_HEIGHT     = 44      -- was ~22
-local MAST_DIAMETER   = 4.5     -- was ~2
-local CANOPY_RIM_R    = 24      -- was ~11
-local CANOPY_APEX_Y   = MAST_HEIGHT          -- 44
-local CANOPY_RIM_Y    = MAST_HEIGHT - 16     -- 28
-local CHAIR_RADIUS    = 22      -- chairs hang just inside the rim
+-- ── Footprint sizing (Wave-Swinger, scaled for ground reachability) ─────────
+-- User playtest: 44-stud mast pushed canopy up to Y=33+, chairs unreachable.
+-- Reduced to 26-stud mast so chair-rest is at player head height.
+local MAST_HEIGHT     = 26
+local MAST_DIAMETER   = 3
+local CANOPY_RIM_R    = 18
+local CANOPY_APEX_Y   = MAST_HEIGHT          -- 26
+local CANOPY_RIM_Y    = MAST_HEIGHT - 10     -- 16
+local CHAIR_RADIUS    = 16      -- chairs hang just inside the rim
 local CHAIR_HANG_Y    = 14      -- top-of-chair Y (below the rim)
 local CHAIN_TOP_Y     = CANOPY_RIM_Y - 1     -- where the chain meets the rim underside
 local NUM_PANELS      = 16
@@ -228,9 +230,11 @@ end
 
 -- ── 4. Weld + reposition ────────────────────────────────────────────────────
 AB.weldAll(m)
--- Lower the umbrella ~12 stud so chairs hang reachable from ground instead
--- of suspended in the sky like a parasol on a pedestal.
-m:PivotTo(originalPivot * CFrame.new(0, -12, 0))
+-- Anchor sits at originalPivot.Y - 16 so the mast base lands near ground
+-- (originalPivot.Y was ~17.6 in the .rbxl). With MAST_HEIGHT=26, canopy
+-- rim is at Y≈16-17 — chairs hanging from chains 10 stud long sit at
+-- Y≈6-7, within player reach.
+m:PivotTo(originalPivot * CFrame.new(0, -16, 0))
 
 print(string.format("[RideRebuildSwingCarousel] Cocktail Umbrella Swing built (%d descendants, PrimaryPart=%s)",
 	#m:GetDescendants(), m.PrimaryPart and m.PrimaryPart.Name or "nil"))
