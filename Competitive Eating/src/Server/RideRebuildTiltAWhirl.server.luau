@@ -99,6 +99,18 @@ end
 local topPancake = m:FindFirstChild("Body") :: BasePart?
 assert(topPancake, "topmost pancake (Body) missing — build sequence wrong")
 
+-- topPancake is AB.cylinder (X-aligned cylinder rotated 90° around Z to lie
+-- flat). Setting it as PrimaryPart breaks PivotTo. Use an invisible identity
+-- anchor instead.
+local pivotAnchor = AB.part({
+	size         = Vector3.new(0.1, 0.1, 0.1),
+	color        = Color3.new(1, 1, 1),
+	cf           = CFrame.new(0, 0, 0),
+	canCollide   = false,
+	transparency = 1,
+	name         = "PivotAnchor",
+}, m)
+
 local topY = topPancake.Position.Y + LAYER_HEIGHT * 0.5   -- top surface of top pancake
 
 -- ── 5. Syrup pour — a giant amber puddle on top of the stack ─────────────────
@@ -240,7 +252,7 @@ for i = 1, 5 do
 end
 
 -- ── 9. Finalize: PrimaryPart, weld, pivot to original location ───────────────
-m.PrimaryPart = topPancake
+m.PrimaryPart = pivotAnchor
 AB.weldAll(m)
 m:PivotTo(originalPivot)
 

@@ -96,7 +96,18 @@ local platter = AB.cylinder(
 	CFrame.new(0, platterY, 0),
 	m, "Platter"
 )
-m.PrimaryPart = platter
+-- `platter` is AB.cylinder (X-aligned cylinder rotated 90° around Z to lie flat).
+-- Setting it as PrimaryPart breaks PivotTo — un-rotates the model. Use an
+-- invisible identity-rotation anchor at the model origin.
+local pivotAnchor = AB.part({
+	size         = Vector3.new(0.1, 0.1, 0.1),
+	color        = Color3.new(1, 1, 1),
+	cf           = CFrame.new(0, 0, 0),
+	canCollide   = false,
+	transparency = 1,
+	name         = "PivotAnchor",
+}, m)
+m.PrimaryPart = pivotAnchor
 
 -- Glossy rim around platter edge — 24-segment polygonal ring
 local rimSegments = 24

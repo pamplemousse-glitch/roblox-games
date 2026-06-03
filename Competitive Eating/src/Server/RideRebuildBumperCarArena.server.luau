@@ -241,10 +241,19 @@ end
 
 -- PrimaryPart on the root model = the floor disc (the most central anchored
 -- part; lets RideController / any future spinner code use a canonical handle).
-local arenaFloor = m:FindFirstChild("ArenaFloor")
-if arenaFloor and arenaFloor:IsA("BasePart") then
-	m.PrimaryPart = arenaFloor
-end
+-- ArenaFloor is an AB.cylinder (X-aligned shape rotated 90° around Z to lie
+-- flat). Setting it as PrimaryPart breaks PivotTo at the end — same bug as
+-- SwingCarousel had with its CenterMast. Use an invisible identity-rotation
+-- anchor at the model origin instead.
+local pivotAnchor = AB.part({
+	size         = Vector3.new(0.1, 0.1, 0.1),
+	color        = COCOA_DRINK,
+	cf           = CFrame.new(0, 0, 0),
+	canCollide   = false,
+	transparency = 1,
+	name         = "PivotAnchor",
+}, m)
+m.PrimaryPart = pivotAnchor
 
 AB.weldAll(m)
 m:PivotTo(originalPivot)

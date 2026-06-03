@@ -141,12 +141,23 @@ local towerCap = AB.sphere(10, PRETZEL,
 	centerCF * CFrame.new(0, TOWER_TOP_Y + 3, 0), m, "TowerCap")
 towerCap.Material = Enum.Material.SmoothPlastic
 
--- Tower "core" sentinel — set as PrimaryPart so PivotTo works.
+-- Tower "core" sentinel — visible cylinder INSIDE the tower (not used as
+-- PrimaryPart because AB.cylinder bakes a 90° Z rotation that would force
+-- PivotTo to un-rotate the entire model). Use an invisible identity anchor
+-- as PrimaryPart.
 local towerCore = AB.cylinder(2, TOWER_HEIGHT, Color3.fromRGB(60, 30, 20),
 	centerCF * CFrame.new(0, (TOWER_BASE_Y + TOWER_TOP_Y) / 2, 0), m, "TowerCore")
 towerCore.Transparency = 1
 towerCore.CanCollide   = false
-m.PrimaryPart = towerCore
+local pivotAnchor = AB.part({
+	size         = Vector3.new(0.1, 0.1, 0.1),
+	color        = Color3.new(1, 1, 1),
+	cf           = centerCF,
+	canCollide   = false,
+	transparency = 1,
+	name         = "PivotAnchor",
+}, m)
+m.PrimaryPart = pivotAnchor
 
 -- ── 8 lollipop chutes ───────────────────────────────────────────────────────
 -- Each chute is a vertical assembly built at TOP position; RideController

@@ -215,13 +215,18 @@ for armIdx = 1, ARM_COUNT do
 end
 
 -- ── Finalise: PrimaryParts, welds, restore pivot ─────────────────────────────
-do
-	local anyPart: BasePart? = nil
-	for _, d in m:GetDescendants() do
-		if d:IsA("BasePart") then anyPart = d :: BasePart; break end
-	end
-	if anyPart then m.PrimaryPart = anyPart end
-end
+-- "First BasePart" as PrimaryPart is unsafe because it could be an
+-- AB.cylinder (X-aligned + 90° Z rotation) which would un-rotate the model
+-- via PivotTo. Explicit invisible identity anchor.
+local pivotAnchor = AB.part({
+	size         = Vector3.new(0.1, 0.1, 0.1),
+	color        = Color3.new(1, 1, 1),
+	cf           = CFrame.new(0, 0, 0),
+	canCollide   = false,
+	transparency = 1,
+	name         = "PivotAnchor",
+}, m)
+m.PrimaryPart = pivotAnchor
 
 -- BaseStructure pivots as one body.
 do

@@ -233,8 +233,20 @@ if gondola then
 		STEM_GREEN)
 end
 
--- ── Set PrimaryPart (use pad — it's anchored, static, at center) ────────────
-m.PrimaryPart = pad
+-- ── Set PrimaryPart ─────────────────────────────────────────────────────────
+-- `pad` is an AB.cylinder (X-aligned shape rotated 90° around Z to lie flat).
+-- Using that as PrimaryPart breaks PivotTo — it un-rotates the whole model.
+-- Use an invisible identity-rotation anchor at world (DROP_CX, 0, DROP_CZ)
+-- instead.
+local pivotAnchor = AB.part({
+	size         = Vector3.new(0.1, 0.1, 0.1),
+	color        = Color3.new(1, 1, 1),
+	cf           = CFrame.new(DROP_CX, 0, DROP_CZ),
+	canCollide   = false,
+	transparency = 1,
+	name         = "PivotAnchor",
+}, m)
+m.PrimaryPart = pivotAnchor
 
 -- ── Weld static cone parts into one rigid model (skip runtime parts) ────────
 -- We weld only the children of `cone` and `baseRing`, plus scoop/sprinkles/
