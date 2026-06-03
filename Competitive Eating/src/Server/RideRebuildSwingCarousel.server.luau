@@ -96,7 +96,10 @@ AB.sphere(2.2, C.tip, O * CFrame.new(0, CANOPY_APEX_Y + 1.2, 0), m, "ApexBead")
 -- Each "panel" is a thin tilted block fanning out from the apex down to the rim.
 -- 16 panels makes a clean stripe pattern (8 red + 8 cream alternating).
 local PANEL_LEN  = math.sqrt((CANOPY_APEX_Y - CANOPY_RIM_Y)^2 + CANOPY_RIM_R^2) -- ~28.8
-local PANEL_TILT = math.atan2(CANOPY_RIM_R, CANOPY_APEX_Y - CANOPY_RIM_Y)
+-- Panel needs to slope DOWN-and-OUT from apex to rim. The original
+-- atan2(R, h) was the complement of what's needed AND the wrong sign —
+-- panels ended up tilting UP-and-OUT instead, building an inverted cone.
+local PANEL_TILT = -math.atan2(CANOPY_APEX_Y - CANOPY_RIM_Y, CANOPY_RIM_R)
 for i = 1, NUM_PANELS do
 	local yaw      = (i - 1) / NUM_PANELS * math.pi * 2
 	local midR     = CANOPY_RIM_R * 0.5
