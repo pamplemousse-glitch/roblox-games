@@ -1,28 +1,27 @@
 -- RideRebuildScreamerCoaster.server.luau
--- Frank's Fairground food-shape pass: ScreamerCoaster → Spaghetti Coaster.
---
--- HARD constraints (per docs/RIDE_REBUILD_PLAYBOOK.md §2):
---   * Preserve every waypoint part name + XYZ: ArcN0_2..ArcN15_2 (16),
---     RailA0_2..RailA49_2 (50), ArcF0_2..ArcF15_2 (16), RailB0_2..RailB49_2 (50)
---     → 132 parts total, read positionally by buildWaypoints() in RideController.
---   * ScreamerCart.Body stays as PrimaryPart of the cart model.
---   * ReplicatedStorage.Remotes.CoasterFade is untouched.
---
--- We can't use ClearAllChildren — it would nuke the 132 waypoints. Instead we
--- whitelist what to keep and Destroy the rest.
+-- Belle-Époque rebuild: ScreamerCoaster → Wooden Cyclone-style Coaster.
+-- Reference: Coney Island Cyclone (1927). Ivory truss columns, deep_wood ties,
+-- antique_gold rivet plates, burgundy lift-hill paint, burgundy car w/ ivory + gold.
+-- HARD constraints (docs/BELLE_EPOQUE_RIDE_PLAYBOOK.md §2): preserve all 132
+-- named waypoints (ArcN0..15_2, RailA0..49_2, ArcF0..15_2, RailB0..49_2) at their
+-- exact XYZ — buildWaypoints() in RideController reads them positionally.
+-- ScreamerCart.Body stays as cart PrimaryPart. CoasterFade remote untouched.
+-- PivotAnchor mandatory on the coaster (universal §5). Whitelist + Destroy (no
+-- :ClearAllChildren — would nuke waypoints).
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerStorage     = game:GetService("ServerStorage")
 local AB = require(ReplicatedStorage:WaitForChild("Common"):WaitForChild("AssetBuilder"))
 
-local PASTA_YELLOW   = Color3.fromRGB(245, 215, 120)
-local TOMATO_RED     = AB.colors.tomato
-local SAUCE_DARK     = Color3.fromRGB(150, 30, 25)
-local PARMESAN       = Color3.fromRGB(245, 240, 215)
-local PARMESAN_DARK  = Color3.fromRGB(215, 205, 165)
-local MEATBALL_BROWN = Color3.fromRGB(110, 65, 40)
-local BASIL          = Color3.fromRGB(85, 145, 70)
-local STAMP          = "_PreFood_2026-06-03"
+-- Belle-Époque palette (playbook §26).
+local BURGUNDY     = AB.colors.burgundy            -- (110, 30, 40)
+local IVORY        = AB.colors.ivory               -- (230, 220, 195)
+local DEEP_WOOD    = AB.colors.deepWood            -- ( 80, 50, 30)
+local WOOD_PLANK   = Color3.fromRGB(160, 110, 70)
+local ANTIQUE_GOLD = Color3.fromRGB(200, 160, 80)
+local WROUGHT_IRON = Color3.fromRGB( 40,  35, 40)
+local CRIMSON_GLOW = Color3.fromRGB(220,  60, 70)
+local STAMP        = "_PreBelleEpoque_2026-06-03"
 
 -- ── Waypoint helpers ────────────────────────────────────────────────────────
 
@@ -63,49 +62,76 @@ end
 
 -- ── Decoration builders ─────────────────────────────────────────────────────
 
--- Two parallel pasta strands offset perpendicular to each waypoint segment.
-local function buildSideRails(wps: { BasePart }, deco: Folder)
-	local THICK, OFFSET = 0.9, 2.2
+-- Twin deep_wood rails + antique_gold rivet plates at each segment join.
+local function buildTrackRails(wps, deco)
+	local THICK, OFFSET = 1.2, 2.4
 	for i = 1, #wps - 1 do
 		local a, b = wps[i].Position, wps[i + 1].Position
-		local fwd, right, len = basisAt(a, b)
-		if len == 0 then continue end
+		local fwd, right, len = basisAt(a, b); if len == 0 then continue end
 		local mid = (a + b) / 2
 		for sign = -1, 1, 2 do
-			local center = mid + right * (OFFSET * sign)
-			-- lookAt → -Z forward; +90° Y aligns +X with travel for the block.
-			local cf = CFrame.lookAt(center, center + fwd) * CFrame.Angles(0, math.rad(90), 0)
-			AB.part({
-				size = Vector3.new(len + 0.2, THICK, THICK),
-				color = PASTA_YELLOW, cf = cf, name = "PastaRail",
-			}, deco).Reflectance = 0.05
+			local c = mid + right * (OFFSET * sign)
+			local cf = CFrame.lookAt(c, c + fwd) * CFrame.Angles(0, math.rad(90), 0)
+			AB.part({ size=Vector3.new(len + 0.2, THICK, THICK), color=DEEP_WOOD,
+				material=Enum.Material.Wood, cf=cf, name="TrackRail" }, deco)
+			local pp = c - fwd * (len * 0.5)
+			AB.part({ size=Vector3.new(0.4, THICK + 0.3, THICK + 0.3), color=ANTIQUE_GOLD,
+				material=Enum.Material.Metal, reflectance=0.15, name="RivetPlate",
+				cf=CFrame.lookAt(pp, pp + fwd) * CFrame.Angles(0, math.rad(90), 0) }, deco)
 		end
 	end
 end
 
--- Parmesan-block ties between rails every `stride`-th segment.
-local function buildTies(wps: { BasePart }, deco: Folder, stride: number)
+-- Deep-wood ties spanning between rails every Nth segment.
+local function buildTies(wps, deco, stride)
 	for i = 1, #wps - 1, stride do
 		local a, b = wps[i].Position, wps[i + 1].Position
-		local fwd, right, len = basisAt(a, b)
-		if len == 0 then continue end
-		local mid = (a + b) / 2 + Vector3.new(0, -0.4, 0)
-		local cf  = CFrame.lookAt(mid, mid + fwd)
-		AB.part({
-			size = Vector3.new(0.8, 0.5, 5.4),
-			color = (i % (stride * 2) == 0) and PARMESAN or PARMESAN_DARK,
-			cf = cf, name = "ParmesanTie",
-		}, deco)
+		local fwd, _, len = basisAt(a, b); if len == 0 then continue end
+		local mid = (a + b) / 2 + Vector3.new(0, -0.6, 0)
+		AB.part({ size=Vector3.new(0.9, 0.5, 6.2),
+			color=(i % (stride * 2) == 0) and DEEP_WOOD or WOOD_PLANK,
+			material=Enum.Material.Wood, cf=CFrame.lookAt(mid, mid + fwd), name="Tie" }, deco)
 	end
 end
 
--- Tomato-sauce ramp paint under the upper 45% of waypoint heights (lift hill).
-local function buildLiftHillPaint(wps: { BasePart }, deco: Folder)
+-- Ivory lattice columns dropping from elevated waypoints to ground.
+local function buildTrussColumns(wps, deco)
+	local minY = math.huge
+	for _, p in wps do if p.Position.Y < minY then minY = p.Position.Y end end
+	local groundY = minY - 6
+	for i = 1, #wps, 5 do
+		local p = wps[i]; local h = p.Position.Y - groundY
+		if h < 4 then continue end
+		local baseY = (p.Position.Y + groundY) / 2
+		local cx, cz = p.Position.X, p.Position.Z
+		for sx = -1, 1, 2 do for sz = -1, 1, 2 do
+			AB.part({ size=Vector3.new(0.8, h, 0.8), color=IVORY, material=Enum.Material.Wood,
+				name="TrussLeg", cf=CFrame.new(cx + sx * 1.6, baseY, cz + sz * 1.6) }, deco)
+		end end
+		for lvl = 1, 3 do
+			local y = groundY + h * (lvl / 4)
+			for face = 0, 3 do
+				local ang = face * math.pi / 2
+				local nx, nz = math.cos(ang), math.sin(ang)
+				local fcx, fcz = cx + nx * 1.6, cz + nz * 1.6
+				local bCF = CFrame.lookAt(Vector3.new(fcx, y, fcz), Vector3.new(fcx - nz, y, fcz + nx))
+				for diag = -1, 1, 2 do
+					AB.part({ size=Vector3.new(0.35, 0.35, 4.5), color=IVORY, material=Enum.Material.Wood,
+						name="TrussBrace", cf=bCF * CFrame.Angles(0, 0, math.rad(diag * 35)) }, deco)
+				end
+			end
+		end
+		AB.part({ size=Vector3.new(3.6, 0.4, 3.6), color=ANTIQUE_GOLD, material=Enum.Material.Metal,
+			reflectance=0.15, name="ColumnCap", cf=CFrame.new(cx, p.Position.Y - 0.3, cz) }, deco)
+	end
+end
+
+-- Burgundy lift-hill paint stripe on the upper 45% of the run.
+local function buildLiftHillPaint(wps, deco)
 	local maxY, minY = -math.huge, math.huge
 	for _, p in wps do
-		local y = p.Position.Y
-		if y > maxY then maxY = y end
-		if y < minY then minY = y end
+		if p.Position.Y > maxY then maxY = p.Position.Y end
+		if p.Position.Y < minY then minY = p.Position.Y end
 	end
 	local threshold = minY + (maxY - minY) * 0.55
 	for i = 1, #wps - 1 do
@@ -113,104 +139,99 @@ local function buildLiftHillPaint(wps: { BasePart }, deco: Folder)
 		if (a.Y + b.Y) / 2 < threshold then continue end
 		local fwd, _, len = basisAt(a, b)
 		if len == 0 then continue end
-		local mid = (a + b) / 2 + Vector3.new(0, -0.9, 0)
-		AB.part({
-			size = Vector3.new(0.6, 0.3, 6.2),
-			color = TOMATO_RED, cf = CFrame.lookAt(mid, mid + fwd),
-			name = "SaucePaint",
-		}, deco)
+		local mid = (a + b) / 2 + Vector3.new(0, -1.3, 0)
+		AB.part({ size=Vector3.new(0.7, 0.4, 7.0), color=BURGUNDY,
+			material=Enum.Material.Wood, name="LiftHillStripe",
+			cf=CFrame.lookAt(mid, mid + fwd) }, deco)
 	end
 end
 
--- Station house at the boarding waypoint (wps[1]).
-local function buildStation(wps: { BasePart }, deco: Folder)
+-- Wrought-iron handrails along the catwalk.
+local function buildHandrails(wps, deco)
+	for i = 1, #wps - 1, 2 do
+		local a, b = wps[i].Position, wps[i + 1].Position
+		local fwd, right, len = basisAt(a, b)
+		if len == 0 then continue end
+		local mid = (a + b) / 2 + Vector3.new(0, 1.6, 0)
+		for sign = -1, 1, 2 do
+			local c = mid + right * (3.2 * sign)
+			AB.part({ size=Vector3.new(0.2, 0.2, len + 0.2), color=WROUGHT_IRON,
+				material=Enum.Material.Metal, name="Handrail",
+				cf=CFrame.lookAt(c, c + fwd) }, deco)
+		end
+	end
+end
+
+-- Classic wooden Cyclone station house at waypoint 1.
+local function buildStation(wps, deco)
 	if #wps < 2 then return end
 	local p0 = wps[1].Position
 	local fwd, _, _ = basisAt(p0, wps[2].Position)
-	local base = p0 - fwd * 6 + Vector3.new(0, -2, 0)
-	local baseCF = CFrame.lookAt(base, base + fwd)
-	AB.part({ size = Vector3.new(16, 0.6, 10), color = PARMESAN,
-		cf = baseCF, name = "StationPlatform" }, deco)
-	AB.part({ size = Vector3.new(16, 0.4, 10), color = TOMATO_RED,
-		cf = baseCF * CFrame.new(0, 7, 0), name = "StationAwning" }, deco)
-	for sx = -1, 1, 2 do
-		for sz = -1, 1, 2 do
-			AB.cylinder(0.8, 7, PASTA_YELLOW,
-				baseCF * CFrame.new(7 * sx, 3.5, 4 * sz), deco, "ForkColumn")
-		end
+	local baseCF = CFrame.lookAt(p0 - fwd * 8 + Vector3.new(0, -2.4, 0), p0 - fwd * 7)
+	AB.part({ size=Vector3.new(20, 0.6, 12), color=WOOD_PLANK, material=Enum.Material.Wood, cf=baseCF, name="StationPlatform" }, deco)
+	for stripe = -2, 2 do
+		AB.part({ size=Vector3.new(20, 0.35, 2.2), color=(stripe % 2 == 0) and BURGUNDY or IVORY,
+			material=Enum.Material.Fabric, name="AwningStripe", cf=baseCF * CFrame.new(0, 8.2, stripe * 2.2) }, deco)
 	end
-	for i = -1, 1 do
-		AB.sphere(2.2, BASIL, baseCF * CFrame.new(i * 5, 8.2, 0), deco, "BasilTuft")
-	end
-end
-
--- Meatball garnish scattered near the station.
-local function buildMeatballGarnish(wps: { BasePart }, deco: Folder)
-	if #wps < 2 then return end
-	local p0 = wps[1].Position
-	for i = 1, 5 do
-		local theta = (i / 5) * math.pi * 2
-		local r = 6 + (i % 2) * 2
-		local pos = p0 + Vector3.new(math.cos(theta) * r, -1.7, math.sin(theta) * r - 4)
-		AB.sphere(2.0 + (i % 3) * 0.4, MEATBALL_BROWN, CFrame.new(pos), deco, "MeatballGarnish")
-	end
+	for sx = -1, 1, 2 do for sz = -1, 1, 2 do
+		AB.part({ size=Vector3.new(0.9, 8, 0.9), color=DEEP_WOOD, material=Enum.Material.Wood,
+			name="StationPost", cf=baseCF * CFrame.new(sx * 9, 4, sz * 5) }, deco)
+	end end
+	AB.part({ size=Vector3.new(20.4, 0.3, 12.4), color=ANTIQUE_GOLD, material=Enum.Material.Metal,
+		reflectance=0.1, name="AwningTrim", cf=baseCF * CFrame.new(0, 7.8, 0) }, deco)
+	AB.part({ size=Vector3.new(14, 2.6, 0.4), color=BURGUNDY, material=Enum.Material.Wood,
+		name="StationSign", cf=baseCF * CFrame.new(0, 11, -6) }, deco)
+	AB.part({ size=Vector3.new(13.6, 0.3, 0.5), color=CRIMSON_GLOW, material=Enum.Material.Neon,
+		name="SignGlow", cf=baseCF * CFrame.new(0, 9.5, -6) }, deco)
 end
 
 -- ── Cart re-skin ────────────────────────────────────────────────────────────
+-- Body stays as cart PrimaryPart (axis-aligned block, no PivotAnchor needed).
 
 local function rebuildCart()
 	local cart = workspace:FindFirstChild("ScreamerCart")
 	if not (cart and cart:IsA("Model")) then
-		warn("[RideRebuildScreamerCoaster] ScreamerCart missing — skipping cart re-skin.")
-		return
+		warn("[RideRebuildScreamerCoaster] ScreamerCart missing — skipping cart re-skin."); return
 	end
-	local cartBackup = cart:Clone()
-	cartBackup.Name = "ScreamerCart" .. STAMP
-	cartBackup.Parent = ServerStorage
-
+	local cartBackup = cart:Clone(); cartBackup.Name = "ScreamerCart" .. STAMP; cartBackup.Parent = ServerStorage
 	local body = cart:FindFirstChild("Body")
 	if not (body and body:IsA("BasePart")) then
-		warn("[RideRebuildScreamerCoaster] ScreamerCart.Body missing — leaving cart untouched.")
-		return
+		warn("[RideRebuildScreamerCoaster] ScreamerCart.Body missing — leaving cart untouched."); return
 	end
-	for _, c in cart:GetChildren() do
-		if c ~= body then c:Destroy() end
-	end
+	for _, c in cart:GetChildren() do if c ~= body then c:Destroy() end end
 	cart.PrimaryPart = body
-
-	-- Body becomes the meatball.
-	body.Shape         = Enum.PartType.Ball
-	local s            = math.max(body.Size.X, body.Size.Y, body.Size.Z, 3.5) * 1.4
-	body.Size          = Vector3.new(s, s, s)
-	body.Color         = MEATBALL_BROWN
-	body.Material      = Enum.Material.Slate
-	body.Anchored      = true
-	body.CanCollide    = true
-	body.TopSurface    = Enum.SurfaceType.Smooth
-	body.BottomSurface = Enum.SurfaceType.Smooth
-
-	local function weldTo(part: BasePart)
+	-- Classic wooden coaster car: burgundy body + ivory trim + antique-gold rivets.
+	body.Shape = Enum.PartType.Block
+	local baseS = math.max(body.Size.X, body.Size.Y, body.Size.Z, 3.0)
+	local L, W, H = baseS * 1.82, baseS * 1.30, baseS * 0.91
+	body.Size, body.Color, body.Material = Vector3.new(L, H, W), BURGUNDY, Enum.Material.Wood
+	body.Anchored, body.CanCollide = true, true
+	body.TopSurface, body.BottomSurface = Enum.SurfaceType.Smooth, Enum.SurfaceType.Smooth
+	local function weldTo(part)
 		part.Parent = cart
-		local w = Instance.new("WeldConstraint")
-		w.Part0 = body; w.Part1 = part; w.Parent = part
+		local w = Instance.new("WeldConstraint"); w.Part0 = body; w.Part1 = part; w.Parent = part
 	end
-	for i = 1, 8 do
-		local theta = (i / 8) * math.pi * 2
-		local y = (i % 2 == 0) and 0.6 or -0.4
-		weldTo(AB.part({
-			size = Vector3.new(0.6, 0.25, 0.6), color = PARMESAN,
-			cf = body.CFrame * CFrame.new(math.cos(theta) * (s * 0.45), y, math.sin(theta) * (s * 0.45)),
-			name = "Sprinkle" .. i,
-		}))
+
+	weldTo(AB.part({ size=Vector3.new(L + 0.05, 0.35, W + 0.05), color=IVORY, material=Enum.Material.Wood,
+		name="TrimStripe", cf=body.CFrame * CFrame.new(0, H * 0.4, 0) }))
+	for sz = -1, 1, 2 do for i = -2, 2 do
+		weldTo(AB.part({ size=Vector3.new(0.4, 0.4, 0.4), color=ANTIQUE_GOLD, material=Enum.Material.Metal,
+			reflectance=0.2, name="Rivet" .. (sz > 0 and "R" or "L") .. (i + 3),
+			cf=body.CFrame * CFrame.new(i * (L * 0.18), H * 0.1, sz * (W * 0.55)) }))
+	end end
+	weldTo(AB.part({ size=Vector3.new(0.6, H * 1.3, W * 0.9), color=DEEP_WOOD, material=Enum.Material.Wood,
+		name="Backrest", cf=body.CFrame * CFrame.new(-L * 0.42, H * 0.55, 0) }))
+	weldTo(AB.part({ size=Vector3.new(0.6, H * 0.7, W * 0.95), color=IVORY, material=Enum.Material.Wood,
+		name="NosePanel", cf=body.CFrame * CFrame.new(L * 0.5, 0, 0) }))
+	for sx = -1, 1, 2 do
+		weldTo(AB.part({ size=Vector3.new(0.4, 0.4, W + 0.6), color=WROUGHT_IRON, material=Enum.Material.Metal,
+			name="Axle" .. (sx > 0 and "F" or "R"), cf=body.CFrame * CFrame.new(sx * L * 0.32, -H * 0.5, 0) }))
 	end
-	local cap = AB.sphere(s * 0.85, SAUCE_DARK, body.CFrame * CFrame.new(0, s * 0.3, 0), nil, "SauceCap")
-	weldTo(cap)
-	weldTo(AB.sphere(1.3, BASIL, body.CFrame * CFrame.new(0, s * 0.55, 0), nil, "BasilSprig"))
 end
 
 -- ── Main rebuild ────────────────────────────────────────────────────────────
 
-task.wait(1) -- let peer rebuild scripts settle
+task.wait(1)
 
 local sc = workspace:FindFirstChild("ScreamerCoaster")
 if not (sc and sc:IsA("Model")) then
@@ -232,20 +253,24 @@ if #wps < 4 then
 	return
 end
 
-local deco = Instance.new("Folder")
-deco.Name   = "FoodDecoration"
-deco.Parent = sc
+-- PivotAnchor (universal §5): mandatory invisible identity-rotation marker.
+-- RideController never reads sc.PrimaryPart (positional waypoint lookup), so
+-- this is hygiene only, but the playbook requires it on every Belle-Époque rebuild.
+local pivotAnchor = AB.part({ size=Vector3.new(0.1, 0.1, 0.1), color=Color3.new(1, 1, 1),
+	cf=sc:GetPivot(), canCollide=false, transparency=1, name="PivotAnchor" }, sc)
+sc.PrimaryPart = pivotAnchor
 
-buildSideRails(wps, deco)
+local deco = Instance.new("Folder"); deco.Name = "BelleEpoqueDecoration"; deco.Parent = sc
+
+buildTrackRails(wps, deco)
 buildTies(wps, deco, 3)
+buildTrussColumns(wps, deco)
 buildLiftHillPaint(wps, deco)
+buildHandrails(wps, deco)
 buildStation(wps, deco)
-buildMeatballGarnish(wps, deco)
 
--- NOTE: we deliberately do NOT touch sc.PrimaryPart or weldAll(sc). The
--- contract is name-based positional lookup of the 132 waypoint parts, and
--- RideController never reads sc.PrimaryPart.
-
+-- NOTE: do NOT weldAll(sc). Waypoint parts must stay independent (positional
+-- lookup by name); decoration parts are anchored so welding is unnecessary.
 rebuildCart()
 
 print(string.format(
