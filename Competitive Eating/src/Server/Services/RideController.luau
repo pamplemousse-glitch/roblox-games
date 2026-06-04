@@ -45,7 +45,7 @@ local FLUME_SPEED   = 14  -- studs/s
 -- Drop Tower
 local DROP_RISE  = 8;  local DROP_FALL  = 45; local DROP_BRAKE = 10
 local DROP_HOLD  = 2.5; local DROP_LOAD  = 8
-local DROP_Y_MIN = 7;  local DROP_Y_MAX = 50; local DROP_BRAKE_Y = 15
+local DROP_Y_MIN = 7;  local DROP_Y_MAX = 33; local DROP_BRAKE_Y = 12  -- DropTower shortened to 40-stud lattice tower (was 61-stud sundae); DROP_Y_MAX reduced so gondola doesn't clip the crown
 local DROP_CX, DROP_CZ = 155, -175
 local SCRAMBLER_MAIN_RPS = 0.28   -- main arm rotation speed
 local SCRAMBLER_SUB_RPS  = -0.84  -- sub-hub counter-rotation (3× main, opposite)
