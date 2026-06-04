@@ -1,264 +1,240 @@
 -- RideRebuildBumperCarArena
--- Frank's Fairground ride-rebuild: BumperCarArena → "Marshmallow Bumpers".
--- Cocoa-drink themed arena, decorative only (no live bumper physics in v1.0).
+-- Frank's Fairground ride-rebuild: BumperCarArena → "Classic Bumper Cars".
+-- Belle-Époque themed arena, decorative only (no live bumper physics, no
+-- RideController coupling — BumperCarArena has no entry in any of its tables).
 --
--- Contract (per docs/RIDE_REBUILD_PLAYBOOK.md §11):
+-- Contract (per docs/BELLE_EPOQUE_RIDE_PLAYBOOK.md §11):
 --   * No mcp__Roblox_Studio__* calls (orchestrator owns Studio).
---   * No RideController edits — BumperCarArena has no entry in any of its tables,
---     and no named-part contract. Decorative only.
---   * Pure primitives via AssetBuilder.
---   * Idempotent rebuild (TokyoGround pattern): clone old → ServerStorage,
---     ClearAllChildren on the same Model, rebuild children, re-pivot.
---   * Footprint = 2× original (read live from current model bbox; no hardcoded coords).
+--   * Pure primitives via AssetBuilder. No Meshy.
+--   * Idempotent rebuild: clone old → ServerStorage, ClearAllChildren on the
+--     same Model, rebuild children, re-pivot.
+--   * Footprint = 2× original (read live from current model bbox).
+--   * MANDATORY PivotAnchor pattern: invisible identity-rotation anchor at
+--     the model origin is PrimaryPart so PivotTo() doesn't bake rotation.
 --
 -- Visual brief:
---   * Floor = cocoa-drink surface (rich brown circular disc).
---   * Walls = cocoa-cup ceramic (white short cylindrical perimeter).
---   * 6-8 bumper cars = giant marshmallows (white squashed spheres), each with
---     a single rider Seat on top.
+--   * Smooth deep_wood plank floor (NOT cocoa drink).
+--   * Surrounding ivory + burgundy wall with antique_gold rim (NOT cocoa cup).
+--   * 6-8 bumper cars: burgundy + ivory two-tone shells with rubber bumpers
+--     and a single Seat each.
+--   * Overhead string lights — crimson_glow + ivory bulbs.
 
-local ServerStorage = game:GetService("ServerStorage")
+local ServerStorage     = game:GetService("ServerStorage")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local AB = require(ReplicatedStorage.Common.AssetBuilder)
 
-local RIDE_NAME       = "BumperCarArena"
-local BACKUP_NAME     = RIDE_NAME .. "_PreFood_2026-06-03"
-local SCALE           = 2          -- 2× footprint per playbook
-local CAR_COUNT       = 7          -- 6-8 cars per playbook (pick middle)
+local RIDE_NAME   = "BumperCarArena"
+local BACKUP_NAME = RIDE_NAME .. "_PreBelleEpoque_2026-06-03"
+local SCALE       = 2
+local CAR_COUNT   = 7
 
--- Marshmallow / cocoa palette (not yet in AssetBuilder.colors — inline so this
--- module stays self-contained; promote to Palettes.luau when that file lands).
-local COCOA_DRINK     = Color3.fromRGB( 70,  40,  20)  -- rich brown floor
-local COCOA_FOAM      = Color3.fromRGB(225, 200, 165)  -- pale cream foam ring
-local CUP_CERAMIC     = Color3.fromRGB(245, 240, 232)  -- off-white porcelain wall
-local CUP_RIM_GOLD    = Color3.fromRGB(195, 155,  70)  -- antique gold cup rim
-local MARSHMALLOW     = Color3.fromRGB(252, 248, 240)  -- soft white
-local MARSHMALLOW_TAN = Color3.fromRGB(228, 215, 188)  -- toasted accent
+-- Belle-Époque palette (per playbook). Palettes.luau not present in src/Common;
+-- inline here, promote later.
+local C = {
+	burgundy     = Color3.fromRGB(130,  30,  50),
+	ivory        = Color3.fromRGB(245, 235, 205),
+	antique_gold = Color3.fromRGB(200, 160,  80),
+	deep_wood    = Color3.fromRGB(110,  75,  45),
+	wood_plank   = Color3.fromRGB(160, 110,  70),
+	wrought_iron = Color3.fromRGB( 40,  35,  40),
+	cream        = Color3.fromRGB(230, 215, 180),
+	crimson_glow = Color3.fromRGB(220,  60,  70),
+}
 
-task.wait(1)   -- let other rebuild scripts settle this server tick
+task.wait(1)   -- let peer rebuild scripts settle this server tick
 
 local m = workspace:FindFirstChild(RIDE_NAME)
-if not m then
+if not m or not m:IsA("Model") then
 	warn(string.format("[RideRebuild] %s missing in workspace; skipping rebuild", RIDE_NAME))
 	return
 end
 
--- Capture original world pivot so we can restore it after the rebuild.
 local originalPivot: CFrame = m:GetPivot()
 
--- Measure original footprint (so 2× is honest, not hardcoded).
--- GetBoundingBox returns CFrame + Size in world space.
 local _origCF, origSize = m:GetBoundingBox()
-local origFootprint = math.max(origSize.X, origSize.Z, 1)   -- guard against 0
-
--- 2× the larger of X/Z, but clamp to sane carnival values so a corrupt empty
--- model can't produce a 4096-stud arena.
+local origFootprint = math.max(origSize.X, origSize.Z, 1)
+-- Clamp so a corrupt empty source model can't produce a 4096-stud arena.
 local arenaDiameter = math.clamp(origFootprint * SCALE, 60, 240)
 
--- Back up existing children (clone, then clear the live model in place so
--- anything in the data model that references workspace.BumperCarArena keeps
--- its handle).
+-- Back up existing children (replace prior backup if present).
+local prior = ServerStorage:FindFirstChild(BACKUP_NAME)
+if prior then prior:Destroy() end
 local clone = m:Clone()
-clone.Name = BACKUP_NAME
+clone.Name   = BACKUP_NAME
 clone.Parent = ServerStorage
 
 m:ClearAllChildren()
 m.PrimaryPart = nil
 
--- ── Build the cocoa-cup arena ───────────────────────────────────────────────
--- Local origin: the new contents are built around CFrame.new() (centred on the
--- model's local origin Y=0). At the end we PivotTo(originalPivot), which puts
--- the cup centre at the same world location the original arena occupied.
+-- ── PivotAnchor (MANDATORY first) ──────────────────────────────────────────
+-- Identity-rotation invisible part at model origin = PrimaryPart, so PivotTo()
+-- doesn't un-rotate the model.
+local pivotAnchor = AB.part({
+	size = Vector3.new(0.1, 0.1, 0.1), color = Color3.new(1, 1, 1),
+	cf = CFrame.new(0, 0, 0), canCollide = false, transparency = 1,
+	name = "PivotAnchor",
+}, m)
+m.PrimaryPart = pivotAnchor
 
-local FLOOR_THICK = 1.5
+-- ── Build constants ────────────────────────────────────────────────────────
+local O           = CFrame.new(0, 0, 0)
+local FLOOR_THICK = 1.2
 local WALL_HEIGHT = 9
-local WALL_THICK  = 2.5
-local FOAM_THICK  = 0.4
+local WALL_THICK  = 2.0
+local PLANK_COUNT = 14
+local SEGMENTS    = 24
+local radius      = arenaDiameter / 2
 
--- 1. Cocoa-drink floor (cylindrical disc, slightly recessed so the foam ring
---    reads as the surface of the drink and the walls read as the cup interior).
-local floorY = -FLOOR_THICK / 2
-AB.cylinder(
-	arenaDiameter,
-	FLOOR_THICK,
-	COCOA_DRINK,
-	CFrame.new(0, floorY, 0),
-	m,
-	"ArenaFloor"
-)
+-- ── 1. Floor: deep_wood plank disc + alternating planks on top ─────────────
+AB.cylinder(arenaDiameter, FLOOR_THICK, C.deep_wood,
+	O * CFrame.new(0, -FLOOR_THICK / 2, 0), m, "ArenaFloorDisc")
 
--- 2. Foam ring — thin pale ring at the drink's surface, hugging the inside of
---    the cup. Realised as a slightly-larger cylinder underneath the floor disc
---    so its 0.4-stud rim peeks out as a foam edge.
-AB.cylinder(
-	arenaDiameter - 2,
-	FOAM_THICK,
-	COCOA_FOAM,
-	CFrame.new(0, 0.1, 0),
-	m,
-	"FoamRing"
-)
+local plankWidth = arenaDiameter / PLANK_COUNT
+local plankThick = 0.25
+for i = 1, PLANK_COUNT do
+	local cx    = -radius + plankWidth * (i - 0.5)
+	-- Chord length at this row across the disc; guard against tiny negatives.
+	local chord = 2 * math.sqrt(math.max(radius * radius - cx * cx, 0))
+	if chord > 1 then
+		local color = (i % 2 == 0) and C.wood_plank or C.deep_wood
+		AB.block(Vector3.new(plankWidth - 0.05, plankThick, chord - 0.2),
+			color, O * CFrame.new(cx, plankThick / 2 + 0.01, 0), m,
+			string.format("Plank_%d", i))
+	end
+end
 
--- 3. Cup wall — white ceramic perimeter, built as 24 short box segments arranged
---    in a circle. A single tall cylinder would look like a soup can; segments
---    plus the gold rim cap above read as a ceramic cup wall.
-local SEGMENTS = 24
-local wallRadius = arenaDiameter / 2 + WALL_THICK / 2
-local segChord = (math.pi * arenaDiameter) / SEGMENTS + 0.5   -- overlap to hide seams
+-- ── 2. Perimeter wall: burgundy wainscot + ivory upper + antique_gold rim ──
+local wallRadius = radius + WALL_THICK / 2
+local segChord   = (math.pi * arenaDiameter) / SEGMENTS + 0.6   -- overlap
+local wainscotH  = 2.5
+local upperH     = WALL_HEIGHT - wainscotH
 
-AB.circleArrange(CFrame.new(0, WALL_HEIGHT / 2, 0), wallRadius, SEGMENTS, m, function(i, cf, _angleDeg)
-	-- Each segment is a tall thin box; its local +Z faces radially OUTWARD
-	-- thanks to circleArrange's yaw. Width along X (tangential), thickness Z.
-	return AB.block(
-		Vector3.new(segChord, WALL_HEIGHT, WALL_THICK),
-		CUP_CERAMIC,
-		cf,
-		m,
-		string.format("CupWall_%d", i)
-	)
+AB.circleArrange(O, wallRadius, SEGMENTS, m, function(i, cf, _)
+	AB.block(Vector3.new(segChord, wainscotH, WALL_THICK), C.burgundy,
+		cf * CFrame.new(0, wainscotH / 2, 0), m,
+		string.format("WallWainscot_%d", i))
+	return AB.block(Vector3.new(segChord, upperH, WALL_THICK - 0.1), C.ivory,
+		cf * CFrame.new(0, wainscotH + upperH / 2, 0), m,
+		string.format("WallPanel_%d", i))
 end)
 
--- 4. Gold rim cap — sits atop the wall ring like the gilded lip of a mug.
-local rimY = WALL_HEIGHT + 0.5
-AB.circleArrange(CFrame.new(0, rimY, 0), wallRadius, SEGMENTS, m, function(i, cf, _angleDeg)
-	return AB.block(
-		Vector3.new(segChord, 1, WALL_THICK + 0.4),
-		CUP_RIM_GOLD,
-		cf,
-		m,
-		string.format("CupRim_%d", i)
-	)
-end)
+AB.circleArrange(O * CFrame.new(0, WALL_HEIGHT + 0.5, 0), wallRadius, SEGMENTS, m,
+	function(i, cf, _)
+		return AB.block(Vector3.new(segChord, 1, WALL_THICK + 0.5),
+			C.antique_gold, cf, m, string.format("WallRim_%d", i))
+	end)
 
--- 5. Boarding entry — gap in wall + a short ramp at one cardinal direction so a
---    player on foot can step in. Replace 2 adjacent wall segments with a low
---    "door" sill and tint a chocolate-shaving threshold.
+-- ── 3. Boarding entry — remove 2 adjacent segments at +X for a doorway ─────
 local function despawnSegments(prefix: string, indices: { number })
 	for _, i in ipairs(indices) do
 		local seg = m:FindFirstChild(string.format(prefix, i))
 		if seg then seg:Destroy() end
 	end
 end
-despawnSegments("CupWall_%d", { 1, 2 })
-despawnSegments("CupRim_%d",  { 1, 2 })
+despawnSegments("WallPanel_%d",    { 1, 2 })
+despawnSegments("WallWainscot_%d", { 1, 2 })
+despawnSegments("WallRim_%d",      { 1, 2 })
 
-local doorRadius = wallRadius + 1
-local doorCF = CFrame.new(doorRadius, 0.5, 0)   -- entry at +X (segment indices 1..2 are near angle 0)
-AB.block(
-	Vector3.new(8, 1, WALL_THICK + 2),
-	COCOA_FOAM,
-	doorCF,
-	m,
-	"EntryRamp"
-)
-AB.block(
-	Vector3.new(8, 0.3, WALL_THICK + 2),
-	CUP_RIM_GOLD,
-	doorCF * CFrame.new(0, 0.65, 0),
-	m,
-	"EntryRampTrim"
-)
+local doorCF = O * CFrame.new(wallRadius + 1, 0.5, 0)
+AB.block(Vector3.new(8, 1, WALL_THICK + 2), C.deep_wood, doorCF, m, "EntryRamp")
+AB.block(Vector3.new(8, 0.3, WALL_THICK + 2), C.antique_gold,
+	doorCF * CFrame.new(0, 0.65, 0), m, "EntryRampTrim")
 
--- ── Marshmallow bumper cars ─────────────────────────────────────────────────
--- Each car is:
---   * a squashed white sphere (the marshmallow body) anchored on the floor
---   * a thin tan top "toasted" cap so it reads as marshmallow not as a snowball
---   * a Seat on top for the rider
--- Cars are scattered around the arena interior on a smaller-radius ring so they
--- look populated but aren't clipping the wall.
-
-local MARSH_DIAMETER = 9
-local MARSH_SQUASH   = 0.55          -- vertical scale on the sphere
-local MARSH_BODY_Y   = MARSH_DIAMETER * MARSH_SQUASH / 2  -- sit on floor
-local carRingR       = math.max(arenaDiameter / 2 - MARSH_DIAMETER - 4, 6)
+-- ── 4. Bumper cars ─────────────────────────────────────────────────────────
+-- Burgundy squashed-sphere body, ivory upper deck, wrought_iron rubber bumper
+-- ring, antique_gold trim, decorative steering column + wheel, and a Seat on
+-- top. Scattered on two concentric rings to avoid clock-face placement.
+local CAR_DIAM   = 9
+local CAR_SQUASH = 0.55
+local CAR_HY     = CAR_DIAM * CAR_SQUASH / 2
+local carRingR   = math.max(radius - CAR_DIAM - 4, 6)
 
 for i = 1, CAR_COUNT do
-	local angle = ((i - 1) / CAR_COUNT) * math.pi * 2
-	-- Stagger every other car closer to centre so it doesn't look like a clock face.
-	local r = carRingR * (i % 2 == 0 and 0.55 or 1.0)
-	local x = math.cos(angle) * r
-	local z = math.sin(angle) * r
-	local yaw = -math.deg(angle) + 90   -- face roughly tangential
+	local angle  = ((i - 1) / CAR_COUNT) * math.pi * 2
+	local r      = carRingR * (i % 2 == 0 and 0.55 or 1.0)
+	local x, z   = math.cos(angle) * r, math.sin(angle) * r
+	local yawRad = math.rad(-math.deg(angle) + 90)   -- tangential
+	local carCF  = CFrame.new(x, 0, z) * CFrame.Angles(0, yawRad, 0)
+	local car    = AB.model(string.format("BumperCar_%d", i), m)
 
-	local carModel = AB.model(string.format("MarshmallowCar_%d", i), m)
+	-- Burgundy body (squashed sphere)
+	local body = AB.sphere(CAR_DIAM, C.burgundy,
+		carCF * CFrame.new(0, CAR_HY, 0), car, "Body")
+	body.Size = Vector3.new(CAR_DIAM, CAR_DIAM * CAR_SQUASH, CAR_DIAM)
 
-	-- Body: build as a Ball, then squash via Size (sphere primitive ignores
-	-- non-uniform Size visually but the underlying Part respects it; the
-	-- result is a squashed sphere that reads as a fat marshmallow).
-	local body = AB.sphere(
-		MARSH_DIAMETER,
-		MARSHMALLOW,
-		CFrame.new(x, MARSH_BODY_Y, z) * CFrame.Angles(0, math.rad(yaw), 0),
-		carModel,
-		"Body"
-	)
-	body.Size = Vector3.new(MARSH_DIAMETER, MARSH_DIAMETER * MARSH_SQUASH, MARSH_DIAMETER)
+	-- Ivory upper deck (two-tone)
+	AB.cylinder(CAR_DIAM - 1.2, 0.5, C.ivory,
+		carCF * CFrame.new(0, CAR_HY + 0.15, 0), car, "UpperDeck")
 
-	-- Toasted-tan cap — small disc on top so the marshmallow reads "fluffy"
-	-- rather than "snowball".
-	AB.cylinder(
-		MARSH_DIAMETER - 2.5,
-		0.6,
-		MARSHMALLOW_TAN,
-		CFrame.new(x, MARSH_BODY_Y + MARSH_DIAMETER * MARSH_SQUASH / 2 + 0.1, z),
-		carModel,
-		"ToastedCap"
-	)
+	-- Antique_gold thin trim band
+	AB.cylinder(CAR_DIAM + 0.15, 0.3, C.antique_gold,
+		carCF * CFrame.new(0, CAR_HY - 0.05, 0), car, "TrimBand")
 
-	-- Skirt — small foam-coloured ring around the base to hide the body's
-	-- waterline where it meets the cocoa floor.
-	AB.cylinder(
-		MARSH_DIAMETER + 0.4,
-		0.4,
-		COCOA_FOAM,
-		CFrame.new(x, 0.25, z),
-		carModel,
-		"BumperSkirt"
-	)
+	-- Wrought_iron rubber bumper
+	AB.cylinder(CAR_DIAM + 0.8, 0.9, C.wrought_iron,
+		carCF * CFrame.new(0, CAR_HY - 0.6, 0), car, "RubberBumper")
 
-	-- Rider Seat — perched on top of the marshmallow. Seat is a real Roblox
-	-- Seat instance so a player walking up can sit on it; decorative-only ride
-	-- means no physics propulsion, just a perch.
+	-- Steering column + wheel (decorative)
+	AB.block(Vector3.new(0.4, 1.6, 0.4), C.wrought_iron,
+		carCF * CFrame.new(0, CAR_HY + 0.9, -CAR_DIAM * 0.18), car,
+		"SteeringColumn")
+	AB.cylinder(1.6, 0.3, C.deep_wood,
+		carCF * CFrame.new(0, CAR_HY + 1.7, -CAR_DIAM * 0.18)
+			* CFrame.Angles(math.rad(90), 0, 0), car, "SteeringWheel")
+
+	-- Rider Seat — real Roblox Seat so a player walking up can sit.
+	-- Decorative ride: anchored, no propulsion.
 	local seat = Instance.new("Seat")
-	seat.Name        = "Seat"
-	seat.Size        = Vector3.new(3, 0.6, 3)
-	seat.Color       = MARSHMALLOW_TAN
-	seat.Material    = Enum.Material.SmoothPlastic
-	seat.TopSurface  = Enum.SurfaceType.Smooth
+	seat.Name          = "Seat"
+	seat.Size          = Vector3.new(2.8, 0.6, 2.8)
+	seat.Color         = C.cream
+	seat.Material      = Enum.Material.SmoothPlastic
+	seat.TopSurface    = Enum.SurfaceType.Smooth
 	seat.BottomSurface = Enum.SurfaceType.Smooth
-	seat.Anchored    = true   -- decorative ride; anchored stops the car drifting
-	seat.CanCollide  = true
-	seat.CFrame      = CFrame.new(x, MARSH_BODY_Y + MARSH_DIAMETER * MARSH_SQUASH / 2 + 0.7, z)
-		* CFrame.Angles(0, math.rad(yaw), 0)
-	seat.Parent      = carModel
+	seat.Anchored      = true
+	seat.CanCollide    = true
+	seat.CFrame        = carCF * CFrame.new(0, CAR_HY + 0.8, 0.4)
+	seat.Parent        = car
 
-	carModel.PrimaryPart = body
-	AB.weldAll(carModel)
+	car.PrimaryPart = body
+	AB.weldAll(car)
 end
 
--- ── Finish up ───────────────────────────────────────────────────────────────
+-- ── 5. Overhead string lights — crimson_glow + ivory bulbs ─────────────────
+-- Two crossed strings at 90°, each in its own sub-model so duplicate named
+-- children (LightCable, Bulb_*) don't clash.
+local STRING_Y       = WALL_HEIGHT + 4
+local BULBS_PER_LINE = 9
+local cableThick     = 0.18
 
--- PrimaryPart on the root model = the floor disc (the most central anchored
--- part; lets RideController / any future spinner code use a canonical handle).
--- ArenaFloor is an AB.cylinder (X-aligned shape rotated 90° around Z to lie
--- flat). Setting it as PrimaryPart breaks PivotTo at the end — same bug as
--- SwingCarousel had with its CenterMast. Use an invisible identity-rotation
--- anchor at the model origin instead.
-local pivotAnchor = AB.part({
-	size         = Vector3.new(0.1, 0.1, 0.1),
-	color        = COCOA_DRINK,
-	cf           = CFrame.new(0, 0, 0),
-	canCollide   = false,
-	transparency = 1,
-	name         = "PivotAnchor",
-}, m)
-m.PrimaryPart = pivotAnchor
+local function buildStringLights(tag: string, yawRad: number)
+	local sub     = AB.model("StringLights_" .. tag, m)
+	local cableCF = O * CFrame.new(0, STRING_Y, 0) * CFrame.Angles(0, yawRad, 0)
+	local cable   = AB.block(Vector3.new(arenaDiameter - 4, cableThick, cableThick),
+		C.wrought_iron, cableCF, sub, "LightCable")
+	sub.PrimaryPart = cable
+	for j = 1, BULBS_PER_LINE do
+		local t          = (j - 0.5) / BULBS_PER_LINE
+		local localX     = -((arenaDiameter - 4) / 2) + t * (arenaDiameter - 4)
+		local bulbColor  = (j % 2 == 0) and C.ivory or C.crimson_glow
+		local bulb = AB.sphere(0.9, bulbColor,
+			cableCF * CFrame.new(localX, -0.5, 0), sub,
+			string.format("Bulb_%d", j))
+		bulb.Material = Enum.Material.Neon
+		AB.glow(bulb, bulbColor, bulbColor == C.crimson_glow and 1.2 or 0.8)
+	end
+	AB.weldAll(sub)
+end
 
+buildStringLights("A", 0)
+buildStringLights("B", math.rad(90))
+
+-- ── Finish up ──────────────────────────────────────────────────────────────
 AB.weldAll(m)
 m:PivotTo(originalPivot)
 
 print(string.format(
-	"[RideRebuild] %s rebuilt as Marshmallow Bumpers — arena Ø %d, %d cars",
-	RIDE_NAME, arenaDiameter, CAR_COUNT
+	"[RideRebuild] %s rebuilt as Classic Bumper Cars — arena Ø %d, %d cars, %d descendants",
+	RIDE_NAME, arenaDiameter, CAR_COUNT, #m:GetDescendants()
 ))
