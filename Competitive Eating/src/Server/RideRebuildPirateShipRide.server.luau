@@ -1,15 +1,16 @@
--- RideRebuildPirateShipRide → BANANA BOAT (2× footprint).
--- Pendulum mechanic preserved: PrimaryPart=Body, 6 Seat_1..Seat_6 kept.
--- A-frame + axle + hull spine tagged "Structural" so partCentroid() ignores
--- decorative banana segments, ripe spots, sail, peel.
--- New pivotY (~56) documented in RIDE_PirateShipRide_INTEGRATION.md.
+-- RideRebuildPirateShipRide → CLASSIC BELLE-ÉPOQUE PIRATE GALLEON.
+-- Replaces the food-shape Banana Boat. Pendulum mechanic preserved:
+--   PrimaryPart = invisible identity-rotation PivotAnchor (NEVER a cylinder).
+--   6 Seat_1..Seat_6 along the deck. "Body" kept as named structural hull part.
+--   Axle world-Y=28 → matches RideController.PENDULUM_RIDES.PirateShipRide.pivotY.
+-- Hull / keel / Body / mast / swing arms / axle / A-frame tagged "Structural"
+-- so partCentroid() ignores decorative trim/sails/figurehead.
 
-local ServerStorage    = game:GetService("ServerStorage")
+local ServerStorage     = game:GetService("ServerStorage")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
 local AB = require(ReplicatedStorage:WaitForChild("Common"):WaitForChild("AssetBuilder"))
 
-task.wait(1) -- let other rebuild scripts land too
+task.wait(1)
 
 local ship = workspace:FindFirstChild("PirateShipRide") :: Model?
 if not ship then
@@ -17,263 +18,235 @@ if not ship then
 	return
 end
 
--- ── 1. Back up the pre-food ride ─────────────────────────────────────────────
+-- ── 1. Back up the pre-Belle-Époque ride ────────────────────────────────────
 local originalPivot = ship:GetPivot()
 do
 	local clone = ship:Clone()
-	clone.Name = "PirateShipRide_PreFood_2026-06-03"
+	clone.Name   = "PirateShipRide_PreBelleEpoque_2026-06-03"
 	clone.Parent = ServerStorage
 end
 ship:ClearAllChildren()
 ship.PrimaryPart = nil
 
--- ── 2. Palette (banana + tropical accents) ──────────────────────────────────
+-- ── 2. Belle-Époque palette ─────────────────────────────────────────────────
 local C = {
-	bananaYellow  = Color3.fromRGB(248, 220, 60),
-	bananaShade   = Color3.fromRGB(225, 195, 35),
-	bananaTip     = Color3.fromRGB(120, 90, 30),
-	ripeSpot      = Color3.fromRGB(95, 60, 25),
-	peelGreen     = Color3.fromRGB(80, 165, 60),
-	leafGreen     = Color3.fromRGB(60, 140, 50),
-	leafDark      = Color3.fromRGB(40, 105, 35),
-	gold          = Color3.fromRGB(220, 180, 60),
-	mastBrown     = Color3.fromRGB(120, 75, 35),
-	frameWood     = Color3.fromRGB(85, 55, 30),
-	seatRed       = Color3.fromRGB(180, 35, 45),
+	burgundy    = Color3.fromRGB(130, 30, 50),
+	ivory       = Color3.fromRGB(245, 235, 205),
+	gold        = Color3.fromRGB(200, 160, 80),
+	deepWood    = Color3.fromRGB(110, 75, 45),
+	iron        = Color3.fromRGB(40, 35, 40),
+	cream       = Color3.fromRGB(230, 215, 180),
+	crimsonGlow = Color3.fromRGB(220, 60, 70),
 }
 
--- World layout. Original ship at world position ≈ (-80, 0, 0) per
--- FranksStringLights. We rebuild around the model origin and PivotTo at the
--- end, so coordinates here are LOCAL to ship.
--- 2× footprint horizontal, but axle stays at ~28 stud so the boat hangs
--- close to the ground instead of suspended at Y=56+. Visible to player
--- without binoculars.
-local HULL_LENGTH   = 50    -- X (long axis)
-local HULL_WIDTH    = 12    -- Z
-local HULL_HEIGHT   = 6     -- Y
-local SEGMENTS      = 9     -- segmented blocks → faint curve
-local AXLE_Y        = 28    -- mechanical axle world-Y MUST match RideController pivotY
-local DECK_Y        = 6     -- top of hull
+-- ── 3. PivotAnchor FIRST (mandatory pattern) ────────────────────────────────
+local pivotAnchor = AB.part({
+	size = Vector3.new(0.1, 0.1, 0.1), color = Color3.new(1, 1, 1),
+	cf = CFrame.new(0, 0, 0), canCollide = false, transparency = 1,
+	name = "PivotAnchor",
+}, ship)
+ship.PrimaryPart = pivotAnchor
 
-local shipCF = CFrame.new(originalPivot.Position)
+local O = CFrame.new(0, 0, 0)
 
--- Helper: a small ripe-spot stuck to hull side.
-local function ripeSpot(parent: Instance, x: number, y: number, zSide: number)
-	local p = AB.part({
-		size  = Vector3.new(1.2, 1.2, 0.4),
-		color = C.ripeSpot,
-		cf    = shipCF * CFrame.new(x, y, zSide),
-		shape = Enum.PartType.Ball,
-		name  = "RipeSpot",
-		canCollide = false,
-	}, parent)
-	p.Size = Vector3.new(math.random(20, 40)/10, math.random(15, 30)/10, 0.4)
+-- ── 4. Dimensions ───────────────────────────────────────────────────────────
+local HULL_LENGTH = 50
+local HULL_WIDTH  = 14
+local HULL_HEIGHT = 7
+local DECK_Y      = 6
+local AXLE_Y      = 28   -- matches controller pivotY
+
+-- ── 5. Hull (tapered planked galleon, structural) ───────────────────────────
+local SEGMENTS = 9
+for i = 1, SEGMENTS do
+	local t       = (i - 1) / (SEGMENTS - 1)
+	local centerT = t - 0.5
+	local x       = centerT * HULL_LENGTH
+	local sternFavor = 1 - 0.55 * (math.max(centerT, 0) * 2) ^ 1.6
+	local bowFavor   = 1 - 0.40 * (math.max(-centerT, 0) * 2) ^ 1.6
+	local taper      = math.min(sternFavor, bowFavor)
+	local segLen     = HULL_LENGTH / SEGMENTS + 0.5
+	local segH       = HULL_HEIGHT * taper
+	local segW       = HULL_WIDTH  * taper
+	local color      = (i % 2 == 0) and C.deepWood or C.burgundy
+	local seg = AB.part({
+		size = Vector3.new(segLen, segH, segW), color = color,
+		material = Enum.Material.WoodPlanks,
+		cf = O * CFrame.new(x, segH / 2, 0), name = "HullSeg_" .. i,
+	}, ship)
+	seg:AddTag("Structural")
 end
 
--- ── 3. Hull: curved banana via 9 segmented blocks ───────────────────────────
--- Curve: Y = baseY + sag * sin(t*pi). Banana sags slightly in the middle.
-local HULL_SAG = 4
-local function buildHull()
-	for i = 1, SEGMENTS do
-		local t        = (i - 1) / (SEGMENTS - 1)            -- 0..1
-		local centerT  = t - 0.5                              -- -0.5..0.5
-		local x        = centerT * HULL_LENGTH
-		-- Banana droops at the ends, peaks in the middle.
-		local ySag     = -HULL_SAG * math.cos(centerT * math.pi)
-		-- Banana tapers at both ends.
-		local taper    = 1 - 0.55 * (math.abs(centerT) * 2)^2
-		local segLen   = HULL_LENGTH / SEGMENTS
-		local segH     = HULL_HEIGHT * taper
-		local segW     = HULL_WIDTH  * taper
+local keel = AB.part({
+	size = Vector3.new(HULL_LENGTH + 2, 1.2, 2.2), color = C.deepWood,
+	material = Enum.Material.Wood, cf = O * CFrame.new(0, -0.4, 0), name = "Keel",
+}, ship)
+keel:AddTag("Structural")
 
-		local isEnd = (i == 1 or i == SEGMENTS)
-		local segCol = isEnd and C.bananaTip or (i % 2 == 0 and C.bananaShade or C.bananaYellow)
+AB.part({
+	size = Vector3.new(HULL_LENGTH - 4, 0.5, HULL_WIDTH - 2.5), color = C.cream,
+	material = Enum.Material.WoodPlanks, cf = O * CFrame.new(0, DECK_Y, 0), name = "Deck",
+}, ship)
 
-		local seg = AB.part({
-			size = Vector3.new(segLen + 0.4, segH, segW),
-			color = segCol,
-			cf   = shipCF * CFrame.new(x, ySag, 0),
-			name = "HullSeg_" .. i,
-		}, ship)
-		seg:AddTag("Structural")
-
-		-- Decorative ripe spots on a few mid segments (untagged).
-		if i >= 3 and i <= 7 and i % 2 == 1 then
-			ripeSpot(ship, x, ySag + 1, segW / 2 + 0.1)
-			ripeSpot(ship, x + 1.5, ySag, -segW / 2 - 0.1)
-		end
-	end
-end
-buildHull()
-
--- ── 4. "Body" — the canonical PrimaryPart spine of the banana ───────────────
--- Thin invisible spar running the hull length at deck height. Used by
--- pendulum animator (RideController sets baseCF at axle, then pivots).
+-- ── 6. "Body" — named structural hull part (NOT PrimaryPart) ────────────────
 local body = AB.part({
-	size = Vector3.new(HULL_LENGTH - 2, 1, HULL_WIDTH - 2),
-	color = C.bananaYellow,
-	cf    = shipCF * CFrame.new(0, DECK_Y - 2, 0),
-	name  = "Body",
-	transparency = 1,
-	canCollide = false,
+	size = Vector3.new(HULL_LENGTH - 4, 1, HULL_WIDTH - 4), color = C.burgundy,
+	cf = O * CFrame.new(0, DECK_Y - 1.5, 0), name = "Body",
+	transparency = 1, canCollide = false,
 }, ship)
 body:AddTag("Structural")
-ship.PrimaryPart = body
 
--- ── 5. Peeled stern: open peel curling up at the back ───────────────────────
-local function peelStrip(xBase: number, zSide: number, name: string)
-	for i = 1, 4 do
-		local up = i * 1.5
-		local out = i * 0.7 * (zSide > 0 and 1 or -1)
-		AB.part({
-			size = Vector3.new(2.5, 4, 1.6),
-			color = (i % 2 == 0) and C.bananaYellow or C.peelGreen,
-			cf = shipCF * CFrame.new(xBase + i * 1.2, DECK_Y - 1 + up, zSide + out)
-				* CFrame.Angles(0, 0, math.rad(zSide > 0 and 15 or -15) * i),
-			name = name .. "_" .. i,
-		}, ship)
+-- ── 7. Bow figurehead + stern castle + lantern ──────────────────────────────
+AB.part({ size = Vector3.new(8, 1.2, 1.2), color = C.deepWood,
+	material = Enum.Material.Wood, cf = O * CFrame.new(HULL_LENGTH / 2 + 3, DECK_Y + 1, 0),
+	name = "Bowsprit" }, ship)
+AB.part({ size = Vector3.new(2.2, 3, 2.2), color = C.ivory,
+	material = Enum.Material.Marble, cf = O * CFrame.new(HULL_LENGTH / 2 + 1.4, DECK_Y + 0.5, 0),
+	name = "FigureheadBody" }, ship)
+AB.sphere(2, C.ivory, O * CFrame.new(HULL_LENGTH / 2 + 1.4, DECK_Y + 2.6, 0), ship, "FigureheadHead")
+AB.part({ size = Vector3.new(1.2, 0.6, 2.4), color = C.gold,
+	material = Enum.Material.Metal, reflectance = 0.3,
+	cf = O * CFrame.new(HULL_LENGTH / 2 + 1.4, DECK_Y + 3.4, 0), name = "FigureheadCrown" }, ship)
+
+AB.part({ size = Vector3.new(8, 4, HULL_WIDTH - 4), color = C.burgundy,
+	material = Enum.Material.WoodPlanks,
+	cf = O * CFrame.new(-HULL_LENGTH / 2 + 4, DECK_Y + 2, 0), name = "SternCastle" }, ship)
+AB.part({ size = Vector3.new(1.5, 2, 1.5), color = C.gold,
+	material = Enum.Material.Metal,
+	cf = O * CFrame.new(-HULL_LENGTH / 2 + 2, DECK_Y + 5.5, 0), name = "SternLantern" }, ship)
+AB.glow(AB.part({
+	size = Vector3.new(0.8, 1, 0.8), color = C.crimsonGlow, material = Enum.Material.Neon,
+	cf = O * CFrame.new(-HULL_LENGTH / 2 + 2, DECK_Y + 5.5, 0),
+	name = "SternLanternGlow", canCollide = false,
+}, ship), C.crimsonGlow, 2)
+
+-- ── 8. Gold rim + railing posts ─────────────────────────────────────────────
+for _, side in {-1, 1} do
+	AB.part({ size = Vector3.new(HULL_LENGTH - 4, 0.5, 0.7), color = C.gold,
+		material = Enum.Material.Metal, reflectance = 0.3,
+		cf = O * CFrame.new(0, DECK_Y + 0.4, side * (HULL_WIDTH / 2 - 1)),
+		name = "GoldRim_" .. (side == 1 and "R" or "L") }, ship)
+	for k = -3, 3 do
+		AB.part({ size = Vector3.new(0.4, 1.6, 0.4), color = C.deepWood,
+			cf = O * CFrame.new(k * 6, DECK_Y + 1.2, side * (HULL_WIDTH / 2 - 1)),
+			name = "RailPost" }, ship)
 	end
 end
-peelStrip( HULL_LENGTH / 2 - 4,  HULL_WIDTH / 2 - 1, "PeelR")
-peelStrip( HULL_LENGTH / 2 - 4, -HULL_WIDTH / 2 + 1, "PeelL")
-peelStrip( HULL_LENGTH / 2 - 6,  0,                 "PeelCenter")
 
--- ── 6. Mast + palm-leaf sail ────────────────────────────────────────────────
-local mastBase = shipCF * CFrame.new(0, DECK_Y, 0)
-AB.cylinder(2, 28, C.mastBrown, mastBase * CFrame.new(0, 14, 0), ship, "Mast")
-
--- Palm fronds: 6 elongated wedges in a star pattern at the top.
-for i = 1, 6 do
-	local angle = (i - 1) * (math.pi * 2 / 6)
-	local len = 14
-	local frondCF = mastBase * CFrame.new(0, 26, 0)
-		* CFrame.Angles(0, angle, 0)
-		* CFrame.new(0, 0, -len / 2)
-		* CFrame.Angles(math.rad(-15), 0, 0)
-	AB.part({
-		size = Vector3.new(7, 0.6, len),
-		color = i % 2 == 0 and C.leafGreen or C.leafDark,
-		cf    = frondCF,
-		name  = "Frond_" .. i,
-	}, ship)
-end
-
--- Coconut cluster at the mast crown.
-for i = 1, 3 do
-	local a = (i - 1) * math.pi * 2 / 3
-	AB.sphere(2.4, C.frameWood,
-		mastBase * CFrame.new(math.cos(a) * 1.4, 25, math.sin(a) * 1.4),
-		ship, "Coconut_" .. i)
-end
-
--- ── 7. Gold trim along hull rim ─────────────────────────────────────────────
-for i = -1, 1, 2 do
-	AB.part({
-		size = Vector3.new(HULL_LENGTH - 4, 0.6, 0.8),
-		color = C.gold,
-		cf    = shipCF * CFrame.new(0, DECK_Y - 0.8, i * (HULL_WIDTH / 2 + 0.2)),
-		material = Enum.Material.Metal,
-		reflectance = 0.3,
-		name  = "GoldTrim_" .. (i == 1 and "R" or "L"),
-	}, ship)
-end
-AB.part({
-	size = Vector3.new(HULL_LENGTH - 6, 0.3, HULL_WIDTH - 4),
-	color = C.gold,
-	cf    = shipCF * CFrame.new(0, DECK_Y - 0.2, 0),
-	material = Enum.Material.Metal,
-	reflectance = 0.25,
-	name  = "DeckTrim",
+-- ── 9. Mast + sail + crow's nest + burgundy pennant ─────────────────────────
+local MAST_BASE_Y = DECK_Y + 0.5
+local MAST_H      = 22
+local mast = AB.part({
+	size = Vector3.new(1.6, MAST_H, 1.6), color = C.deepWood,
+	material = Enum.Material.Wood,
+	cf = O * CFrame.new(0, MAST_BASE_Y + MAST_H / 2, 0), name = "Mast",
 }, ship)
+mast:AddTag("Structural")
 
--- ── 8. 6 Seats along the deck, named Seat_1..Seat_6 ─────────────────────────
-local SEAT_SPACING = (HULL_LENGTH - 14) / 5
-for i = 1, 6 do
-	local x = -(HULL_LENGTH - 14) / 2 + (i - 1) * SEAT_SPACING
-	local seat = Instance.new("Seat")
-	seat.Name        = "Seat_" .. i
-	seat.Size        = Vector3.new(3, 1, 4)
-	seat.Color       = C.seatRed
-	seat.Material    = Enum.Material.SmoothPlastic
-	seat.Anchored    = true
-	seat.CanCollide  = true
-	seat.CFrame      = shipCF * CFrame.new(x, DECK_Y + 0.5, 0)
-	seat.Parent      = ship
+AB.part({ size = Vector3.new(18, 0.8, 0.8), color = C.deepWood,
+	material = Enum.Material.Wood,
+	cf = O * CFrame.new(0, MAST_BASE_Y + MAST_H * 0.65, 0), name = "Yardarm" }, ship)
 
-	-- Seat back so riders read as seated, not floating.
-	AB.part({
-		size = Vector3.new(0.8, 3, 4),
-		color = C.frameWood,
-		cf    = shipCF * CFrame.new(x - 1.6, DECK_Y + 2, 0),
-		name  = "SeatBack_" .. i,
-	}, ship)
+local SAIL_W, SAIL_H = 16, 10
+local sailCY = MAST_BASE_Y + MAST_H * 0.45
+for i = 1, 3 do
+	local stripe = (i == 2) and C.burgundy or C.ivory
+	AB.part({ size = Vector3.new(SAIL_W, SAIL_H / 3, 0.3), color = stripe,
+		material = Enum.Material.Fabric,
+		cf = O * CFrame.new(0, sailCY + (i - 2) * (SAIL_H / 3), 0.6),
+		name = "Sail_" .. i }, ship)
 end
 
--- ── 9. Two swing arms (axle → hull) ─────────────────────────────────────────
+AB.cylinder(4, 1.2, C.cream, O * CFrame.new(0, MAST_BASE_Y + MAST_H - 1, 0), ship, "CrowsNest")
+AB.part({ size = Vector3.new(0.3, 1.6, 5), color = C.burgundy,
+	material = Enum.Material.Fabric,
+	cf = O * CFrame.new(0, MAST_BASE_Y + MAST_H + 1, 2.5), name = "Pennant" }, ship)
+AB.part({ size = Vector3.new(0.3, 0.4, 1.5), color = C.gold,
+	material = Enum.Material.Metal,
+	cf = O * CFrame.new(0, MAST_BASE_Y + MAST_H + 2, 0.75), name = "PennantPole" }, ship)
+
+-- ── 10. Six Seat_1..Seat_6 (RideController contract) ───────────────────────
+local SEAT_SPAN    = HULL_LENGTH - 18
+local SEAT_SPACING = SEAT_SPAN / 5
+for i = 1, 6 do
+	local x = -SEAT_SPAN / 2 + (i - 1) * SEAT_SPACING
+	local seat = Instance.new("Seat")
+	seat.Name = "Seat_" .. i
+	seat.Size = Vector3.new(3, 1, 4)
+	seat.Color = C.deepWood
+	seat.Material = Enum.Material.WoodPlanks
+	seat.Anchored = true
+	seat.CanCollide = true
+	seat.CFrame = O * CFrame.new(x, DECK_Y + 0.8, 0)
+	seat.Parent = ship
+
+	AB.part({ size = Vector3.new(0.8, 3, 4), color = C.ivory,
+		material = Enum.Material.WoodPlanks,
+		cf = O * CFrame.new(x - 1.6, DECK_Y + 2.4, 0), name = "SeatBack_" .. i }, ship)
+	AB.part({ size = Vector3.new(0.9, 0.4, 4), color = C.gold,
+		material = Enum.Material.Metal, reflectance = 0.3,
+		cf = O * CFrame.new(x - 1.6, DECK_Y + 3.9, 0), name = "SeatTrim_" .. i }, ship)
+end
+
+-- ── 11. Swing arms (deck → axle) ────────────────────────────────────────────
 for _, side in {-1, 1} do
 	local armLen = AXLE_Y - DECK_Y
 	local arm = AB.part({
-		size = Vector3.new(1.2, armLen, 1.2),
-		color = C.frameWood,
-		cf    = shipCF * CFrame.new(0, DECK_Y + armLen / 2, side * (HULL_WIDTH / 2 - 1)),
-		name  = "SwingArm_" .. (side == 1 and "R" or "L"),
+		size = Vector3.new(1.4, armLen, 1.4), color = C.iron,
+		material = Enum.Material.Metal,
+		cf = O * CFrame.new(0, DECK_Y + armLen / 2, side * (HULL_WIDTH / 2 - 1)),
+		name = "SwingArm_" .. (side == 1 and "R" or "L"),
 	}, ship)
 	arm:AddTag("Structural")
 end
 
--- ── 10. Axle bar at the top of the swing arms ───────────────────────────────
+-- ── 12. Axle ────────────────────────────────────────────────────────────────
 local axle = AB.part({
-	size = Vector3.new(1.4, 1.4, HULL_WIDTH + 4),
-	color = C.gold,
-	cf    = shipCF * CFrame.new(0, AXLE_Y, 0),
-	material = Enum.Material.Metal,
-	reflectance = 0.4,
-	name  = "Axle",
+	size = Vector3.new(1.6, 1.6, HULL_WIDTH + 6), color = C.gold,
+	material = Enum.Material.Metal, reflectance = 0.4,
+	cf = O * CFrame.new(0, AXLE_Y, 0), name = "Axle",
 }, ship)
 axle:AddTag("Structural")
 
--- ── 11. A-frame static supports (tagged Structural) ─────────────────────────
--- Two A-frame triangles, fore and aft, each meeting at the axle ends.
-local A_FRAME_BASE     = 28                   -- foot spread along Z
-local A_FRAME_OFFSET_X = HULL_LENGTH / 2 + 8  -- forward / aft offset
+-- ── 13. A-frame supports fore + aft ─────────────────────────────────────────
+local A_FRAME_BASE     = 30
+local A_FRAME_OFFSET_X = HULL_LENGTH / 2 + 9
 
 local function aFrame(xPos: number, label: string)
 	for _, side in {-1, 1} do
 		local footZ = side * (A_FRAME_BASE / 2)
-		-- Compute angled leg from foot up to axle midpoint.
 		local foot  = Vector3.new(xPos, 0, footZ)
 		local top   = Vector3.new(xPos, AXLE_Y, 0)
 		local mid   = (foot + top) / 2
 		local diff  = top - foot
 		local len   = diff.Magnitude
-		-- Build leg as a long block; orient by lookAt from foot toward top.
-		local cf = CFrame.lookAt(mid, mid + diff.Unit) * CFrame.Angles(math.rad(90), 0, 0)
+		local cf    = CFrame.lookAt(mid, mid + diff.Unit) * CFrame.Angles(math.rad(90), 0, 0)
 		local leg = AB.part({
-			size = Vector3.new(1.8, len, 1.8),
-			color = C.frameWood,
-			cf    = shipCF * cf,
-			material = Enum.Material.Wood,
-			name  = "AFrame_" .. label .. "_" .. (side == 1 and "R" or "L"),
+			size = Vector3.new(2, len, 2), color = C.deepWood,
+			material = Enum.Material.Wood, cf = O * cf,
+			name = "AFrame_" .. label .. "_" .. (side == 1 and "R" or "L"),
 		}, ship)
 		leg:AddTag("Structural")
+		AB.part({ size = Vector3.new(2.4, 0.6, 2.4), color = C.gold,
+			material = Enum.Material.Metal, reflectance = 0.3,
+			cf = O * CFrame.new(xPos, AXLE_Y - 0.6, footZ * 0.05),
+			name = "AFrameRivet_" .. label }, ship)
 	end
-	-- Horizontal crossbeam between feet for rigidity.
-	AB.part({
-		size = Vector3.new(2, 1.4, A_FRAME_BASE),
-		color = C.frameWood,
-		cf    = shipCF * CFrame.new(xPos, 1, 0),
+	local base = AB.part({
+		size = Vector3.new(2.4, 1.6, A_FRAME_BASE + 2), color = C.deepWood,
 		material = Enum.Material.Wood,
-		name  = "AFrame_" .. label .. "_Base",
-	}, ship):AddTag("Structural")
+		cf = O * CFrame.new(xPos, 0.8, 0),
+		name = "AFrame_" .. label .. "_Base",
+	}, ship)
+	base:AddTag("Structural")
 end
-
 aFrame( A_FRAME_OFFSET_X, "Fore")
 aFrame(-A_FRAME_OFFSET_X, "Aft")
 
--- ── 12. Weld + restore pivot ────────────────────────────────────────────────
+-- ── 14. Weld + restore pivot ────────────────────────────────────────────────
 AB.weldAll(ship)
 ship:PivotTo(originalPivot)
 
 print(string.format(
-	"[RideRebuildPirateShipRide] Rebuilt as Banana Boat — %d parts, PrimaryPart=Body, pivotY target ≈ %d",
+	"[RideRebuildPirateShipRide] Rebuilt as Belle-Époque Galleon — %d parts, PrimaryPart=PivotAnchor, axleY=%d",
 	#ship:GetDescendants(), AXLE_Y))
