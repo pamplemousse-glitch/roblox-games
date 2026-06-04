@@ -1,40 +1,46 @@
 --!strict
--- RideRebuildParachuteJump: idempotent food-shape rebuild for the
--- ParachuteJump ride → "Lollipop Drop". Central giant pretzel-twist tower with
--- 8 disc-lollipop "parachutes" rising and falling around it (red/white striped
--- discs on white sticks, with rider seats hanging below).
+-- RideRebuildParachuteJump: Belle-Époque "Classic Parachute Drop" rebuild
+-- replacing the prior Lollipop Drop food-shape. Tall central deep_wood +
+-- antique_gold lattice tower (NOT a pretzel). 8 ivory parachute canopies with
+-- burgundy stripes, each with a rider Seat hanging below.
 --
--- Hard contract preserved (RideController.luau lines 665-690, 895-921):
---   * workspace.ParachuteJump stays a Model (we ClearAllChildren, never destroy).
+-- HARD contract preserved (RideController.luau ~lines 685-711, 942-961):
+--   * workspace.ParachuteJump stays a Model (ClearAllChildren, never destroy).
 --   * For each chute idx 1..8, the per-frame loop translates every BasePart
---     whose name matches: ^Chute[A-Za-z]+<idx>$ | ^ChuteS<idx>_%d+$ | ^ChutFrame<idx>$
---     All chute-attached parts use those exact patterns. The central tower,
---     deco, and ground use names that do NOT match (no trailing digit) so they
---     stay static.
---   * Chutes are built at their TOP Y (183). RideController captures
---     originalPos = top, then offsets down by (TOP - BOTTOM = 176) studs.
+--     whose name matches the regex (RideController.luau:700):
+--       ^Chute[A-Za-z]+<idx>$    -- ChuteBasket<i>, ChuteFrame<i>, ChuteRider<i>,
+--                                   ChuteD<i>, ChuteCanopy<i>, ChuteRope<i>, etc.
+--       ^ChuteS<idx>_%d+$        -- ChuteS<i>_1..N stripes
+--       ^ChutFrame<idx>$         -- legacy alias
+--     Anything NOT matching those patterns (tower, ground, deco, PivotAnchor)
+--     stays static.
+--   * Chutes are built at their TOP Y (PARACHUTE_TOP_Y=183). RideController
+--     captures originalPos = top, then offsets down by (TOP - BOTTOM = 176).
 --
--- Scale: 2× original footprint. Central tower ~200 studs tall, chutes orbit at
--- radius ~50 studs.
+-- Scale: 2× horizontal footprint. TOP_Y / BOTTOM_Y preserved.
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerStorage     = game:GetService("ServerStorage")
 
 local AB = require(ReplicatedStorage.Common.AssetBuilder)
 
+-- ── Constants RideController depends on — DO NOT CHANGE ─────────────────────
 local TOP_Y      = 183           -- must match PARACHUTE_TOP_Y
 local BOTTOM_Y   = 7             -- must match PARACHUTE_BOTTOM_Y
 local CHUTE_COUNT = 8
-local CHUTE_ORBIT_R = 50         -- 2× original
+local CHUTE_ORBIT_R = 50         -- 2× horizontal of original 25
 
-local PRETZEL    = Color3.fromRGB(140,  90,  45)   -- darker pretzel brown
-local PRETZEL_HI = Color3.fromRGB(180, 130,  70)   -- AB.colors.pretzelBrown
-local SALT       = Color3.fromRGB(240, 235, 220)
-local STICK      = Color3.fromRGB(250, 248, 240)
-local LOLLI_RED  = Color3.fromRGB(220,  45,  55)
-local LOLLI_WHT  = Color3.fromRGB(250, 245, 240)
-local SEAT_COL   = Color3.fromRGB(80,  35,  35)
-local GROUND     = Color3.fromRGB(230, 215, 200)
+-- ── Belle-Époque palette ────────────────────────────────────────────────────
+local DEEP_WOOD     = Color3.fromRGB( 80,  50,  30)   -- tower main timber
+local DEEP_WOOD_HI  = Color3.fromRGB(105,  70,  45)   -- highlighted timber
+local ANTIQUE_GOLD  = Color3.fromRGB(195, 155,  70)   -- lattice + rivets
+local ANTIQUE_GOLD2 = Color3.fromRGB(225, 185,  90)   -- bright gold cap
+local IVORY         = Color3.fromRGB(230, 220, 195)   -- canopy base
+local BURGUNDY      = Color3.fromRGB(110,  30,  40)   -- canopy stripes + accents
+local CRIMSON_GLOW  = Color3.fromRGB(170,  45,  55)   -- accent stripes
+local SEAT_COL      = Color3.fromRGB( 70,  35,  35)   -- rider seat leather
+local ROPE_COL      = Color3.fromRGB(160, 130,  90)   -- canopy ropes
+local GROUND        = Color3.fromRGB(195, 180, 155)   -- packed dirt pad
 
 task.wait(1)
 
@@ -44,13 +50,13 @@ if not m then
 	return
 end
 
--- Capture original pivot before clearing so the new build lands in the same spot.
+-- Capture original pivot so the new build lands in the same spot.
 local originalPivot = m:GetPivot()
 
 -- 1) Backup
 do
 	local clone = m:Clone()
-	clone.Name  = "ParachuteJump_PreFood_2026-06-03"
+	clone.Name  = "ParachuteJump_PreClassic_2026-06-03"
 	clone.Parent = ServerStorage
 end
 
@@ -60,95 +66,139 @@ m.PrimaryPart = nil
 
 local centerCF = CFrame.new(0, 0, 0)   -- build at origin, PivotTo at end
 
--- ── Ground pad (pastel candy-shop floor) ─────────────────────────────────────
+-- ── Ground pad (carnival packed earth) ──────────────────────────────────────
 local pad = AB.cylinder(140, 1.5, GROUND,
 	centerCF * CFrame.new(0, BOTTOM_Y - 1, 0), m, "GroundPad")
-pad.Material = Enum.Material.SmoothPlastic
+pad.Material = Enum.Material.Slate
 
--- Decorative sprinkle ring on the pad
-for i = 1, 24 do
-	local ang = (i / 24) * math.pi * 2
-	local r   = 55
+-- Antique-gold ring inlay around the pad
+for i = 1, 32 do
+	local ang = (i / 32) * math.pi * 2
+	local r   = 62
 	local sx, sz = math.cos(ang) * r, math.sin(ang) * r
-	local col = ({LOLLI_RED, LOLLI_WHT, Color3.fromRGB(255,200,80), Color3.fromRGB(120,200,120)})[((i - 1) % 4) + 1]
-	AB.block(Vector3.new(2, 0.6, 0.8), col,
+	local plaque = AB.block(Vector3.new(3, 0.3, 1.2),
+		ANTIQUE_GOLD,
 		centerCF * CFrame.new(sx, BOTTOM_Y - 0.1, sz) * CFrame.Angles(0, -ang, 0),
-		m, "PadSprinkle")
+		m, "PadInlay")
+	plaque.Material = Enum.Material.Metal
 end
 
--- ── Central pretzel-twist tower ──────────────────────────────────────────────
--- Tower: stacked "rope" rings — 3 thick cylinders per slice, rotated through
--- 360° to fake a braid. ~24 slices over ~200 studs.
-local TOWER_BASE_Y   = BOTTOM_Y - 0.5
-local TOWER_TOP_Y    = TOP_Y + 14
-local TOWER_HEIGHT   = TOWER_TOP_Y - TOWER_BASE_Y         -- ~190
-local SLICES         = 26
-local SLICE_H        = TOWER_HEIGHT / SLICES
-local BRAID_R        = 5.5
-local BRAID_THICK    = 4.5
+-- ── Central lattice tower (deep_wood + antique_gold) ────────────────────────
+-- Belle-Époque ironwork-meets-timber lattice: 4 main corner posts plus diagonal
+-- braces forming X-shapes between horizontal ring beams. Tower runs from
+-- BOTTOM_Y - 0.5 up to TOP_Y + 14 (silhouette caps above the topmost canopy).
 
-for s = 0, SLICES - 1 do
-	local y = TOWER_BASE_Y + (s + 0.5) * SLICE_H
-	-- 3 strands offset 120° each, slice angle advances → twisted braid look.
-	local twist = math.rad(s * 28)
-	for strand = 0, 2 do
-		local ang = twist + math.rad(strand * 120)
-		local x   = math.cos(ang) * BRAID_R
-		local z   = math.sin(ang) * BRAID_R
-		local col = (strand % 2 == 0) and PRETZEL or PRETZEL_HI
-		local p = AB.cylinder(BRAID_THICK, BRAID_THICK + 0.5, col,
-			centerCF * CFrame.new(x, y, z),
-			m, "TowerBraid")
-		p.Material = Enum.Material.SmoothPlastic
+local TOWER_BASE_Y = BOTTOM_Y - 0.5
+local TOWER_TOP_Y  = TOP_Y + 14
+local TOWER_HEIGHT = TOWER_TOP_Y - TOWER_BASE_Y       -- ~190
+
+local POST_R         = 12         -- corner-post radius from center axis
+local POST_THICK     = 2.8
+local RING_COUNT     = 9          -- horizontal ring beams (incl. base + top)
+local RING_SPACING   = TOWER_HEIGHT / (RING_COUNT - 1)
+
+-- 4 main corner posts (deep_wood, slight taper via stacked segments)
+for corner = 0, 3 do
+	local ang = math.rad(corner * 90 + 45)
+	local cx, cz = math.cos(ang) * POST_R, math.sin(ang) * POST_R
+	-- One tall cylinder; capped by sphere finials at base + top.
+	local post = AB.cylinder(POST_THICK, TOWER_HEIGHT, DEEP_WOOD,
+		centerCF * CFrame.new(cx, TOWER_BASE_Y + TOWER_HEIGHT / 2, cz),
+		m, "TowerPost")
+	post.Material = Enum.Material.Wood
+	-- Gold base finial
+	local finialB = AB.sphere(POST_THICK + 1, ANTIQUE_GOLD,
+		centerCF * CFrame.new(cx, TOWER_BASE_Y + 0.5, cz), m, "TowerPostFinialBase")
+	finialB.Material = Enum.Material.Metal
+	-- Gold top finial
+	local finialT = AB.sphere(POST_THICK + 1, ANTIQUE_GOLD2,
+		centerCF * CFrame.new(cx, TOWER_TOP_Y - 0.5, cz), m, "TowerPostFinialTop")
+	finialT.Material = Enum.Material.Metal
+end
+
+-- Horizontal ring beams (antique_gold) connecting the 4 posts, one per ring level.
+for ringIdx = 0, RING_COUNT - 1 do
+	local ringY = TOWER_BASE_Y + ringIdx * RING_SPACING
+	for side = 0, 3 do
+		local angA = math.rad(side * 90 + 45)
+		local angB = math.rad((side + 1) * 90 + 45)
+		local ax, az = math.cos(angA) * POST_R, math.sin(angA) * POST_R
+		local bx, bz = math.cos(angB) * POST_R, math.sin(angB) * POST_R
+		local midX, midZ = (ax + bx) / 2, (az + bz) / 2
+		local span = math.sqrt((bx - ax) ^ 2 + (bz - az) ^ 2)
+		local yaw = math.atan2(bz - az, bx - ax)
+		local beam = AB.block(
+			Vector3.new(span, 1.2, 1.2),
+			ANTIQUE_GOLD,
+			centerCF * CFrame.new(midX, ringY, midZ) * CFrame.Angles(0, -yaw, 0),
+			m, "TowerRingBeam")
+		beam.Material = Enum.Material.Metal
 	end
 end
 
--- Pretzel knots: oversized loops at base, middle, and top for "this is a pretzel" silhouette.
-local function pretzelKnot(yPos: number, outerR: number, ringName: string)
-	local segments = 18
-	for i = 1, segments do
-		local a = (i / segments) * math.pi * 2
-		local x = math.cos(a) * outerR
-		local z = math.sin(a) * outerR
-		local p = AB.cylinder(6, 7, PRETZEL,
-			centerCF * CFrame.new(x, yPos, z) * CFrame.Angles(0, -a, 0),
-			m, ringName)
-		p.Material = Enum.Material.SmoothPlastic
+-- Diagonal X-braces (deep_wood_hi) between each pair of ring beams on each face.
+for ringIdx = 0, RING_COUNT - 2 do
+	local yLo = TOWER_BASE_Y + ringIdx * RING_SPACING
+	local yHi = yLo + RING_SPACING
+	for side = 0, 3 do
+		local angA = math.rad(side * 90 + 45)
+		local angB = math.rad((side + 1) * 90 + 45)
+		local ax, az = math.cos(angA) * POST_R, math.sin(angA) * POST_R
+		local bx, bz = math.cos(angB) * POST_R, math.sin(angB) * POST_R
+		-- Brace 1: bottom-A → top-B
+		-- Brace 2: bottom-B → top-A
+		local pairs_ = {
+			{a = Vector3.new(ax, yLo, az), b = Vector3.new(bx, yHi, bz)},
+			{a = Vector3.new(bx, yLo, bz), b = Vector3.new(ax, yHi, az)},
+		}
+		for _, pp in pairs_ do
+			local mid = (pp.a + pp.b) / 2
+			local delta = pp.b - pp.a
+			local len = delta.Magnitude
+			-- Orient: align block X to delta direction
+			local lookAt = CFrame.lookAt(pp.a, pp.b)
+			local cf = CFrame.new(mid) * lookAt.Rotation
+				* CFrame.Angles(0, math.rad(90), 0)
+			local brace = AB.block(
+				Vector3.new(len, 0.7, 0.7),
+				DEEP_WOOD_HI,
+				centerCF * cf,
+				m, "TowerBrace")
+			brace.Material = Enum.Material.Wood
+		end
 	end
 end
 
-pretzelKnot(TOWER_BASE_Y + 6,                12, "TowerKnotBase")
-pretzelKnot(TOWER_BASE_Y + TOWER_HEIGHT/2,   11, "TowerKnotMid")
-pretzelKnot(TOWER_TOP_Y - 6,                 14, "TowerKnotTop")
-
--- Salt sprinkles on the knots
-for i = 1, 36 do
-	local a = math.rad(i * 10 + 7)
-	local r = (i % 3 == 0) and 14 or 12
-	local y = TOWER_BASE_Y + 6 + ((i % 3) * 0.7)
-	AB.sphere(0.9, SALT,
-		centerCF * CFrame.new(math.cos(a) * r, y, math.sin(a) * r), m, "SaltGrainBase")
-end
-for i = 1, 28 do
-	local a = math.rad(i * 13 + 4)
-	AB.sphere(1.0, SALT,
-		centerCF * CFrame.new(math.cos(a) * 16, TOWER_TOP_Y - 6 + ((i % 3) * 0.5), math.sin(a) * 16),
-		m, "SaltGrainTop")
+-- Gold rivet studs at each post/ring intersection (decor)
+for ringIdx = 0, RING_COUNT - 1 do
+	local ringY = TOWER_BASE_Y + ringIdx * RING_SPACING
+	for corner = 0, 3 do
+		local ang = math.rad(corner * 90 + 45)
+		local cx, cz = math.cos(ang) * POST_R, math.sin(ang) * POST_R
+		local rivet = AB.sphere(1.2, ANTIQUE_GOLD2,
+			centerCF * CFrame.new(cx, ringY, cz), m, "TowerRivet")
+		rivet.Material = Enum.Material.Metal
+	end
 end
 
--- Top cap so the tower silhouette closes
-local towerCap = AB.sphere(10, PRETZEL,
-	centerCF * CFrame.new(0, TOWER_TOP_Y + 3, 0), m, "TowerCap")
-towerCap.Material = Enum.Material.SmoothPlastic
+-- Decorative top crown: gold finial sphere + spire
+local crownBase = AB.cylinder(8, 2, ANTIQUE_GOLD,
+	centerCF * CFrame.new(0, TOWER_TOP_Y + 1, 0), m, "TowerCrownBase")
+crownBase.Material = Enum.Material.Metal
 
--- Tower "core" sentinel — visible cylinder INSIDE the tower (not used as
--- PrimaryPart because AB.cylinder bakes a 90° Z rotation that would force
--- PivotTo to un-rotate the entire model). Use an invisible identity anchor
--- as PrimaryPart.
-local towerCore = AB.cylinder(2, TOWER_HEIGHT, Color3.fromRGB(60, 30, 20),
-	centerCF * CFrame.new(0, (TOWER_BASE_Y + TOWER_TOP_Y) / 2, 0), m, "TowerCore")
-towerCore.Transparency = 1
-towerCore.CanCollide   = false
+local crownBall = AB.sphere(6, ANTIQUE_GOLD2,
+	centerCF * CFrame.new(0, TOWER_TOP_Y + 5, 0), m, "TowerCrownBall")
+crownBall.Material    = Enum.Material.Metal
+crownBall.Reflectance = 0.1
+
+local crownSpire = AB.cylinder(0.8, 10, ANTIQUE_GOLD2,
+	centerCF * CFrame.new(0, TOWER_TOP_Y + 12, 0), m, "TowerCrownSpire")
+crownSpire.Material = Enum.Material.Metal
+-- The cylinder builder bakes a 90°Z rotation that points X up; re-orient so the
+-- spire is vertical (Y up). Match by setting CFrame after creation.
+crownSpire.CFrame = centerCF * CFrame.new(0, TOWER_TOP_Y + 12, 0)
+
+-- Invisible PivotAnchor at origin so PivotTo lands cleanly (no baked rotation).
 local pivotAnchor = AB.part({
 	size         = Vector3.new(0.1, 0.1, 0.1),
 	color        = Color3.new(1, 1, 1),
@@ -159,76 +209,127 @@ local pivotAnchor = AB.part({
 }, m)
 m.PrimaryPart = pivotAnchor
 
--- ── 8 lollipop chutes ───────────────────────────────────────────────────────
--- Each chute is a vertical assembly built at TOP position; RideController
--- captures top Y, then offsets each part down per frame.
+-- ── 8 parachute canopies + rider seats ──────────────────────────────────────
+-- Built at TOP positions. RideController captures top Y, then per frame offsets
+-- each part down by (TOP_Y - BOTTOM_Y) on the phase cycle.
 --
 -- Parts that move with chute idx (regex-matched):
---   ChuteBasket<idx>  → disc head (lollipop candy)
---   ChuteFrame<idx>   → stick (cylinder above the disc)
---   ChuteRider<idx>   → Seat hanging below the disc
---   ChuteS<idx>_1..6  → striping rings on the disc
---   ChuteD<idx>       → decorative dome on disc top
---
--- Anything NOT matching those patterns stays static (tower, ground, deco).
+--   ChuteCanopy<idx>     → ivory canopy dome (the parachute)
+--   ChuteCrown<idx>      → small top vent disk (cap on canopy)
+--   ChuteFrame<idx>      → vertical cable from canopy to seat (cylinder)
+--   ChuteRider<idx>      → Seat hanging below canopy
+--   ChuteBasket<idx>     → wooden seat-back / basket the rider sits in
+--   ChuteRopeA/B/C/D<idx> → 4 suspension cords (canopy → basket corners)
+--   ChuteS<idx>_1..N     → burgundy stripe panels on the canopy
 
-local function buildLollipop(idx: number)
+local CANOPY_R       = 9            -- canopy half-width
+local CANOPY_H       = 7            -- canopy dome height
+local SEAT_DROP      = 14           -- distance from canopy bottom to seat top
+local STRIPE_COUNT   = 8            -- burgundy stripe panels per canopy
+
+local function buildChute(idx: number)
 	local ang = ((idx - 1) / CHUTE_COUNT) * math.pi * 2
 	local cx, cz = math.cos(ang) * CHUTE_ORBIT_R, math.sin(ang) * CHUTE_ORBIT_R
-	local discY  = TOP_Y                            -- top of cycle (disc center)
-	-- Rider seat sits ON TOP of the disc (the lollipop is the platform).
-	-- discY + disc-half-height (1.25) + seat-half-height (0.5) = +1.75
-	local seatY  = discY + 2.5
-	local stickY = discY + 11                       -- stick rises above seat/disc
 
-	-- Disc head (the candy puck): big flat cylinder oriented horizontally.
-	local disc = AB.part({
-		size  = Vector3.new(2.5, 22, 22),           -- 22-stud diameter disc, 2.5 tall
-		color = LOLLI_RED,
-		cf    = centerCF * CFrame.new(cx, discY, cz),
-		shape = Enum.PartType.Cylinder,
-		name  = "ChuteBasket" .. idx,               -- regex match → moves with chute
+	-- Y positions at TOP of cycle
+	local canopyY = TOP_Y                        -- canopy dome center
+	local cableY  = canopyY - SEAT_DROP * 0.5    -- middle of cable
+	local seatY   = canopyY - SEAT_DROP          -- rider seat
+	local basketY = seatY - 1.2                  -- basket frame under seat
+
+	-- Canopy dome (ivory hemisphere via flattened sphere)
+	local canopy = AB.part({
+		size  = Vector3.new(CANOPY_R * 2, CANOPY_H * 2, CANOPY_R * 2),
+		color = IVORY,
+		cf    = centerCF * CFrame.new(cx, canopyY, cz),
+		shape = Enum.PartType.Ball,
+		name  = "ChuteCanopy" .. idx,
 	}, m)
-	disc.Material = Enum.Material.SmoothPlastic
-	-- Roblox cylinder shape extrudes along X; rotate so flat face points up.
-	disc.CFrame = centerCF * CFrame.new(cx, discY, cz) * CFrame.Angles(0, 0, math.rad(90))
+	canopy.Material = Enum.Material.Fabric
 
-	-- Spiral stripes — nested rings on the disc face. Smaller rings sit
-	-- progressively higher (0.2 stud each) so all are visible from above
-	-- instead of being occluded by the outermost ring.
-	for s = 1, 6 do
-		local stripeR = 22 - (s - 1) * 3            -- outer→inner: 22, 19, 16, 13, 10, 7
-		local col     = (s % 2 == 0) and LOLLI_WHT or LOLLI_RED
-		local stripeY = discY + 1.3 + (s - 1) * 0.22
-		local topStripe = AB.part({
-			size  = Vector3.new(0.4, stripeR, stripeR),
-			color = col,
-			shape = Enum.PartType.Cylinder,
-			name  = "ChuteS" .. idx .. "_" .. s,    -- regex match → moves
-		}, m)
-		topStripe.Material = Enum.Material.SmoothPlastic
-		topStripe.CFrame = centerCF * CFrame.new(cx, stripeY, cz) * CFrame.Angles(0, 0, math.rad(90))
+	-- Top vent / crown disk
+	local crown = AB.part({
+		size  = Vector3.new(0.6, 4, 4),
+		color = BURGUNDY,
+		cf    = centerCF * CFrame.new(cx, canopyY + CANOPY_H * 0.85, cz)
+			* CFrame.Angles(0, 0, math.rad(90)),
+		shape = Enum.PartType.Cylinder,
+		name  = "ChuteCrown" .. idx,
+	}, m)
+	crown.Material = Enum.Material.Fabric
+
+	-- Burgundy stripe panels — radial slices around the canopy underside.
+	-- Each stripe is a flat narrow block angled outward from the canopy axis.
+	for s = 1, STRIPE_COUNT do
+		local sa = ((s - 1) / STRIPE_COUNT) * math.pi * 2
+		local sr = CANOPY_R * 0.78
+		local sx, sz = math.cos(sa) * sr, math.sin(sa) * sr
+		local stripeCol = (s % 2 == 0) and BURGUNDY or CRIMSON_GLOW
+		local stripe = AB.block(
+			Vector3.new(1.6, CANOPY_H * 1.1, 3.6),
+			stripeCol,
+			centerCF * CFrame.new(cx + sx, canopyY + 0.6, cz + sz)
+				* CFrame.Angles(0, -sa, math.rad(12)),
+			m,
+			"ChuteS" .. idx .. "_" .. s)
+		stripe.Material = Enum.Material.Fabric
 	end
 
-	-- Dome on top center (the candy's glossy bubble)
-	local dome = AB.sphere(7, LOLLI_RED,
-		centerCF * CFrame.new(cx, discY + 3.5, cz), m, "ChuteD" .. idx)
-	dome.Material    = Enum.Material.SmoothPlastic
-	dome.Reflectance = 0.05
+	-- Suspension cords: 4 ropes from canopy underside → basket corners
+	local ROPE_R    = CANOPY_R * 0.55
+	local ropeMidY  = (canopyY - CANOPY_H * 0.3 + basketY) / 2
+	local ropeLen   = (canopyY - CANOPY_H * 0.3) - basketY
+	local ropeSuffixes = {"A", "B", "C", "D"}
+	for r = 0, 3 do
+		local ra = math.rad(r * 90 + 45)
+		local rx, rz = math.cos(ra) * ROPE_R, math.sin(ra) * ROPE_R
+		-- Diagonal rope: from canopy edge inward to basket corner. Rendered
+		-- as a thin vertical cylinder. Names use ChuteRope{A,B,C,D}<idx> so
+		-- the RideController regex `^Chute[A-Za-z]+<idx>$` matches each one
+		-- (the underscore-numeric suffix variant is reserved for ChuteS<i>_N).
+		local rope = AB.cylinder(0.4, ropeLen, ROPE_COL,
+			centerCF * CFrame.new(cx + rx, ropeMidY, cz + rz),
+			m, "ChuteRope" .. ropeSuffixes[r + 1] .. idx)
+		rope.Material = Enum.Material.Fabric
+	end
 
-	-- Stick — white cylinder above the disc (looks like a lollipop handle
-	-- pointing skyward, also reads as the "cable" connecting to the carriage above).
-	local stick = AB.cylinder(2.4, 18, STICK,
-		centerCF * CFrame.new(cx, stickY, cz),
-		m, "ChuteFrame" .. idx)                     -- regex match → moves
-	stick.Material = Enum.Material.SmoothPlastic
+	-- Central cable (the visible structural cable connecting to the lattice
+	-- guide rail — preserves the ChuteFrame<idx> name the RideController reads).
+	local cableLen = (canopyY - CANOPY_H * 0.3) - seatY
+	local cable = AB.cylinder(0.6, cableLen, ANTIQUE_GOLD,
+		centerCF * CFrame.new(cx, cableY, cz),
+		m, "ChuteFrame" .. idx)
+	cable.Material = Enum.Material.Metal
 
-	-- Rider seat: sits on top face of the disc (the lollipop IS the carriage).
-	-- Keeping the seat above the disc guarantees it stays above ground at the
-	-- bottom of the fall cycle (disc bottom Y=5.75, seat Y=9.5 at bottom).
+	-- Basket frame (deep_wood crate under the seat) — gives the rider a clear
+	-- seat-platform silhouette below the canopy. Name uses ChuteBasket<idx>
+	-- which is the original RideController-tracked name.
+	local basket = AB.block(
+		Vector3.new(5, 2.2, 5),
+		DEEP_WOOD,
+		centerCF * CFrame.new(cx, basketY, cz),
+		m,
+		"ChuteBasket" .. idx)
+	basket.Material = Enum.Material.Wood
+
+	-- Gold trim around basket rim
+	for t = 0, 3 do
+		local ta = math.rad(t * 90)
+		local tx, tz = math.cos(ta) * 2.6, math.sin(ta) * 2.6
+		local trim = AB.block(
+			Vector3.new(5.2, 0.4, 0.5),
+			ANTIQUE_GOLD,
+			centerCF * CFrame.new(cx + tx, basketY + 1.05, cz + tz)
+				* CFrame.Angles(0, -ta, 0),
+			m,
+			"ChuteBasketTrim" .. idx)
+		trim.Material = Enum.Material.Metal
+	end
+
+	-- Rider seat
 	local seat = Instance.new("Seat")
-	seat.Name        = "ChuteRider" .. idx          -- regex match → moves
-	seat.Size        = Vector3.new(4, 1, 4)
+	seat.Name        = "ChuteRider" .. idx
+	seat.Size        = Vector3.new(3.5, 1, 3.5)
 	seat.Color       = SEAT_COL
 	seat.Material    = Enum.Material.SmoothPlastic
 	seat.Anchored    = true
@@ -237,36 +338,21 @@ local function buildLollipop(idx: number)
 	seat.TopSurface  = Enum.SurfaceType.Smooth
 	seat.Parent      = m
 
-	-- Decorative "basket rim" hanging just below the disc — gives the
-	-- parachute-basket silhouette without dropping the actual seat underground.
-	-- Names use a different "Chute<word><idx>" pattern (ChuteRim<idx>) so they
-	-- match the regex and translate with the chute.
-	for r = 0, 3 do
-		local ra = math.rad(r * 90)
-		local rx, rz = math.cos(ra) * 9, math.sin(ra) * 9
-		local rim = AB.block(
-			Vector3.new(0.6, 4, 0.6),
-			SEAT_COL,
-			centerCF * CFrame.new(cx + rx, discY - 2.5, cz + rz),
-			m,
-			"ChuteRim" .. idx
-		)
-		rim.Material = Enum.Material.Fabric
-	end
+	-- Tiny decorative finial above canopy crown (acts as a parachute "vent
+	-- ribbon" indicator). Uses ChuteD<idx> pattern from prior contract.
+	local finial = AB.sphere(1.6, ANTIQUE_GOLD2,
+		centerCF * CFrame.new(cx, canopyY + CANOPY_H * 0.95 + 1, cz),
+		m, "ChuteD" .. idx)
+	finial.Material = Enum.Material.Metal
 end
 
 for i = 1, CHUTE_COUNT do
-	buildLollipop(i)
+	buildChute(i)
 end
 
 -- ── Finalize ────────────────────────────────────────────────────────────────
 AB.weldAll(m)
--- IMPORTANT: anchorAll happens at RideController init; weldAll attached
--- everything to towerCore, but each frame the chutes use Position assignment
--- so welds to anchored parts only matter for any non-chute deco. All parts
--- are anchored anyway (AB.part defaults). Welds are harmless safety.
-
 m:PivotTo(originalPivot)
 
-print(("[RideRebuildParachuteJump] Rebuilt %d-chute Lollipop Drop (%d descendants)"):format(
+print(("[RideRebuildParachuteJump] Rebuilt classic Parachute Drop (%d chutes, %d descendants)"):format(
 	CHUTE_COUNT, #m:GetDescendants()))
