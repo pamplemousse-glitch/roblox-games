@@ -1,18 +1,21 @@
--- RideRebuildSwingCarousel: Cocktail Umbrella Swing rebuild for Frank's Fairground.
--- Replaces workspace.SwingCarousel with a 2×-footprint cocktail-umbrella swing
--- (striped paper canopy + 16 bendy-straw chairs) using AB primitives only.
+-- RideRebuildSwingCarousel: Belle-Époque Wave Swinger rebuild for Frank's Fairground.
+-- Replaces workspace.SwingCarousel with a classic wave-swinger ride — a striped
+-- conical canopy on a central spire with 16 chain-suspended wooden chairs.
 --
--- Pattern (per RIDE_REBUILD_PLAYBOOK.md "Universal contract"):
---   1. Wait briefly for the workspace to settle.
---   2. Bail (warn, no error) if Workspace.SwingCarousel doesn't exist.
---   3. Clone original into ServerStorage as a backup.
---   4. ClearAllChildren on the model (preserve the Model instance — RideController
---      and SPIN_RIDES read it by name on init).
---   5. Build the new umbrella swing under it at the original pivot, 2× footprint.
---   6. Preserve ChairGroup_1..ChairGroup_16 (each a Model containing one Seat,
---      one Chain* part, and decorative parts) — read by RideController swing-out.
---   7. PrimaryPart = CenterMast (preserved from previous build; weldAll uses it).
---   8. PivotTo(originalPivot) so the ride stays where it was.
+-- Per BELLE_EPOQUE_RIDE_PLAYBOOK.md "4. SwingCarousel → Wave Swinger":
+--   • Burgundy + ivory striped conical canopy (no cocktail umbrella aesthetic).
+--   • Antique-gold spire + decorative bands.
+--   • 16 wrought-iron chains suspending deep-wood seats with ivory backrests.
+--
+-- PROVEN CONSTANTS (do not change — verified by user playtest):
+--   MAST_HEIGHT = 26, CANOPY_RIM_R = 18, CHAIR_RADIUS = 16, PivotTo Y offset -16.
+--
+-- Named-part contract preserved (read by RideController buildSpin / swing-out):
+--   PivotAnchor (PrimaryPart, identity rotation)
+--   ChairGroup_1..ChairGroup_16 (Model) — each contains:
+--     Chain_<i>   — BasePart whose name starts "Chain" (fed into swing-out chains list)
+--     <other parts> — fed into swing-out parts list (`ChairSwing.parts`)
+--     RiderSeat   — Seat (RideController scans via `ch:IsA("Seat")`)
 
 local ServerStorage = game:GetService("ServerStorage")
 local AB            = require(game.ReplicatedStorage.Common.AssetBuilder)
@@ -28,60 +31,48 @@ end
 local originalPivot = m:GetPivot()
 
 -- 1. Back up the existing model (idempotent: replace prior backup if present).
-local prior = ServerStorage:FindFirstChild("SwingCarousel_PreFood_2026-06-03")
+local BACKUP_NAME = "SwingCarousel_PreBelleEpoque_2026-06-03"
+local prior = ServerStorage:FindFirstChild(BACKUP_NAME)
 if prior then prior:Destroy() end
 local backup  = m:Clone()
-backup.Name   = "SwingCarousel_PreFood_2026-06-03"
+backup.Name   = BACKUP_NAME
 backup.Parent = ServerStorage
 
--- 2. Clear children (preserve the Model itself).
+-- Also keep prior food-shape backup if it still exists (don't shadow it).
 m:ClearAllChildren()
 m.PrimaryPart = nil
 
--- ── Palette (cocktail umbrella + bendy straws) ──────────────────────────────
+-- ── Belle-Époque palette ────────────────────────────────────────────────────
 local C = {
-	paperRed   = Color3.fromRGB(210, 60, 60),    -- striped canopy wedge
-	paperCream = Color3.fromRGB(245, 230, 200),  -- striped canopy wedge
-	stem       = Color3.fromRGB(230, 215, 175),  -- paper umbrella stem (tan)
-	tip        = Color3.fromRGB(220, 70, 70),    -- canopy apex bead
-	goldRim    = Color3.fromRGB(220, 180, 60),   -- decorative gold accents
-	chainSilver= Color3.fromRGB(170, 170, 175),  -- chain ribbon
-	strawYellow= Color3.fromRGB(245, 220, 70),
-	strawPink  = Color3.fromRGB(245, 130, 175),
-	strawBlue  = Color3.fromRGB(85, 165, 230),
-	strawCream = Color3.fromRGB(245, 235, 215),
-	seatTan    = Color3.fromRGB(195, 160, 110),  -- bun-coloured seat pad
+	burgundy    = Color3.fromRGB(130,  30,  50),
+	ivory       = Color3.fromRGB(245, 235, 205),
+	antiqueGold = Color3.fromRGB(200, 160,  80),
+	deepWood    = Color3.fromRGB(110,  75,  45),
+	woodPlank   = Color3.fromRGB(160, 110,  70),
+	wroughtIron = Color3.fromRGB( 40,  35,  40),
+	cream       = Color3.fromRGB(230, 215, 180),
 }
 
--- ── Footprint sizing (Wave-Swinger, scaled for ground reachability) ─────────
--- User playtest: 44-stud mast pushed canopy up to Y=33+, chairs unreachable.
--- Reduced to 26-stud mast so chair-rest is at player head height.
+-- ── Footprint sizing (PROVEN — DO NOT CHANGE) ───────────────────────────────
 local MAST_HEIGHT     = 26
 local MAST_DIAMETER   = 3
 local CANOPY_RIM_R    = 18
 local CANOPY_APEX_Y   = MAST_HEIGHT          -- 26
 local CANOPY_RIM_Y    = MAST_HEIGHT - 10     -- 16
 local CHAIR_RADIUS    = 16      -- chairs hang just inside the rim
-local CHAIR_HANG_Y    = 14      -- top-of-chair Y (below the rim)
-local CHAIN_TOP_Y     = CANOPY_RIM_Y - 1     -- where the chain meets the rim underside
+local CHAIR_HANG_Y    = 14      -- top-of-chair Y
+local CHAIN_TOP_Y     = CANOPY_RIM_Y - 1     -- where chain meets rim underside
 local NUM_PANELS      = 16
 local NUM_CHAIRS      = 16
 
--- Local origin for the rebuild — everything is built around (0,0,0) then the
--- whole model is pivoted to originalPivot at the end so the ride lands where
--- it sat in the .rbxl.
 local O = CFrame.new(0, 0, 0)
 
--- ── 1. Center mast + invisible anchor ───────────────────────────────────────
--- The mast must use Roblox's X-aligned Cylinder shape rotated 90° around Z
--- to stand upright. But setting that rotated cylinder as PrimaryPart breaks
--- PivotTo at the end: PivotTo would un-rotate the model to make PrimaryPart's
--- CFrame match originalPivot (identity rotation), laying the whole canopy
--- on its side. The fix is a separate identity-rotation anchor part that
--- carries the model's pivot.
+-- ── 1. PivotAnchor (identity rotation, PrimaryPart) ─────────────────────────
+-- MUST be a non-rotated part — using the rotated cylinder mast as PrimaryPart
+-- would bake a 90° Z rotation that breaks final PivotTo (per playbook rule 5).
 local anchor = AB.part({
 	size         = Vector3.new(0.1, 0.1, 0.1),
-	color        = C.stem,
+	color        = Color3.new(1, 1, 1),
 	cf           = O,
 	canCollide   = false,
 	transparency = 1,
@@ -90,31 +81,40 @@ local anchor = AB.part({
 anchor:AddTag("Structural")
 m.PrimaryPart = anchor
 
+-- ── 2. Central spire (burgundy structural mast + gold finial) ───────────────
 local mast = AB.cylinder(
-	MAST_DIAMETER, MAST_HEIGHT, C.stem,
+	MAST_DIAMETER, MAST_HEIGHT, C.burgundy,
 	O * CFrame.new(0, MAST_HEIGHT / 2, 0),
 	m, "CenterMast"
 )
-mast:AddTag("Structural")    -- anchors partCentroid even with decorative chairs
+mast:AddTag("Structural")
 
--- Stem gold bands every ~10 studs for paper-umbrella detail.
-for i, y in { 8, 18, 28 } do
-	local band = AB.cylinder(MAST_DIAMETER + 0.4, 0.8, C.goldRim,
-		O * CFrame.new(0, y, 0), m, "StemBand_" .. i)
-	band:AddTag("Structural")
+-- Antique-gold base flange (where the spire meets the ground decking).
+AB.cylinder(MAST_DIAMETER + 3.5, 0.8, C.antiqueGold,
+	O * CFrame.new(0, 0.4, 0), m, "BaseFlange"):AddTag("Structural")
+AB.cylinder(MAST_DIAMETER + 5.5, 0.6, C.deepWood,
+	O * CFrame.new(0, 0.1, 0), m, "BasePlinth"):AddTag("Structural")
+
+-- Decorative gold rings along the mast.
+for i, y in { 6, 14, 22 } do
+	AB.cylinder(MAST_DIAMETER + 0.5, 0.7, C.antiqueGold,
+		O * CFrame.new(0, y, 0), m, "MastBand_" .. i):AddTag("Structural")
 end
 
--- Apex bead — the little red tip on a real cocktail umbrella.
-AB.sphere(2.2, C.tip, O * CFrame.new(0, CANOPY_APEX_Y + 1.2, 0), m, "ApexBead")
+-- Antique-gold spire above the canopy apex — the wave-swinger silhouette.
+AB.cylinder(MAST_DIAMETER * 0.6, 4.0, C.antiqueGold,
+	O * CFrame.new(0, CANOPY_APEX_Y + 2.0, 0), m, "SpireShaft"):AddTag("Structural")
+AB.sphere(2.4, C.antiqueGold,
+	O * CFrame.new(0, CANOPY_APEX_Y + 4.4, 0), m, "SpireBall")
+AB.cylinder(0.5, 3.0, C.antiqueGold,
+	O * CFrame.new(0, CANOPY_APEX_Y + 7.0, 0), m, "SpireFinial"):AddTag("Structural")
+AB.sphere(1.0, C.burgundy,
+	O * CFrame.new(0, CANOPY_APEX_Y + 8.7, 0), m, "FinialTip")
 
--- ── 2. Conical striped canopy (16 alternating wedge panels) ─────────────────
--- Each "panel" is a thin tilted block fanning out from the apex down to the rim.
--- 16 panels makes a clean stripe pattern (8 red + 8 cream alternating).
-local PANEL_LEN  = math.sqrt((CANOPY_APEX_Y - CANOPY_RIM_Y)^2 + CANOPY_RIM_R^2) -- ~28.8
--- Panel needs to slope DOWN-and-OUT from apex to rim. The original
--- atan2(R, h) was the complement of what's needed AND the wrong sign —
--- panels ended up tilting UP-and-OUT instead, building an inverted cone.
+-- ── 3. Striped conical canopy (16 alternating burgundy + ivory panels) ──────
+local PANEL_LEN  = math.sqrt((CANOPY_APEX_Y - CANOPY_RIM_Y)^2 + CANOPY_RIM_R^2)
 local PANEL_TILT = -math.atan2(CANOPY_APEX_Y - CANOPY_RIM_Y, CANOPY_RIM_R)
+local PANEL_WIDTH = 2 * math.pi * CANOPY_RIM_R / NUM_PANELS
 for i = 1, NUM_PANELS do
 	local yaw      = (i - 1) / NUM_PANELS * math.pi * 2
 	local midR     = CANOPY_RIM_R * 0.5
@@ -123,118 +123,117 @@ for i = 1, NUM_PANELS do
 		* CFrame.new(midR * math.cos(yaw), midY, midR * math.sin(yaw))
 		* CFrame.Angles(0, -yaw, 0)
 		* CFrame.Angles(0, 0, PANEL_TILT)
-	local col = (i % 2 == 1) and C.paperRed or C.paperCream
-	-- Wedge width: 2 * pi * r / 16 ≈ 9.4 studs at the rim.
+	local col = (i % 2 == 1) and C.burgundy or C.ivory
 	local panel = AB.block(
-		Vector3.new(PANEL_LEN, 0.3, 2 * math.pi * CANOPY_RIM_R / NUM_PANELS),
+		Vector3.new(PANEL_LEN, 0.4, PANEL_WIDTH),
 		col, panelCF, m, "CanopyPanel_" .. i
 	)
 	panel:AddTag("Structural")
 end
 
--- Canopy underside ring (cream) — hides the seam between panels, helps the
--- silhouette read as a solid umbrella from below.
+-- Canopy underside ring (deep wood — reads as the canopy's wooden ribbing).
 for i = 1, NUM_PANELS do
 	local yaw    = (i - 1) / NUM_PANELS * math.pi * 2 + (math.pi / NUM_PANELS)
 	local segCF  = O
-		* CFrame.new(CANOPY_RIM_R * math.cos(yaw), CANOPY_RIM_Y - 0.4, CANOPY_RIM_R * math.sin(yaw))
+		* CFrame.new(CANOPY_RIM_R * math.cos(yaw), CANOPY_RIM_Y - 0.5, CANOPY_RIM_R * math.sin(yaw))
 		* CFrame.Angles(0, -yaw, 0)
-	AB.block(Vector3.new(1.2, 0.6, 2 * math.pi * CANOPY_RIM_R / NUM_PANELS),
-		C.paperCream, segCF, m, "CanopyRim_" .. i)
+	AB.block(Vector3.new(1.4, 0.5, PANEL_WIDTH),
+		C.deepWood, segCF, m, "CanopyRim_" .. i)
 end
 
--- Gold rim ring on the rim's outer edge for a touch of belle-époque sparkle.
+-- Antique-gold trim ring along the outer rim edge.
 for i = 1, NUM_PANELS do
 	local yaw    = (i - 1) / NUM_PANELS * math.pi * 2 + (math.pi / NUM_PANELS)
 	local segCF  = O
-		* CFrame.new((CANOPY_RIM_R + 0.4) * math.cos(yaw), CANOPY_RIM_Y - 0.1, (CANOPY_RIM_R + 0.4) * math.sin(yaw))
+		* CFrame.new((CANOPY_RIM_R + 0.5) * math.cos(yaw), CANOPY_RIM_Y - 0.1, (CANOPY_RIM_R + 0.5) * math.sin(yaw))
 		* CFrame.Angles(0, -yaw, 0)
-	AB.block(Vector3.new(0.4, 0.4, 2 * math.pi * CANOPY_RIM_R / NUM_PANELS),
-		C.goldRim, segCF, m, "GoldRim_" .. i)
+	AB.block(Vector3.new(0.5, 0.5, PANEL_WIDTH),
+		C.antiqueGold, segCF, m, "GoldRim_" .. i)
 end
 
--- ── 3. 16 chair groups (bendy straws) ───────────────────────────────────────
+-- Decorative ivory pennants hanging between every other rim segment.
+for i = 1, NUM_PANELS, 2 do
+	local yaw    = (i - 1) / NUM_PANELS * math.pi * 2 + (math.pi / NUM_PANELS)
+	local segCF  = O
+		* CFrame.new((CANOPY_RIM_R + 0.2) * math.cos(yaw), CANOPY_RIM_Y - 1.6, (CANOPY_RIM_R + 0.2) * math.sin(yaw))
+		* CFrame.Angles(0, -yaw, 0)
+	AB.wedge(Vector3.new(0.2, 1.6, 2.0), C.ivory, segCF, m, "Pennant_" .. i)
+end
+
+-- ── 4. 16 chair groups (wrought-iron chain + deep-wood chair) ───────────────
 -- Each ChairGroup_i Model contains:
---   • Chain_i        — silver rod from canopy rim down to chair top
---   • StrawVert_i    — vertical straw segment (the "leg" of the bendy straw)
---   • StrawBend_i    — diagonal segment forming the 90° bend
---   • StrawHoriz_i   — horizontal segment — this is also the seat plank shape
---   • SeatPad_i      — small bun-coloured pad on top of horizontal segment
---   • RiderSeat      — the actual Seat (RideController scans for `ch:IsA("Seat")`)
--- The first Chain* part feeds the swing-out chains list; other parts feed
--- the swing-out parts list (`ChairSwing.parts`).
-local STRAW_COLORS = { C.strawYellow, C.strawPink, C.strawBlue, C.strawCream }
+--   • Chain_i      — wrought-iron suspension chain (name starts "Chain")
+--   • SeatPlank_i  — deep-wood seat plank
+--   • Backrest_i   — ivory backrest with burgundy trim
+--   • SeatPad_i    — cream cushion
+--   • RiderSeat    — invisible Seat (boarding target)
 for i = 1, NUM_CHAIRS do
 	local yaw   = (i - 1) / NUM_CHAIRS * math.pi * 2
 	local cx    = CHAIR_RADIUS * math.cos(yaw)
 	local cz    = CHAIR_RADIUS * math.sin(yaw)
 	local group = AB.model("ChairGroup_" .. i, m)
 
-	-- Chain ribbon: thin silver rod from the rim down to the top of the chair.
-	local chainLen = CHAIN_TOP_Y - CHAIR_HANG_Y - 3
-	local chainCF  = O * CFrame.new(cx, CHAIR_HANG_Y + 3 + chainLen / 2, cz)
-	AB.block(Vector3.new(0.3, chainLen, 0.3), C.chainSilver, chainCF, group, "Chain_" .. i)
+	-- Wrought-iron chain from the rim down to chair top.
+	local chainLen = CHAIN_TOP_Y - CHAIR_HANG_Y - 1
+	local chainCF  = O * CFrame.new(cx, CHAIR_HANG_Y + 1 + chainLen / 2, cz)
+	AB.block(Vector3.new(0.35, chainLen, 0.35), C.wroughtIron, chainCF, group, "Chain_" .. i)
 
-	-- Bendy-straw chair: striped paper umbrella sits above a coloured straw.
-	local color = STRAW_COLORS[((i - 1) % #STRAW_COLORS) + 1]
+	-- A second thinner chain a stud forward for visual depth.
+	local chain2CF = O * CFrame.new(cx, CHAIR_HANG_Y + 1 + chainLen / 2, cz)
+		* CFrame.Angles(0, -yaw, 0) * CFrame.new(0, 0, 0.6)
+	AB.block(Vector3.new(0.25, chainLen, 0.25), C.wroughtIron, chain2CF, group, "ChainAux_" .. i)
 
-	-- Vertical segment of the straw (hangs down).
-	local vertCF = O * CFrame.new(cx, CHAIR_HANG_Y + 1.5, cz)
-	AB.cylinder(1.0, 3.5, color, vertCF, group, "StrawVert_" .. i)
+	-- Chain hub at the rim (gold link plate where chain meets canopy underside).
+	local hubCF = O * CFrame.new(cx, CHAIN_TOP_Y - 0.2, cz)
+	AB.block(Vector3.new(1.0, 0.4, 1.0), C.antiqueGold, hubCF, group, "ChainHub_" .. i)
 
-	-- 45° bend joining vertical to horizontal — sells the bendy-straw shape.
-	-- Aim the bend outward (away from the mast) so the seat sits on a small
-	-- shelf protruding outward.
+	-- Deep-wood seat plank (the chair seat itself).
+	local seatY     = CHAIR_HANG_Y
+	local plankCF   = O * CFrame.new(cx, seatY, cz) * CFrame.Angles(0, -yaw, 0)
+	AB.block(Vector3.new(2.6, 0.5, 1.8), C.deepWood, plankCF, group, "SeatPlank_" .. i)
+
+	-- Cream cushion on top of the plank.
+	local cushCF = O * CFrame.new(cx, seatY + 0.4, cz) * CFrame.Angles(0, -yaw, 0)
+	AB.block(Vector3.new(2.4, 0.3, 1.6), C.cream, cushCF, group, "SeatPad_" .. i)
+
+	-- Ivory backrest (facing inward — the rider faces outward as the ride spins).
 	local outX, outZ = math.cos(yaw), math.sin(yaw)
-	local bendCF = O
-		* CFrame.new(cx + outX * 0.9, CHAIR_HANG_Y - 0.4, cz + outZ * 0.9)
-		* CFrame.Angles(0, -yaw, 0)
-		* CFrame.Angles(0, 0, math.rad(45))
-	AB.cylinder(1.0, 2.6, color, bendCF, group, "StrawBend_" .. i)
+	local backX = cx + outX * (-0.9)   -- backrest sits behind rider (toward mast)
+	local backZ = cz + outZ * (-0.9)
+	local backCF = O * CFrame.new(backX, seatY + 1.4, backZ) * CFrame.Angles(0, -yaw, 0)
+	AB.block(Vector3.new(0.4, 2.2, 1.8), C.ivory, backCF, group, "Backrest_" .. i)
 
-	-- Horizontal seat plank (the bottom of the bendy straw).
-	local seatX = cx + outX * 2.2
-	local seatZ = cz + outZ * 2.2
-	local seatY = CHAIR_HANG_Y - 1.4
-	local horizCF = O * CFrame.new(seatX, seatY, seatZ) * CFrame.Angles(0, -yaw, 0)
-	AB.cylinder(1.0, 3.2, color, horizCF, group, "StrawHoriz_" .. i)
+	-- Burgundy trim cap on top of the backrest.
+	local trimCF = O * CFrame.new(backX, seatY + 2.6, backZ) * CFrame.Angles(0, -yaw, 0)
+	AB.block(Vector3.new(0.5, 0.25, 1.9), C.burgundy, trimCF, group, "BackrestTrim_" .. i)
 
-	-- Bun-coloured seat pad sitting on top of the horizontal straw.
-	local padCF = O * CFrame.new(seatX, seatY + 0.6, seatZ) * CFrame.Angles(0, -yaw, 0)
-	AB.block(Vector3.new(2.6, 0.4, 1.8), C.seatTan, padCF, group, "SeatPad_" .. i)
-
-	-- The actual Seat — must be a child of the ChairGroup so RideController's
-	-- swing-out scanner finds it via `ch:IsA("Seat")`.
+	-- The actual Seat — child of ChairGroup so RideController finds it.
 	local seat = Instance.new("Seat")
-	seat.Name        = "RiderSeat"
-	seat.Size        = Vector3.new(2.4, 0.6, 1.6)
-	seat.Color       = C.seatTan
-	seat.Material    = Enum.Material.SmoothPlastic
-	seat.Anchored    = true
-	seat.CanCollide  = true
-	seat.TopSurface  = Enum.SurfaceType.Smooth
+	seat.Name          = "RiderSeat"
+	seat.Size          = Vector3.new(2.4, 0.6, 1.6)
+	seat.Color         = C.deepWood
+	seat.Material      = Enum.Material.SmoothPlastic
+	seat.Anchored      = true
+	seat.CanCollide    = true
+	seat.TopSurface    = Enum.SurfaceType.Smooth
 	seat.BottomSurface = Enum.SurfaceType.Smooth
-	seat.CFrame      = O * CFrame.new(seatX, seatY + 1.0, seatZ) * CFrame.Angles(0, -yaw, 0)
-	seat.Parent      = group
+	seat.Transparency  = 1   -- visual is the SeatPlank+SeatPad; Seat is the mount target
+	seat.CFrame        = O * CFrame.new(cx, seatY + 0.7, cz) * CFrame.Angles(0, -yaw, 0)
+	seat.Parent        = group
 
-	-- Boarding prompt directly on the seat (mirrors the gallop-rider pattern in
-	-- RideController; the spawned BoardZone path no-ops because Seats aren't
-	-- direct children of the SwingCarousel Model).
+	-- Boarding prompt on the seat (mirrors gallop-rider pattern).
 	local prompt = Instance.new("ProximityPrompt")
 	prompt.ActionText            = "Board"
-	prompt.ObjectText            = "Cocktail Swing"
+	prompt.ObjectText            = "Wave Swinger"
 	prompt.MaxActivationDistance = 8
 	prompt.RequiresLineOfSight   = false
 	prompt.Parent                = seat
 end
 
--- ── 4. Weld + reposition ────────────────────────────────────────────────────
+-- ── 5. Weld + reposition ────────────────────────────────────────────────────
 AB.weldAll(m)
--- Anchor sits at originalPivot.Y - 16 so the mast base lands near ground
--- (originalPivot.Y was ~17.6 in the .rbxl). With MAST_HEIGHT=26, canopy
--- rim is at Y≈16-17 — chairs hanging from chains 10 stud long sit at
--- Y≈6-7, within player reach.
+-- PROVEN offset: originalPivot.Y was ~17.6 in the .rbxl; -16 lands base near ground.
 m:PivotTo(originalPivot * CFrame.new(0, -16, 0))
 
-print(string.format("[RideRebuildSwingCarousel] Cocktail Umbrella Swing built (%d descendants, PrimaryPart=%s)",
+print(string.format("[RideRebuildSwingCarousel] Belle-Époque Wave Swinger built (%d descendants, PrimaryPart=%s)",
 	#m:GetDescendants(), m.PrimaryPart and m.PrimaryPart.Name or "nil"))
