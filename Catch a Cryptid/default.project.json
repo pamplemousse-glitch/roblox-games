@@ -1,0 +1,26 @@
+{
+  "name": "CatchACryptid",
+  "tree": {
+    "$className": "DataModel",
+    "ServerScriptService": {
+      "$className": "ServerScriptService",
+      "$path": "src/Server"
+    },
+    "ReplicatedStorage": {
+      "$className": "ReplicatedStorage",
+      "Common": {
+        "$path": "src/Common"
+      },
+      "Assets": {
+        "$path": "src/Assets"
+      }
+    },
+    "StarterPlayer": {
+      "$className": "StarterPlayer",
+      "StarterPlayerScripts": {
+        "$className": "StarterPlayerScripts",
+        "$path": "src/Client"
+      }
+    }
+  }
+}
